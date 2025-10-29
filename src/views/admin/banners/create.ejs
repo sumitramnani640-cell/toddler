@@ -1,0 +1,108 @@
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-plus mr-2"></i>Add New Banner
+                </h3>
+            </div>
+            <form action="/admin/banners" method="POST" enctype="multipart/form-data">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="title">Banner Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                        <small class="form-text text-muted">Enter a descriptive title for the banner</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Banner Image <span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="image" name="image" accept="image/*" required>
+                            <label class="custom-file-label" for="image">Choose file</label>
+                        </div>
+                        <small class="form-text text-muted">Supported formats: JPG, PNG, GIF, WebP. Max size: 5MB</small>
+                    </div>
+
+                    <div class="form-group">
+                        <div id="imagePreview" class="mt-2" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width: 100%; max-height: 300px;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Create Banner
+                    </button>
+                    <a href="/admin/banners" class="btn btn-secondary ml-2">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle mr-2"></i>Banner Guidelines
+                </h3>
+            </div>
+            <div class="card-body">
+                <h5>Image Requirements</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success mr-2"></i>High quality images</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Good contrast and visibility</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Appropriate dimensions</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>File size under 5MB</li>
+                </ul>
+
+                <h5>Recommended Dimensions</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-info text-info mr-2"></i>Hero Banner: 1920x600px</li>
+                    <li><i class="fas fa-info text-info mr-2"></i>Side Banner: 300x250px</li>
+                    <li><i class="fas fa-info text-info mr-2"></i>Square Banner: 400x400px</li>
+                </ul>
+
+                <h5>Best Practices</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success mr-2"></i>Use clear, readable text</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Keep design simple</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Use brand colors</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Test on different devices</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Image preview functionality
+    document.getElementById('image').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+    });
+
+    // Update custom file label
+    document.getElementById('image').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file';
+        document.querySelector('.custom-file-label').textContent = fileName;
+    });
+</script>

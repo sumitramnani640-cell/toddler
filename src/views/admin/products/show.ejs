@@ -1,0 +1,148 @@
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-box mr-2"></i>Product Details: <%= product.name %>
+                </h3>
+                <div class="card-tools">
+                    <a href="/admin/products/<%= product.id %>/edit" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <% if (product.image) { %>
+                            <img src="<%= product.image %>" alt="<%= product.name %>" class="img-fluid rounded">
+                        <% } else { %>
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-3x mb-2"></i>
+                                    <p>No image available</p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="col-md-8">
+                        <dl class="row">
+                            <dt class="col-sm-3">Name:</dt>
+                            <dd class="col-sm-9"><strong><%= product.name %></strong></dd>
+                            
+                            <dt class="col-sm-3">Description:</dt>
+                            <dd class="col-sm-9"><%= product.description || 'No description available' %></dd>
+                            
+                            <dt class="col-sm-3">Price:</dt>
+                            <dd class="col-sm-9">
+                                <span class="h4 text-primary">$<%= parseFloat(product.price).toFixed(2) %></span>
+                            </dd>
+                            
+                            <dt class="col-sm-3">Stock:</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge badge-<%= product.stock > 0 ? 'success' : 'danger' %> badge-lg">
+                                    <%= product.stock %> units
+                                </span>
+                            </dd>
+                            
+                            <dt class="col-sm-3">Category:</dt>
+                            <dd class="col-sm-9">
+                                <% if (product.category) { %>
+                                    <a href="/admin/categories/<%= product.category.id %>" class="badge badge-info">
+                                        <%= product.category.name %>
+                                    </a>
+                                <% } else { %>
+                                    <span class="text-muted">No category assigned</span>
+                                <% } %>
+                            </dd>
+                            
+                            <dt class="col-sm-3">Status:</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge badge-<%= product.status === 'active' ? 'success' : 'secondary' %>">
+                                    <%= product.status %>
+                                </span>
+                            </dd>
+                            
+                            <dt class="col-sm-3">Created:</dt>
+                            <dd class="col-sm-9"><%= new Date(product.createdAt).toLocaleString() %></dd>
+                            
+                            <dt class="col-sm-3">Updated:</dt>
+                            <dd class="col-sm-9"><%= new Date(product.updatedAt).toLocaleString() %></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/admin/products" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Products
+                </a>
+                <a href="/admin/products/<%= product.id %>/edit" class="btn btn-warning ml-2">
+                    <i class="fas fa-edit mr-1"></i> Edit Product
+                </a>
+                <form action="/admin/products/<%= product.id %>" method="POST" class="d-inline ml-2">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger delete-btn">
+                        <i class="fas fa-trash mr-1"></i> Delete Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar mr-2"></i>Quick Stats
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info">
+                                <i class="fas fa-dollar-sign"></i>
+                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Price</span>
+                                <span class="info-box-number">$<%= parseFloat(product.price).toFixed(2) %></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success">
+                                <i class="fas fa-boxes"></i>
+                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Stock</span>
+                                <span class="info-box-number"><%= product.stock %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tools mr-2"></i>Quick Actions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/admin/products/<%= product.id %>/edit" class="btn btn-warning">
+                        <i class="fas fa-edit mr-1"></i> Edit Product
+                    </a>
+                    <a href="/admin/products/create" class="btn btn-primary">
+                        <i class="fas fa-plus mr-1"></i> Add Similar Product
+                    </a>
+                    <a href="/admin/categories" class="btn btn-info">
+                        <i class="fas fa-tags mr-1"></i> Manage Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

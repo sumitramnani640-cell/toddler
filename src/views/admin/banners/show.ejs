@@ -1,0 +1,111 @@
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-images mr-2"></i>Banner Details: <%= banner.title %>
+                </h3>
+                <div class="card-tools">
+                    <a href="/admin/banners/<%= banner.id %>/edit" class="btn btn-warning btn-sm">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <% if (banner.image) { %>
+                            <img src="<%= banner.image %>" alt="<%= banner.title %>" class="img-fluid rounded">
+                        <% } else { %>
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-3x mb-2"></i>
+                                    <p>No image available</p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Title:</dt>
+                            <dd class="col-sm-8"><strong><%= banner.title %></strong></dd>
+                            
+                            <dt class="col-sm-4">Status:</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge badge-<%= banner.status === 'active' ? 'success' : 'secondary' %>">
+                                    <%= banner.status %>
+                                </span>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Created:</dt>
+                            <dd class="col-sm-8"><%= new Date(banner.createdAt).toLocaleString() %></dd>
+                            
+                            <dt class="col-sm-4">Updated:</dt>
+                            <dd class="col-sm-8"><%= new Date(banner.updatedAt).toLocaleString() %></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/admin/banners" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Banners
+                </a>
+                <a href="/admin/banners/<%= banner.id %>/edit" class="btn btn-warning ml-2">
+                    <i class="fas fa-edit mr-1"></i> Edit Banner
+                </a>
+                <form action="/admin/banners/<%= banner.id %>" method="POST" class="d-inline ml-2">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger delete-btn">
+                        <i class="fas fa-trash mr-1"></i> Delete Banner
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar mr-2"></i>Banner Stats
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="info-box">
+                    <span class="info-box-icon bg-info">
+                        <i class="fas fa-images"></i>
+                    </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Status</span>
+                        <span class="info-box-number">
+                            <span class="badge badge-<%= banner.status === 'active' ? 'success' : 'secondary' %>">
+                                <%= banner.status %>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tools mr-2"></i>Quick Actions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/admin/banners/<%= banner.id %>/edit" class="btn btn-warning">
+                        <i class="fas fa-edit mr-1"></i> Edit Banner
+                    </a>
+                    <a href="/admin/banners/create" class="btn btn-primary">
+                        <i class="fas fa-plus mr-1"></i> Add Banner
+                    </a>
+                    <a href="/" class="btn btn-info" target="_blank">
+                        <i class="fas fa-external-link-alt mr-1"></i> View Website
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

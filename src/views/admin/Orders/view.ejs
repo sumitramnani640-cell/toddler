@@ -1,0 +1,67 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title"><i class="fas fa-receipt mr-2"></i>Order #<%= order.order_number %></h3>
+        <div>
+            <a href="/admin/orders/<%= order.id %>/edit" class="btn btn-warning btn-sm mr-2">
+                <i class="fas fa-edit mr-1"></i> Edit
+            </a>
+            <form action="/admin/orders/<%= order.id %>?_method=DELETE" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this order?');">
+                    <i class="fas fa-trash mr-1"></i> Delete
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-4">Customer:</dt>
+            <dd class="col-sm-8">
+                <% if (order.user) { %>
+                    <strong><%= order.user.name %></strong><br>
+                    <small><%= order.user.email %></small>
+                <% } else { %>
+                    <span class="text-muted">Guest Checkout</span>
+                <% } %>
+            </dd>
+
+            <dt class="col-sm-4">Total Amount:</dt>
+            <dd class="col-sm-8">$<%= order.total_amount %></dd>
+
+            <!-- <dt class="col-sm-4">Payment Method:</dt>
+            <dd class="col-sm-8"><%= order.payment_method || 'N/A' %></dd> -->
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8"><span class="badge badge-info"><%= order.status %></span></dd>
+
+            <!-- <dt class="col-sm-4">Address:</dt>
+            <dd class="col-sm-8"><%= order.address || 'N/A' %></dd> -->
+
+            <dt class="col-sm-4">Created:</dt>
+            <dd class="col-sm-8"><%= new Date(order.createdAt).toLocaleDateString() %></dd>
+        </dl>
+
+        <% if (order.items && order.items.length > 0) { %>
+            <h5 class="mt-4">Order Items</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                </thead>
+                <tbody>
+                    <% order.items.forEach(item => { %>
+                        <tr>
+                            <td><%= item.product ? item.product.name : 'Deleted Product' %></td>
+                            <td><%= item.quantity %></td>
+                            <td>$<%= item.price %></td>
+                            <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+
+    <div class="card-footer">
+        <a href="/admin/orders" class="btn btn-secondary"><i class="fas fa-arrow-left mr-1"></i> Back</a>
+    </div>
+</div>

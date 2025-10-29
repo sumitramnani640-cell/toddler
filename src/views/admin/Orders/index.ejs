@@ -1,0 +1,72 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title"><i class="fas fa-shopping-cart mr-2"></i>All Orders</h3>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>ID</th>
+                        <th>userID</th>
+                        <th>totalAmount</th>
+                        <th>Status</th>
+                        <th>createdAt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (orders && orders.length > 0) { %>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order.id %></td>
+                                <td><strong>#<%= order.order_number %></strong></td>
+                                <td>
+                                    <% if (order.user) { %>
+                                        <%= order.user.name %><br>
+                                        <small class="text-muted"><%= order.user.email %></small>
+                                    <% } else { %>
+                                        <span class="text-muted">Guest</span>
+                                    <% } %>
+                                </td>
+                                <td>$<%= order.total_amount %></td>
+                                <td>
+                                    <span class="badge badge-<%= order.status === 'delivered' ? 'success' :
+                                        order.status === 'processing' ? 'info' :
+                                        order.status === 'pending' ? 'warning' :
+                                        order.status === 'cancelled' ? 'danger' : 'secondary' %>">
+                                        <%= order.status %>
+                                    </span>
+                                </td>
+                                <td><%= order.payment_method || 'N/A' %></td>
+                                <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                <td>
+                                    <div class="btn-group"  role="group">
+                                        <!-- View -->
+                                        <a href="/admin/Orders/<%= order.id %>" class="btn btn-info btn-sm" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <!-- Edit -->
+                                        <a href="/admin/Orders/<%= order.id %>/edit" class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <!-- Delete -->
+                                        <form action="/admin/Orders/<%= order.id %>?_method=DELETE" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this order?');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">No orders found</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

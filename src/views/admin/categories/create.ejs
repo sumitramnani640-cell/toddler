@@ -1,0 +1,96 @@
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-plus mr-2"></i>Add New Category
+                </h3>
+            </div>
+            <form action="/admin/categories" method="POST">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="name">Category Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                        <small class="form-text text-muted">Enter a descriptive name for the category</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="slug">Slug <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="slug" name="slug" required>
+                        <small class="form-text text-muted">URL-friendly version of the name (lowercase, no spaces)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter category description"></textarea>
+                        <small class="form-text text-muted">Optional description for the category</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i> Create Category
+                    </button>
+                    <a href="/admin/categories" class="btn btn-secondary ml-2">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle mr-2"></i>Category Guidelines
+                </h3>
+            </div>
+            <div class="card-body">
+                <h5>Category Information</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success mr-2"></i>Use clear, descriptive names</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Keep names concise</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Use consistent naming</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Include helpful descriptions</li>
+                </ul>
+
+                <h5>Slug Requirements</h5>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success mr-2"></i>Lowercase letters only</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Use hyphens for spaces</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>No special characters</li>
+                    <li><i class="fas fa-check text-success mr-2"></i>Must be unique</li>
+                </ul>
+
+                <h5>Examples</h5>
+                <ul class="list-unstyled">
+                    <li><strong>Name:</strong> Fresh Vegetables</li>
+                    <li><strong>Slug:</strong> fresh-vegetables</li>
+                    <li><strong>Name:</strong> Dairy Products</li>
+                    <li><strong>Slug:</strong> dairy-products</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-generate slug from name
+    document.getElementById('name').addEventListener('input', function(e) {
+        const name = e.target.value;
+        const slug = name.toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single
+            .trim();
+        document.getElementById('slug').value = slug;
+    });
+</script>
