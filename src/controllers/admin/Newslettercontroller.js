@@ -1,43 +1,75 @@
-const db = require('../models');
-const Newsletter = db.Newsletter;
+const { Newsletter } = require('../../models');
 
-// Subscribe to newsletter (frontend)
-exports.subscribe = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).send('Email is required');
+const newsletterController = {
+    // List all subscribers
+    index: async (req, res) => {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = 10;
+            const offset = (page - 1) * limit;
 
-    const exists = await Newsletter.findOne({ where: { email } });
-    if (exists) return res.status(400).send('Already subscribed');
+            const { count, rows: subscribers } = await Newsletter.findAndCountAll({
+                order: [['subscribedAt', 'DESC']],
+                limit: limit,
+                offset: offset
+            });
 
-    await Newsletter.create({ email });
-    res.status(200).send('Subscribed successfully');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
+            const totalPages = Math.ceil(count / limit);
+
+            res.render('admin/newsletter/index', {
+                title: 'Newsletter Subscribers - Admin Panel',
+                subscribers,
+                currentPage: page,
+                totalPages,
+                totalSubscribers: count
+            });
+        } catch (error) {
+            console.error('Newsletter index error:', error);
+            req.flash('error_msg', 'Error loading subscribers');
+            res.redirect('/admin/dashboard');
+        }
+    },
+
+    // Add subscriber (frontend)
+    subscribe: async (req, res) => {
+        try {
+            const { email } = req.body;
+            if (!email) {
+                return res.status(400).send('Email is required');
+            }
+
+            const exists = await Newsletter.findOne({ where: { email } });
+            if (exists) {
+                return res.status(400).send('Already subscribed');
+            }
+
+            await Newsletter.create({ email });
+            res.status(200).send('Subscribed successfully');
+        } catch (error) {
+            console.error('Newsletter subscribe error:', error);
+            res.status(500).send('Server error');
+        }
+    },
+
+    // Delete subscriber
+    destroy: async (req, res) => {
+        try {
+            const subscriber = await Newsletter.findByPk(req.params.id);
+
+            if (!subscriber) {
+                req.flash('error_msg', 'Subscriber not found');
+                return res.redirect('/admin/newsletter');
+            }
+
+            await subscriber.destroy();
+            req.flash('success_msg', 'Subscriber deleted successfully');
+            res.redirect('/admin/newsletter');
+        } catch (error) {
+            console.error('Newsletter delete error:', error);
+            req.flash('error_msg', 'Error deleting subscriber');
+            res.redirect('/admin/newsletter');
+        }
+    }
 };
 
-// Get all subscribers (admin)
-exports.getAll = async (req, res) => {
-  try {
-    const subscribers = await Newsletter.findAll({
-      order: [['subscribedAt', 'DESC']],
-    });
-    res.render('admin/newsletters', { subscribers });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
-};
-
-// Delete subscriber (admin)
-exports.deleteSubscriber = async (req, res) => {
-  try {
-    await Newsletter.destroy({ where: { id: req.params.id } });
-    res.redirect('/admin/newsletters');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
-};
+module.exports = newsletterController;

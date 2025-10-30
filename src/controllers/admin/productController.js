@@ -1,9 +1,9 @@
 const { Product, Category } = require('../../models');
 const path = require('path');
 const fs = require('fs').promises;
-
-// Configure multer for file uploads
 const multer = require('multer');
+
+// -------------------- Multer Configuration --------------------
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/uploads/products/');
@@ -15,23 +15,18 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
-    },
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (req, file, cb) => {
         const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Only image files are allowed!'));
-        }
+        if (mimetype && extname) cb(null, true);
+        else cb(new Error('Only image files (JPG, PNG, GIF, WebP) are allowed!'));
     }
 });
 
+// -------------------- Product Controller --------------------
 const productController = {
     // List all products
     index: async (req, res) => {
@@ -47,8 +42,8 @@ const productController = {
                     attributes: ['name']
                 }],
                 order: [['createdAt', 'DESC']],
-                limit: limit,
-                offset: offset
+                limit,
+                offset
             });
 
             const totalPages = Math.ceil(count / limit);
@@ -92,7 +87,6 @@ const productController = {
     store: async (req, res) => {
         try {
             const uploadMiddleware = upload.single('image');
-            
             uploadMiddleware(req, res, async (err) => {
                 if (err) {
                     req.flash('error_msg', err.message);
@@ -100,26 +94,33 @@ const productController = {
                 }
 
                 const { name, description, price, stock, category_id, status } = req.body;
-                let imagePath = null;
 
-                if (req.file) {
-                    imagePath = '/uploads/products/' + req.file.filename;
+                // ✅ Validate numeric fields
+                const parsedPrice = parseFloat(price);
+                const parsedStock = parseInt(stock);
+                const parsedCategoryId = parseInt(category_id);
+
+                if (!name || isNaN(parsedPrice) || isNaN(parsedStock) || isNaN(parsedCategoryId)) {
+                    req.flash('error_msg', 'Please fill all required fields correctly.');
+                    return res.redirect('/admin/products/create');
                 }
 
-                const product = await Product.create({
+                let imagePath = null;
+                if (req.file) imagePath = '/uploads/products/' + req.file.filename;
+
+                await Product.create({
                     name,
                     description,
-                    price: parseFloat(price),
-                    stock: parseInt(stock),
+                    price: parsedPrice,
+                    stock: parsedStock,
                     image: imagePath,
-                    category_id: parseInt(category_id),
+                    category_id: parsedCategoryId,
                     status: status || 'active'
                 });
 
                 req.flash('success_msg', 'Product created successfully');
                 res.redirect('/admin/products');
             });
-
         } catch (error) {
             console.error('Product store error:', error);
             req.flash('error_msg', 'Error creating product');
@@ -131,10 +132,7 @@ const productController = {
     show: async (req, res) => {
         try {
             const product = await Product.findByPk(req.params.id, {
-                include: [{
-                    model: Category,
-                    as: 'category'
-                }]
+                include: [{ model: Category, as: 'category' }]
             });
 
             if (!product) {
@@ -187,7 +185,6 @@ const productController = {
     update: async (req, res) => {
         try {
             const uploadMiddleware = upload.single('image');
-            
             uploadMiddleware(req, res, async (err) => {
                 if (err) {
                     req.flash('error_msg', err.message);
@@ -201,11 +198,19 @@ const productController = {
                 }
 
                 const { name, description, price, stock, category_id, status } = req.body;
+                const parsedPrice = parseFloat(price);
+                const parsedStock = parseInt(stock);
+                const parsedCategoryId = parseInt(category_id);
+
+                if (!name || isNaN(parsedPrice) || isNaN(parsedStock) || isNaN(parsedCategoryId)) {
+                    req.flash('error_msg', 'Please fill all required fields correctly.');
+                    return res.redirect(`/admin/products/${req.params.id}/edit`);
+                }
+
                 let imagePath = product.image;
 
-                // If new image uploaded, delete old image and use new one
+                // ✅ Replace image if new one uploaded
                 if (req.file) {
-                    // Delete old image if exists
                     if (product.image) {
                         const oldImagePath = path.join('public', product.image);
                         try {
@@ -220,17 +225,16 @@ const productController = {
                 await product.update({
                     name,
                     description,
-                    price: parseFloat(price),
-                    stock: parseInt(stock),
+                    price: parsedPrice,
+                    stock: parsedStock,
                     image: imagePath,
-                    category_id: parseInt(category_id),
+                    category_id: parsedCategoryId,
                     status: status || 'active'
                 });
 
                 req.flash('success_msg', 'Product updated successfully');
                 res.redirect('/admin/products');
             });
-
         } catch (error) {
             console.error('Product update error:', error);
             req.flash('error_msg', 'Error updating product');
@@ -247,7 +251,7 @@ const productController = {
                 return res.redirect('/admin/products');
             }
 
-            // Delete image file if exists
+            // ✅ Delete image if exists
             if (product.image) {
                 const imagePath = path.join('public', product.image);
                 try {
@@ -258,10 +262,8 @@ const productController = {
             }
 
             await product.destroy();
-
             req.flash('success_msg', 'Product deleted successfully');
             res.redirect('/admin/products');
-
         } catch (error) {
             console.error('Product delete error:', error);
             req.flash('error_msg', 'Error deleting product');

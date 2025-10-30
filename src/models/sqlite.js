@@ -15,7 +15,7 @@ const Product = require('./Product');
 const Category = require('./Category');
 const Banner = require('./Banner');
 const User = require('./User');
-const order = require('./Order');
+const order = require('./rder');
 
 // Initialize models
 const models = {

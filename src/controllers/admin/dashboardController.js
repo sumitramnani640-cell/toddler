@@ -1,4 +1,4 @@
-const { Product, Category, Banner, User, Order } = require('../../models');
+const { Product, Category, Banner, User, Order, Newsletter } = require('../../models');
 
 const dashboardController = {
   index: async (req, res) => {
@@ -9,13 +9,14 @@ const dashboardController = {
         totalCustomers,
         totalBanners,
         totalOrder,
-        
+        totalNewsletter
       ] = await Promise.all([
         Product.count(),
         Category.count(),
         User.count(),
         Banner.count(),
-        Order.count()
+        Order.count(),
+        Newsletter.count()
       ]);
 
       const recentProducts = await Product.findAll({
@@ -40,7 +41,8 @@ const dashboardController = {
         totalCategories,
         totalCustomers,
         totalBanners,
-        totalOrder, // ✅ fixed here
+        totalOrder,
+        totalNewsletter, // ✅ added this
         recentProducts,
         recentCustomers
       });

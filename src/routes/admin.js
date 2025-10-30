@@ -74,11 +74,11 @@ router.get('/orders', orderController.index);
 router.get('/orders/:id', orderController.show);
 router.get('/orders/:id/edit', orderController.edit);
 router.post('/orders/:id', orderController.update);
-router.get('/orders/:id/', orderController.destroy);
+router.post('/orders/:id/', orderController.destroy);
 
 // Newsletter routes
 
-router.get('/newsletters', newsletterController.getAll);
-router.post('/newsletters/:id/delete', newsletterController.deleteSubscriber);
+router.get('/newsletters', newsletterController.index);
+router.post('/newsletters/:id/delete', newsletterController.destroy);
 
 module.exports = router;

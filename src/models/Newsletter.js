@@ -1,5 +1,6 @@
-// src/models/Newsletter.js
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const Newsletter = sequelize.define('Newsletter', {
     id: {
       type: DataTypes.INTEGER,

@@ -62,4 +62,6 @@ Object.keys(models).forEach((modelName) => {
 module.exports = {
   sequelize,
   ...models,
+  Newsletter
+
 };
