@@ -77,9 +77,9 @@ router.post('/orders/:id', orderController.update);
 router.post('/orders/:id/', orderController.destroy);
 
 // Newsletter routes
+router.get('/newsletter', NewsletterController.index);
+router.post('/newsletter/:id', NewsletterController.destroy);
 
-router.get('/Newsletters', NewsletterController.index);
-router.post('/Newsletters/:id', NewsletterController.destroy);
 
 
 module.exports = router;

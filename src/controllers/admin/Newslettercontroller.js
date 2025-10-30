@@ -1,6 +1,6 @@
 const { Newsletter } = require('../../models');
 
-const newsletterController = {
+const NewsletterController = {
     // List all subscribers
     index: async (req, res) => {
         try {
@@ -16,7 +16,7 @@ const newsletterController = {
 
             const totalPages = Math.ceil(count / limit);
 
-            res.render('admin/newsletter/index', {
+            res.render('admin/Newsletter', {
                 title: 'Newsletter Subscribers - Admin Panel',
                 subscribers,
                 currentPage: page,
@@ -72,4 +72,4 @@ const newsletterController = {
     }
 };
 
-module.exports = newsletterController;
+module.exports = NewsletterController;

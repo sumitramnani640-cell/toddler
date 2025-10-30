@@ -39,7 +39,7 @@ const Order = OrderModel(sequelize);
 const Newsletter = NewsletterModel(sequelize);
 
 // ✅ Define associations (if any)
-const models = { Admin, Product, Category, Banner, User, Order };
+const models = { Admin, Product, Category, Banner, User, Order, Newsletter };
 
 Object.keys(models).forEach((modelName) => {
   if (models[modelName].associate) {
