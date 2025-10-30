@@ -27,6 +27,7 @@ const CategoryModel = require('./Category');
 const BannerModel = require('./Banner');
 const UserModel = require('./User');
 const OrderModel = require('./Order');
+const NewsletterModel = require('./Newsletter');
 
 // ✅ Initialize models
 const Admin = AdminModel(sequelize);
@@ -35,6 +36,7 @@ const Category = CategoryModel(sequelize);
 const Banner = BannerModel(sequelize);
 const User = UserModel(sequelize);
 const Order = OrderModel(sequelize);
+const Newsletter = NewsletterModel(sequelize);
 
 // ✅ Define associations (if any)
 const models = { Admin, Product, Category, Banner, User, Order };

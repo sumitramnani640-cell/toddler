@@ -8,7 +8,8 @@ const dashboardController = {
         totalCategories,
         totalCustomers,
         totalBanners,
-        totalOrder
+        totalOrder,
+        
       ] = await Promise.all([
         Product.count(),
         Category.count(),
