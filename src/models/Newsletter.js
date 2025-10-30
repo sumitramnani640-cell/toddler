@@ -1,19 +1,21 @@
+// src/models/Newsletter.js
 module.exports = (sequelize, DataTypes) => {
   const Newsletter = sequelize.define('Newsletter', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: true
     },
     subscribedAt: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
+      defaultValue: DataTypes.NOW
+    }
   });
+
   return Newsletter;
 };
