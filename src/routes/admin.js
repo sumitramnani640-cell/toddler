@@ -9,7 +9,7 @@ const categoryController = require('../controllers/admin/categoryController');
 const bannerController = require('../controllers/admin/bannerController');
 const customerController = require('../controllers/admin/customerController');
 const orderController = require('../controllers/admin/orderController');
-const newsletterController = require('../controllers/admin/Newslettercontroller');
+const NewsletterController = require('../controllers/admin/NewsletterController');
 
 // Middleware to check if admin is logged in
 const requireAuth = (req, res, next) => {
@@ -78,7 +78,8 @@ router.post('/orders/:id/', orderController.destroy);
 
 // Newsletter routes
 
-router.get('/newsletters', newsletterController.index);
-router.post('/newsletters/:id/delete', newsletterController.destroy);
+router.get('/Newsletters', NewsletterController.index);
+router.post('/Newsletters/:id', NewsletterController.destroy);
+
 
 module.exports = router;
