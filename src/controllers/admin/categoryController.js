@@ -1,4 +1,7 @@
 const { Category, Product } = require('../../models');
+const fs = require('fs');
+const path = require('path');
+const { Op } = require('sequelize');
 
 const categoryController = {
     // List all categories
@@ -25,33 +28,33 @@ const categoryController = {
         }
     },
 
-    // Show create category form
+    // Create page
     create: (req, res) => {
         res.render('admin/categories/create', {
             title: 'Add Category - Savers Grocery Admin'
         });
     },
 
-    // Store new category
+    // Store category
     store: async (req, res) => {
         try {
             const { name, slug, description, status } = req.body;
 
-            // Check if slug already exists
-            const existingCategory = await Category.findOne({
+            // Slug check
+            const exists = await Category.findOne({
                 where: { slug: slug.toLowerCase() }
             });
-
-            if (existingCategory) {
-                req.flash('error_msg', 'A category with this slug already exists');
+            if (exists) {
+                req.flash('error_msg', 'Slug already exists');
                 return res.redirect('/admin/categories/create');
             }
 
-            const category = await Category.create({
+            await Category.create({
                 name,
                 slug: slug.toLowerCase(),
                 description,
-                status: status || 'active'
+                status: status || 'active',
+                image: req.file ? req.file.filename : null
             });
 
             req.flash('success_msg', 'Category created successfully');
@@ -64,7 +67,7 @@ const categoryController = {
         }
     },
 
-    // Show single category
+    // Show Single Category
     show: async (req, res) => {
         try {
             const category = await Category.findByPk(req.params.id, {
@@ -92,7 +95,7 @@ const categoryController = {
         }
     },
 
-    // Show edit category form
+    // Edit
     edit: async (req, res) => {
         try {
             const category = await Category.findByPk(req.params.id);
@@ -103,18 +106,18 @@ const categoryController = {
             }
 
             res.render('admin/categories/edit', {
-                title: `Edit ${category.name} - Savers Grocery Admin`,
+                title: `Edit ${category.name}`,
                 category
             });
 
         } catch (error) {
-            console.error('Category edit form error:', error);
-            req.flash('error_msg', 'Error loading edit form');
+            console.error('Edit form error:', error);
+            req.flash('error_msg', 'Error loading edit page');
             res.redirect('/admin/categories');
         }
     },
 
-    // Update category
+    // Update Category
     update: async (req, res) => {
         try {
             const category = await Category.findByPk(req.params.id);
@@ -125,24 +128,32 @@ const categoryController = {
 
             const { name, slug, description, status } = req.body;
 
-            // Check if slug already exists (excluding current category)
-            const existingCategory = await Category.findOne({
-                where: { 
+            // Slug exists check
+            const exists = await Category.findOne({
+                where: {
                     slug: slug.toLowerCase(),
-                    id: { [require('sequelize').Op.ne]: category.id }
+                    id: { [Op.ne]: category.id }
                 }
             });
-
-            if (existingCategory) {
-                req.flash('error_msg', 'A category with this slug already exists');
+            if (exists) {
+                req.flash('error_msg', 'Slug already exists');
                 return res.redirect(`/admin/categories/${req.params.id}/edit`);
+            }
+
+            // Remove old image if new is uploaded
+            if (req.file && category.image) {
+                const oldImagePath = path.join(__dirname, '../../public/uploads/categories', category.image);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
             }
 
             await category.update({
                 name,
                 slug: slug.toLowerCase(),
                 description,
-                status: status || 'active'
+                status: status || 'active',
+                image: req.file ? req.file.filename : category.image
             });
 
             req.flash('success_msg', 'Category updated successfully');
@@ -155,7 +166,7 @@ const categoryController = {
         }
     },
 
-    // Delete category
+    // Delete Category
     destroy: async (req, res) => {
         try {
             const category = await Category.findByPk(req.params.id);
@@ -164,14 +175,21 @@ const categoryController = {
                 return res.redirect('/admin/categories');
             }
 
-            // Check if category has products
             const productCount = await Product.count({
                 where: { category_id: category.id }
             });
 
             if (productCount > 0) {
-                req.flash('error_msg', 'Cannot delete category with existing products');
+                req.flash('error_msg', 'Cannot delete category having products');
                 return res.redirect('/admin/categories');
+            }
+
+            // Delete image
+            if (category.image) {
+                const imagePath = path.join(__dirname, '../../public/uploads/categories', category.image);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
             }
 
             await category.destroy();

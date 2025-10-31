@@ -17,10 +17,12 @@ module.exports = (sequelize) => {
         },
 
         banner_image: {
-          type: DataTypes.STRING,
-          allowNull: true
+          type: DataTypes.STRING(255),
+          allowNull: true,
+            validate: {
+                len: [0, 255]
+            }
         },
-
         
         slug: {
             type: DataTypes.STRING(100),
@@ -39,7 +41,7 @@ module.exports = (sequelize) => {
             type: DataTypes.ENUM('active', 'inactive'),
             defaultValue: 'active',
             allowNull: false
-        }
+        },
     }, {
         tableName: 'categories',
         timestamps: true
