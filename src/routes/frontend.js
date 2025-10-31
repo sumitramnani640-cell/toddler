@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const homeController = require('../controllers/frontend/homeController');
-const newsletterController = require('../controllers/admin/Newslettercontroller');
+const newsletterController = require('../controllers/admin/NewsletterController');
 
 // Frontend routes
 router.get('/', homeController.index);

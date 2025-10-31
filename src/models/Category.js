@@ -15,15 +15,10 @@ module.exports = (sequelize) => {
                 len: [2, 100]
             }
         },
-
-        banner_image: {
-          type: DataTypes.STRING(255),
-          allowNull: true,
-            validate: {
-                len: [0, 255]
-            }
+        image: {
+          type: DataTypes.STRING,
+          allowNull: true
         },
-        
         slug: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -41,7 +36,7 @@ module.exports = (sequelize) => {
             type: DataTypes.ENUM('active', 'inactive'),
             defaultValue: 'active',
             allowNull: false
-        },
+        }
     }, {
         tableName: 'categories',
         timestamps: true
