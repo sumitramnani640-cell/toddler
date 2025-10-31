@@ -3,226 +3,203 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%= title %></title>
+    <title><%= title || "Savers Grocery" %></title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #81eb8f 100%);
-            color: #ffffff;
-            padding: 10px 0;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 30px;
-            border-radius: 8px;
+        /* Amazon-like colors */
+        header {
+            background-color: #131921;
         }
-        .product-card {
-            transition: transform 0.3s ease;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .nav-bottom {
+            background-color: #232f3e;
         }
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-        .category-card {
-            background: linear-gradient(45deg, #eceff1, #e9ecef);
-            border: none;
-            transition: transform 0.3s ease;
-        }
-        .category-card:hover {
-            transform: translateY(-3px);
+        .search-btn {
+            background-color: #febd69;
         }
         .banner-carousel {
             height: 400px;
             object-fit: cover;
+            border-radius: 10px;
+        }
+        .category-card img, .product-card img {
+            height: 180px;
+            object-fit: cover;
+        }
+        footer {
+            background-color: #232f3e;
+            color: #fff;
+            padding: 40px 0;
+        }
+        footer a {
+            color: #ddd;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="/">
-                <i class="fas fa-shopping-cart me-2"></i>Savers Grocery
+
+    <!-- ✅ AMAZON STYLE HEADER -->
+    <header class="text-white py-2">
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+
+            <!-- Logo -->
+            <a href="/" class="text-white fw-bold fs-4 text-decoration-none">
+                <i class="fas fa-shopping-cart"></i> Savers Grocery
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#categories">Categories</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-primary ms-2" href="/admin">Admin</a>
-                    </li>
-                </ul>
-            </div>
+
+            <!-- Search -->
+            <form class="d-flex flex-grow-1 mx-4" action="/search" method="GET">
+                <select name="category" class="form-select w-auto me-2">
+                    <option value="">All</option>
+                    <% categories && categories.forEach(cat => { %>
+                        <option value="<%= cat.slug || cat.id %>"><%= cat.name %></option>
+                    <% }) %>
+                </select>
+                <input type="text" name="q" class="form-control" placeholder="Search products...">
+                <button class="btn search-btn ms-2"><i class="fas fa-search"></i></button>
+            </form>
+
+            <!-- Cart -->
+            <a href="/cart" class="text-white text-decoration-none position-relative">
+                <i class="fas fa-shopping-cart fa-lg"></i>
+                <span class="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+                    0
+                </span>
+            </a>
+
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-section">
-        <div class="container text-center">
-            <h1 class="display-4 fw-bold mb-4">Welcome to Savers Grocery</h1>
-            <p class="lead mb-4">Fresh products delivered to your doorstep</p>
-            <a href="#products" ></a>
-        </div>
-    </section>
+    <!-- ✅ AMAZON STYLE SUB NAV -->
+    <div class="nav-bottom text-white small py-1">
+        <div class="container-fluid px-4 d-flex gap-4">
 
-    <!-- Banners Section -->
-    <% if (banners && banners.length > 0) { %>
-        <section class="py-5">
-            <div class="container">
-                <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        <% banners.forEach((banner, index) => { %>
-                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                                <img src="<%= banner.image %>" class="d-block w-100 banner-carousel" alt="<%= banner.title %>">
-                                <div class="carousel-caption d-none d-md-block">
-                                    <h5><%= banner.title %></h5>
-                                </div>
-                            </div>
-                        <% }); %>
-                    </div>
-                    <% if (banners.length > 1) { %>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    <% } %>
-                </div>
-            </div>
-        </section>
-    <% } %>
-
- <!-- Categories Section -->
-<!-- Categories Section -->
-<% if (categories && categories.length > 0) { %>
-<section id="categories" class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-5">Categories</h2>
-        <div class="row">
-            <% categories.slice(0, 8).forEach(category => { %>
-                <div class="col-md-4 col-lg-3 mb-4">
-                    <div class="card category-card h-100 text-center shadow-sm border-0">
-                        <% if (category.image) { %>
-                            <img 
-                                src="/uploads/categories/<%= category.image %>" 
-                                alt="<%= category.name %>" 
-                                class="card-img-top" 
-                                style="height: 180px; object-fit: cover; border-top-left-radius: .5rem; border-top-right-radius: .5rem;"
-                            >
-                        <% } else { %>
-                            <img 
-                                src="/images/placeholder.jpg" 
-                                alt="No image" 
-                                class="card-img-top" 
-                                style="height: 180px; object-fit: cover; border-top-left-radius: .5rem; border-top-right-radius: .5rem;"
-                            >
-                        <% } %>
-
-                        <div class="card-body">
-                            <h5 class="card-title"><%= category.name %></h5>
-                            <% if (category.description) { %>
-                                <p class="card-text text-muted">
-                                    <%= category.description.substring(0, 80) %>...
-                                </p>
-                            <% } %>
-                            <a href="/category/<%= category.slug %>" class="btn btn-outline-primary mt-2">
-                                View Category
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            <% }); %>
+            <a href="#categories" class="text-white">Categories</a>
+            <a href="#products" class="text-white">Products</a>
+            <a href="#contact" class="text-white">Contact</a>
+            <a href="/admin" class="text-warning fw-bold">Admin</a>
         </div>
     </div>
-</section>
-<% } %>
 
-
-    <!-- Featured Products Section -->
-    <% if (featuredProducts && featuredProducts.length > 0) { %>
-        <section id="products" class="py-5">
-            <div class="container">
-                <h2 class="text-center mb-5">Featured Products</h2>
-                <div class="row">
-                    <% featuredProducts.forEach(product => { %>
-                        <div class="col-md-6 col-lg-3 mb-4">
-                            <div class="card product-card h-100">
-                                <% if (product.image) { %>
-                                    <img src="<%= product.image %>" class="card-img-top" alt="<%= product.name %>" style="height: 200px; object-fit: cover;">
-                                <% } else { %>
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                        <i class="fas fa-image fa-3x text-muted"></i>
-                                    </div>
-                                <% } %>
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title"><%= product.name %></h5>
-                                    <% if (product.description) { %>
-                                        <p class="card-text text-muted flex-grow-1"><%= product.description.substring(0, 80) %>...</p>
-                                    <% } %>
-                                    <div class="mt-auto">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="h5 text-primary mb-0">$<%= parseFloat(product.price).toFixed(2) %></span>
-                                            <span class="badge bg-<%= product.stock > 0 ? 'success' : 'danger' %>">
-                                                <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
-                                            </span>
-                                        </div>
-                                        <% if (product.category) { %>
-                                            <small class="text-muted">Category: <%= product.category.name %></small>
-                                        <% } %>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
-            </div>
-        </section>
-    <% } %>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <!-- ✅ BANNERS -->
+    <% if (banners && banners.length > 0) { %>
+    <section class="py-4">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Savers Grocery</h5>
-                    <p>Fresh products at your doorstep</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p>&copy; 2024 Savers Grocery. All rights reserved.</p>
-                    <a href="/admin" class="text-white-50">Admin Panel</a>
+            <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% banners.forEach((banner, index) => { %>
+                        <div class="carousel-item <%= index===0 ? 'active' : '' %>">
+                            <img src="<%= banner.image %>" class="d-block w-100 banner-carousel" alt=""
+                             style="height: 300px; object-fit: cover; border-radius: 0;">
+                        </div>
+                    <% }) %>
                 </div>
             </div>
         </div>
-       <!-- Newsletter Section -->
-        <section class="newsletter">
-          <h3>Subscribe to our Newsletter</h3>
-            <form action="/subscribe" method="POST">
-              <input type="email" name="email" placeholder="Enter your email" required>
-                <button type="submit">Subscribe</button>
-                  </form>
-                       </section>
-                 </footer>
+    </section>
+    <% } %>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ✅ CATEGORIES -->
+    <% if (categories && categories.length > 0) { %>
+    <section id="categories" class="py-5 bg-light">
+        <div class="container">
+
+            <h3 class="mb-4 fw-bold text-center">Shop by Category</h3>
+            <div class="row">
+                <% categories.slice(0,8).forEach(cat => { %>
+                <div class="col-md-3 mb-4">
+                    <div class="card category-card shadow-sm">
+                        <img src="/uploads/categories/<%= cat.image || 'placeholder.jpg' %>" class="card-img-top" alt="">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold"><%= cat.name %></h6>
+                            <a href="/category/<%= cat.slug || cat.id %>" class="btn btn-sm btn-warning mt-2">View More</a>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- ✅ FEATURED PRODUCTS -->
+    <% if (featuredProducts && featuredProducts.length > 0) { %>
+    <section id="products" class="py-5">
+        <div class="container">
+            <h3 class="mb-4 fw-bold text-center">Featured Products</h3>
+            <div class="row">
+                <% featuredProducts.forEach(prod => { %>
+                <div class="col-md-3 mb-4">
+                    <div class="card product-card shadow-sm">
+                        <img src="<%= prod.image %>" class="card-img-top" alt="">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-truncate"><%= prod.name %></h6>
+                            <p class="text-muted small"><%= prod.description?.substring(0,50) %>...</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-success fw-bold">$<%= prod.price %></span>
+                                <span class="badge bg-<%= prod.stock>0 ? 'success' : 'danger' %>">
+                                    <%= prod.stock>0 ? 'In Stock' : 'Out Of Stock' %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    
+    <!-- ✅ AMAZON STYLE FOOTER -->
+    <footer class="mt-5">
+        <div class="container">
+            <div class="row text-start">
+
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold">Get to Know Us</h6>
+                    <a href="#">About</a><br>
+                    <a href="#">Careers</a><br>
+                    <a href="#">Press Releases</a>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold">Connect With Us</h6>
+                    <a href="#">Facebook</a><br>
+                    <a href="#">Instagram</a>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold">Make Money With Us</h6>
+                    <a href="#">Sell on Savers</a><br>
+                    <a href="#">Affiliate</a>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h6 class="fw-bold">Let Us Help You</h6>
+                    <a href="#">Your Account</a><br>
+                    <a href="#">Returns Centre</a><br>
+                    <a href="/admin">Admin Panel</a>
+                </div>
+
+            </div>
+            <div class="text-center small mt-4">
+                © 2024 Savers Grocery — All Rights Reserved
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
