@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [2, 200]
+                len: [1, 200]
             }
         },
         image: {
