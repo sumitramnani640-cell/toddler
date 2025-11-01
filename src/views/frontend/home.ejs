@@ -12,37 +12,167 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* Amazon-like colors */
-        header {
-            background-color: #131921;
-        }
-        .nav-bottom {
-            background-color: #232f3e;
-        }
-        .search-btn {
-            background-color: #febd69;
-        }
-        .banner-carousel {
-            height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .category-card img, .product-card img {
-            height: 180px;
-            object-fit: cover;
-        }
-        footer {
-            background-color: #232f3e;
-            color: #fff;
-            padding: 40px 0;
-        }
-        footer a {
-            color: #ddd;
-            text-decoration: none;
-        }
-        footer a:hover {
-            color: #fff;
-        }
+/* ✅ Header */
+header, .nav-bottom {
+    width: 100%;
+    background: #31383f;
+}
+
+/* ✅ Universal Layout */
+body, html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #ffffff !important;
+    overflow-x: hidden;
+}
+
+/* ✅ Center main content */
+.container, .container-fluid, .main-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+}
+
+/* ✅ Full-Width Banner with No Clipping */
+.banner {
+    width: 100%;
+}
+.banner img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 0 !important;
+    display: block;
+}
+
+/* ✅ Category Section */
+.category-section {
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 1200px;
+}
+.banner-carousel {
+    border-radius: 8px;
+    height: 300px;
+    object-fit: cover;
+    width: 100%;
+
+}   
+.category-header {
+    text-align: center;
+}
+.category-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.view-all {
+    font-size: 14px;
+    text-decoration: none;
+    color: #0073e6;
+    font-weight: 600;
+}
+
+/* ✅ Product Grid */
+.products-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+/* ✅ Product Card */
+.product-card {
+    width: 230px;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 12px;
+    transition: 0.25s ease;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+}
+.product-image img {
+    width: 100%;
+    height: 210px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* ✅ Title */
+.product-title {
+    text-align:center;
+    font-size:15px;
+    font-weight:700;
+    margin: 10px 0 6px;
+}
+
+/* ✅ CTA Button */
+.add-btn {
+    background: #0073e6;
+    border: none;
+    color: #fff;
+    padding: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    transition: 0.25s;
+    text-transform: uppercase;
+}
+.add-btn:hover {
+    background: #005bb8;
+}
+
+/* ✅ Footer */
+footer {
+    width: 100%;
+    background: #31383f;
+    color: #ffffff;
+    text-align: center;
+    padding: 35px 15px;
+    font-size: 14px;
+}
+
+/* ✅ RESPONSIVE DESIGN */
+
+/* Tablet */
+@media (max-width: 991px) {
+    .product-card {
+        width: 200px;
+    }
+    .banner img {
+        height: 230px;
+    }
+}
+
+/* Large Phones */
+@media (max-width: 600px) {
+    .product-card {
+        width: 46%;
+    }
+    .banner img {
+        height: 200px;
+    }
+}
+
+/* Small Phones */
+@media (max-width: 420px) {
+    .product-card {
+        width: 90%;
+    }
+    .banner img {
+        height: 180px;
+    }
+}
+
+
     </style>
 </head>
 <body>
@@ -88,7 +218,7 @@
             <a href="#contact" class="text-white">Contact</a>
         </div>
     </div>
-
+<div class="main-container">
     <!-- ✅ BANNERS -->
     <% if (banners && banners.length > 0) { %>
     <section class="py-4">
@@ -129,6 +259,389 @@
         </div>
     </section>
     <% } %>
+    
+
+  <!-- sea food -->
+<div class="category-section">
+    <div class="category-header">
+        <h2>Meat - Freshly That We Serve </h2>
+        <a href="/category/Meat" class="view-all">View All</a>
+    </div>
+
+    <div class="banner">
+        <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner">
+    </div>
+    </div>
+    </br>
+
+    <div class="products-container">
+
+        <!-- Product Card 1 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="Canned Tuna Fish">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Canned Tuna Fish</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Fresh Salmon</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 4 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Raw Shrimp</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+  <!-- sea food -->
+<div class="category-section">
+    <div class="category-header">
+        <h2>Meat - Freshly That We Serve </h2>
+        <a href="/category/Meat" class="view-all">View All</a>
+    </div>
+
+    <div class="banner">
+        <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner">
+    </div>
+    </div>
+    </br>
+
+    <div class="products-container">
+
+        <!-- Product Card 1 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="Canned Tuna Fish">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Canned Tuna Fish</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Fresh Salmon</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 4 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Raw Shrimp</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+  <!-- sea food -->
+<div class="category-section">
+    <div class="category-header">
+        <h2>Meat - Freshly That We Serve </h2>
+        <a href="/category/Meat" class="view-all">View All</a>
+    </div>
+
+    <div class="banner">
+        <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner">
+    </div>
+    </div>
+    </br>
+
+    <div class="products-container">
+
+        <!-- Product Card 1 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="Canned Tuna Fish">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Canned Tuna Fish</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Fresh Salmon</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 4 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Raw Shrimp</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+  <!-- sea food -->
+<div class="category-section">
+    <div class="category-header">
+        <h2>Meat - Freshly That We Serve </h2>
+        <a href="/category/Meat" class="view-all">View All</a>
+    </div>
+
+    <div class="banner">
+        <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner">
+    </div>
+    </div>
+    </br>
+
+    <div class="products-container">
+
+        <!-- Product Card 1 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="Canned Tuna Fish">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Canned Tuna Fish</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Fresh Salmon</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 4 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Raw Shrimp</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+  <!-- sea food -->
+<div class="category-section">
+    <div class="category-header">
+        <h2>Meat - Freshly That We Serve </h2>
+        <a href="/category/Meat" class="view-all">View All</a>
+    </div>
+
+    <div class="banner">
+        <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner">
+    </div>
+    </div>
+    </br>
+
+    <div class="products-container">
+
+        <!-- Product Card 1 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="Canned Tuna Fish">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Canned Tuna Fish</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Fresh Salmon</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        
+        <!-- Product Card 3 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">King Mackerel</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+        <!-- Product Card 4 -->
+        <div class="product-card shadow-sm">
+            <div class="product-image">
+                <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
+            </div>
+            <div class="product-info">
+                <h6 class="product-title">Raw Shrimp</h6>
+                <button class="add-btn"><h6>View Product</h6></button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
 
     <!-- ✅ FEATURED PRODUCTS -->
     <% if (featuredProducts && featuredProducts.length > 0) { %>
@@ -136,7 +649,7 @@
         <div class="container">
             <h3 class="mb-4 fw-bold text-center">Featured Products</h3>
             <div class="row">
-                <% featuredProducts.forEach(prod => { %>
+                <% featuredProducts.slice(0, 4).forEach(prod => { %>
                 <div class="col-md-3 mb-4">
                     <div class="card product-card shadow-sm">
                         <img src="<%= prod.image %>" class="card-img-top" alt="">
@@ -157,6 +670,7 @@
         </div>
     </section>
     <% } %>
+</div>
 
     
     <!-- ✅ AMAZON STYLE FOOTER -->
