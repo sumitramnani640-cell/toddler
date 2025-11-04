@@ -1,51 +1,41 @@
-const { Product, Category } = require('../../models');
+const { Category, Product } = require('../../models');
 
 const categoryController = {
 
-    // ✅ View Products Under Selected Category
-    productsByCategory: async (req, res) => {
+    show: async (req, res) => {
         try {
-            const { slug } = req.params;
+            const slug = req.params.slug;
 
-            // Find selected category
             const category = await Category.findOne({
-                where: { slug, status: 'active' }
+                where: { slug, status: "active" },
+                include: [{
+                    model: Product,
+                    as: "products",
+                    where: { status: "active" },
+                    required: false
+                }]
             });
 
             if (!category) {
-                return res.redirect('/');
+                return res.render("frontend/404", { 
+                    title: "Category Not Found",
+                    message: "No category found"
+                });
             }
-
-            // Fetch all categories for sidebar
-            const categories = await Category.findAll({
-                where: { status: 'active' },
-                order: [['name', 'ASC']]
-            });
-
-            // Fetch category products
-            const products = await Product.findAll({
-                where: { category_id: category.id, status: 'active' },
-                include: [
-                    { model: Category, as: 'category', attributes: ['name', 'slug'] }
-                ],
-                order: [['createdAt', 'DESC']]
-            });
-
-            res.render('frontend/category-products', {
-                title: category.name + ' - Savers Grocery',
+// return res.json(category);
+            res.render("frontend/categories", {
+                title: category.name,
                 category,
-                products,
-                categories,
-                activeCategory: slug,
-                layout: false
+                products: category.products
             });
 
         } catch (error) {
-            console.error('Category Page Error:', error);
-            res.redirect('/');
+            console.error("Frontend Category Page Error:", error);
+            res.render("frontend/500", {
+                title: "Error",
+            });
         }
     }
-
 };
 
 module.exports = categoryController;

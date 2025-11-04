@@ -7,5 +7,5 @@ const categoryController = require('../controllers/frontend/categoryController')
 // Frontend routes
 router.get('/', homeController.index);
 router.post('/subscribe', newsletterController.subscribe);
-router.get('/category/:slug', categoryController.productsByCategory);
+router.get('/shop/:slug', categoryController.show);
 module.exports = router;
