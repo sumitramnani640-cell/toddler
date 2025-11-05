@@ -11,11 +11,28 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        
+    .hg-topbar, .hg-delivery { background:#1f7a4a; color:#fff; }
+    .hg-topbar { font-size:14px; }
+    .hg-topbar .icon { width:20px; display:inline-block; text-align:center; }
+    .hg-main { background:#fff; border-top:4px solid transparent; border-bottom:1px solid #eee; }
+    .hg-main .logo img { height:56px; }
+    .hg-search .form-control { height:40px; border-radius:6px; }
+    .hg-search .btn-search { height:40px; border-radius:6px; }
+    .hg-cta .btn { border-radius:8px; }
+    .hg-cart { position:relative; }
+    .hg-cart .badge { position:absolute; top:-6px; right:-8px; background:#ffcc00; color:#000; font-weight:700; border-radius:50%; padding:4px 7px; }
+    @media (max-width:767px) {
+      .hg-search { display:none; }
+      .hg-main .logo img { height:48px; }
+    }
+  
         /* ✅ Header */
         header,
         .nav-bottom {
             width: 100%;
-            background: #02880d;
+            background: #ffffff;
+            color: #000000;
         }
 
         /* ✅ Universal Layout */
@@ -197,31 +214,73 @@
     </style>
 </head>
 
-<body> <!-- ✅ AMAZON STYLE HEADER -->
-    <header class="text-white py-2">
-        <div class="container-fluid px-4 d-flex align-items-center justify-content-between"> <!-- Logo --> <a href="/"
-                class="text-white fw-bold fs-4 text-decoration-none"> <i class="fas fa-shopping-cart"></i> Savers
-                Grocery </a> <!-- Search -->
-            <form class="d-flex flex-grow-1 mx-4" action="/search" method="GET"> <select name="category"
-                    class="form-select w-auto me-2">
-                    <option value="">All</option>
-                    <% categories && categories.forEach(cat=> { %> <option value="<%= cat.slug || cat.id %>">
-                            <%= cat.name %>
-                        </option>
-                        <% }) %>
-                </select> <input type="text" name="q" class="form-control" placeholder="Search products..."> <button
-                    class="btn search-btn ms-2"><i class="fas fa-search"></i></button> </form> <!-- Cart --> <a
-                href="/cart" class="text-white text-decoration-none position-relative"> <i
-                    class="fas fa-shopping-cart fa-lg"></i> <span
-                    class="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle">
-                    0 </span> </a>
-        </div>
-    </header> <!-- ✅ AMAZON STYLE SUB NAV -->
-    <div class="nav-bottom text-white small py-1">
-        <div class="container-fluid px-4 d-flex gap-4"> <a href="#categories" class="text-white">Categories</a> <a
-                href="#products" class="text-white">Products</a> <a href="#contact" class="text-white">Contact</a>
-        </div>
+<!-- thin sub-nav (keeps static links) -->
+<div class="nav-bottom text-white small py-1" style="background:#025a09;">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-4">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-truck me-2"></i>
+        <span>Fast &amp; Free Delivery</span>
+      </div>
+      
+      <div class="d-flex align-items-center">
+        <i class="fas fa-shopping-basket me-2"></i>
+        <span>Shop from over thousand products</span>
+      </div>
     </div>
+
+    <div class="d-flex align-items-center">
+      <i class="fas fa-phone me-2"></i>
+      <a href="tel:+971542526215" class="text-white text-decoration-none">+971-542526215</a>
+    </div>
+  </div>
+</div>
+
+<body> <!-- ✅ AMAZON STYLE HEADER -->
+
+<header class="text-white py-2" style="background:#ffffff;">
+
+  <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+    <!-- Logo (static) -->
+    <a href="/" class="text-black fw-bold fs-4 text-decoration-none d-flex align-items-center">
+      <i class="fas fa-shopping-cart me-2"></i> Savers Grocery
+    </a>
+
+    <!-- Search (only the category <select> is dynamic) -->
+    <form class="d-flex flex-grow-1 mx-4" action="/search" method="GET" style="max-width:900px;">
+      <select name="category" class="form-select w-auto me-2">
+        <option value="">All</option>
+        <% if (Array.isArray(categories)) { %>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat.slug || cat.id %>"><%= cat.name %></option>
+          <% }) %>
+        <% } %>
+      </select>
+
+      <input type="text" name="q" class="form-control" placeholder="Search products...">
+      <button class="btn search-btn ms-2" type="submit" style="background:#fff;color:#02880d;border:none;">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
+
+    <!-- Cart (keeps static badge as in your original) -->
+    <a href="/cart" class="text-black text-decoration-none position-relative">
+      <i class="fas fa-shopping-cart fa-lg"></i>
+      <span class="badge rounded-pill bg-warning text-dark position-absolute top-0 start-100 translate-middle">0</span>
+    </a>
+  </div>
+</header>
+
+<!-- thin sub-nav (keeps static links) -->
+<div class="nav-bottom text-white small py-1" style="background:#025a09;">
+  <div class="container-fluid px-4 d-flex gap-4">
+    <a href="# " class="text-white">Categories</a>
+    <a href="#" class="text-white">Products</a>
+    <a href="#" class="text-white">Contact</a>
+  </div>
+</div>
+
+
     <div class="main-container"> <!-- ✅ BANNERS -->
         <% if (banners && banners.length> 0) { %> <section class="py-4">
                 <div class="container">

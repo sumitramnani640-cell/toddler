@@ -1,67 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%= category.name %> - Savers Grocery</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="/frontend/css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= category.name %> - Savers Grocery</title>
+
+  <!-- Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/frontend/css/style.css">
 </head>
 <body>
-    <!-- ✅ HEADER START -->
-    <header class="bg-dark text-white py-3">
-        <div class="container d-flex justify-content-between">
-            <h4 class="m-0">Savers Grocery</h4>
-            <nav>
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/">Home</a>
-                    </li>
-                    <% if (typeof categories !== 'undefined') { %>
-                        <% categories.forEach(cat => { %>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="/shop/<%= cat.slug %>"><%= cat.name %></a>
-                            </li>
-                        <% }) %>
-                    <% } %>
-                </ul>
-            </nav>
-        </div>
-    </header>
-    <!-- ✅ HEADER END -->
-    <div class="container py-4">
-        <h3 class="mb-4 fw-bold text-dark"><%= category.name %></h3>
-        <div class="row g-4">
-            <% if(products && products.length > 0) { %>
-                <% products.forEach(product => { %>
-                <div class="col-md-3 col-6">
-                    <div class="card shadow-sm h-100">
-                        <img src="/uploads/products/<%= product.image || 'placeholder.jpg' %>" 
-                             class="card-img-top" 
-                             alt="<%= product.name %>">
 
-                        <div class="card-body text-center">
-                            <h6 class="fw-bold text-truncate"><%= product.name %></h6>
-                            <p class="text-success fw-bold">₹<%= product.price %></p>
-                            <a href="/product/<%= product.slug %>" class="btn btn-dark btn-sm w-100">
-                                View Product
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <% }) %>
-            <% } else { %>
-                <div class="col-12 text-center">
-                    <h5 class="text-muted py-5">No products found in this category</h5>
-                </div>
-            <% } %>
+  <!-- ✅ HEADER START -->
+  <header>
+    <!-- Top green info bar -->
+    <div class="top-bar bg-success text-white small">
+      <div class="container d-flex align-items-center justify-content-between py-1">
+        <div class="d-flex align-items-center gap-3">
+          <div><i class="fas fa-shipping-fast me-2"></i> Fast &amp; Free Delivery</div>
+          <div class="d-none d-md-flex align-items-center">
+            <i class="fas fa-store me-2"></i> Shop from over thousand products
+          </div>
         </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-none d-md-flex align-items-center">
+            <i class="fas fa-phone me-2"></i>
+            <a href="tel:+971542526215" class="text-white text-decoration-none">+971-542526215</a>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- ✅ FOOTER START -->
-    <footer class="bg-dark text-white text-center py-3 mt-5">
-        <p class="m-0">© 2025 Savers Grocery. All Rights Reserved.</p>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Main header: logo, search, CTAs -->
+    <div class="main-header bg-white border-bottom">
+      <div class="container d-flex align-items-center justify-content-between py-3">
+        <!-- Logo + menu -->
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-light d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+          </button>
+          <a href="/" class="d-flex align-items-center text-decoration-none">
+            <img src="/assets/logo (1).png" alt="Savers Grocery" style="height:48px; width:auto;">
+          </a>
+        </div>
+
+        <!-- Search bar -->
+        <div class="flex-fill px-3 d-none d-md-block">
+          <form action="/search" method="GET" class="d-flex">
+            <input name="q" class="form-control me-2" type="search" placeholder="Search Products">
+            <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+          </form>
+        </div>
+
+        <!-- Buttons / actions -->
+        <div class="d-flex align-items-center gap-2">
+          <!-- <a href="/horeca" class="btn btn-danger text-white d-none d-md-inline-block">Horeca</a> -->
+          <!-- <a href="/bulk" class="btn btn-outline-success d-none d-md-inline-block">Bulk Savings</a> -->
+
+          <a href="/login" class="d-flex align-items-center text-decoration-none text-dark">
+            <i class="fas fa-user-circle fs-5 me-1"></i>
+            <span class="d-none d-lg-inline">Login &amp; Register</span>
+          </a>
+
+          <a href="/cart" class="btn btn-outline-secondary position-relative" aria-label="Cart">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Mobile search -->
+      <div class="container d-md-none py-2">
+        <form action="/search" method="GET" class="d-flex">
+          <input name="q" class="form-control me-2" type="search" placeholder="Search Products">
+          <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delivery info bar -->
+    <div class="sub-bar bg-success text-white small">
+      <div class="container d-flex align-items-center justify-content-between py-1">
+        <div><i class="fas fa-clock me-2"></i> Next Standard Delivery Today <strong>6:00 PM–10:00 PM</strong></div>
+        <div><i class="fas fa-map-marker-alt me-1"></i> Deliver to: <strong>Dubai Festival City – Dubai</strong></div>
+      </div>
+    </div>
+
+ <!-- Category navigation -->
+<div class="category-nav border-top bg-light">
+  <div class="container">
+    <nav class="nav py-2 overflow-auto align-items-center">
+      <!-- 🏠 Home link with icon -->
+      <a class="nav-link px-2 d-flex align-items-center" href="/">
+        <i class="fas fa-home me-1"></i> Home
+      </a>
+
+      <!-- › Category name -->
+      <span class="nav-link px-2 fw-bold text-dark">
+        <i class="fas fa-angle-right text-secondary mx-1"></i>
+        <%= category.name %>
+      </span>
+
+      <!-- Other categories -->
+      <% if (typeof categories !== 'undefined') { %>
+        <% categories.forEach(cat => { %>
+          <a class="nav-link px-2" href="/shop/<%= cat.slug %>"><%= cat.name %></a>
+        <% }) %>
+      <% } %>
+    </nav>
+  </div>
+</div>
+
+
+    <!-- Offcanvas mobile menu -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="list-unstyled">
+          <li><a href="/" class="d-block py-2 text-dark">Home</a></li>
+          <% if (typeof categories !== 'undefined') { %>
+            <% categories.forEach(cat => { %>
+              <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
+            <% }) %>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Inline tweaks -->
+    <style>
+      .top-bar, .sub-bar { background-color: #2f8a4a; }
+      .main-header .btn-success { background-color: #198754; border-color: #198754; }
+      .category-nav .nav-link { color: #000; font-weight: 500; }
+      .category-nav .nav-link:hover { color: #198754; }
+    </style>
+  </header>
+  <!-- ✅ HEADER END -->
+
+  <!-- ✅ CATEGORY CONTENT -->
+  <div class="container py-4">
+    <!-- <h3 class="mb-4 fw-bold text-dark"><%= category.name %></h3> -->
+    <div class="row g-4">
+      <% if (products && products.length > 0) { %>
+        <% products.forEach(product => { %>
+          <div class="col-md-3 col-6">
+            <div class="card shadow-sm h-100">
+              <img src="/uploads/products/<%= product.image || 'placeholder.jpg' %>"
+                   class="card-img-top"
+                   alt="<%= product.name %>">
+              <div class="card-body text-center">
+                <h6 class="fw-bold text-truncate"><%= product.name %></h6>
+                <p class="text-success fw-bold">₹<%= product.price %></p>
+                <a href="/product/<%= product.slug %>" class="btn btn-dark btn-sm w-100">
+                  View Product
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="col-12 text-center">
+          <h5 class="text-muted py-5">No products found in this category</h5>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ✅ FOOTER -->
+  <footer class="bg-dark text-white text-center py-3 mt-5">
+    <p class="m-0">© 2025 Savers Grocery. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>
