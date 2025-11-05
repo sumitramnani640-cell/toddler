@@ -8,4 +8,5 @@ const categoryController = require('../controllers/frontend/categoryController')
 router.get('/', homeController.index);
 router.post('/subscribe', newsletterController.subscribe);
 router.get('/shop/:slug', categoryController.show);
+// router.get('/category/:slug', homeController.show);
 module.exports = router;

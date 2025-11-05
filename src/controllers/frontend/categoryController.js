@@ -22,8 +22,9 @@ const categoryController = {
                     message: "No category found"
                 });
             }
+            
 // return res.json(category);
-            res.render("frontend/categories", {
+            res.render("frontend/test", {
                 title: category.name,
                 category,
                 products: category.products
