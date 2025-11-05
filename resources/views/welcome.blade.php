@@ -1,8 +1,0 @@
-
-    @include('partials.header')
-    @include('partials.home')
-    @include('partials.footer')
-
-
-
-

@@ -11,20 +11,77 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-    .hg-topbar, .hg-delivery { background:#1f7a4a; color:#fff; }
-    .hg-topbar { font-size:14px; }
-    .hg-topbar .icon { width:20px; display:inline-block; text-align:center; }
-    .hg-main { background:#fff; border-top:4px solid transparent; border-bottom:1px solid #eee; }
-    .hg-main .logo img { height:56px; }
-    .hg-search .form-control { height:40px; border-radius:6px; }
-    .hg-search .btn-search { height:40px; border-radius:6px; }
-    .hg-cta .btn { border-radius:8px; }
-    .hg-cart { position:relative; }
-    .hg-cart .badge { position:absolute; top:-6px; right:-8px; background:#ffcc00; color:#000; font-weight:700; border-radius:50%; padding:4px 7px; }
+    .hg-topbar, .hg-delivery { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .hg-topbar { 
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    .hg-topbar .icon { 
+        width: 20px; 
+        display: inline-block; 
+        text-align: center; 
+    }
+    .hg-main { 
+        background: #fff; 
+        border-top: 4px solid transparent; 
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .hg-main .logo img { 
+        height: 56px; 
+    }
+    .hg-search .form-control { 
+        height: 40px; 
+        border-radius: 6px; 
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    .hg-search .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .hg-search .btn-search { 
+        height: 40px; 
+        border-radius: 6px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: #fff;
+        transition: all 0.3s ease;
+    }
+    .hg-search .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .hg-cta .btn { 
+        border-radius: 8px; 
+    }
+    .hg-cart { 
+        position: relative; 
+    }
+    .hg-cart .badge { 
+        position: absolute; 
+        top: -6px; 
+        right: -8px; 
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: #fff; 
+        font-weight: 700; 
+        border-radius: 50%; 
+        padding: 4px 7px; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
     @media (max-width:767px) {
-      .hg-search { display:none; }
-      .hg-main .logo img { height:48px; }
+      .hg-search { display: none; }
+      .hg-main .logo img { height: 48px; }
     }
   
         /* ✅ Header */
@@ -33,15 +90,16 @@
             width: 100%;
             background: #ffffff;
             color: #000000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         /* ✅ Universal Layout */
         body,
         html {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background: #ffffff !important;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%) !important;
             overflow-x: hidden;
         }
 
@@ -95,21 +153,42 @@
         }
 
         .category-header h2 {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 10px;
-            color: #000000;
-            font-style: Arial, sans-serif;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .category-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
         }
 
         .view-all {
             font-size: 14px;
             text-decoration: none;
-            color: #0073e6;
+            color: #667eea;
             font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .view-all:hover {
+            color: #764ba2;
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(5px);
         }
 
         /* ✅ Product Grid */
@@ -124,23 +203,54 @@
         /* ✅ Product Card */
         .product-card {
             width: 230px;
-            border: 1px solid #dddddd;
-            border-radius: 12px;
+            border: none;
+            border-radius: 15px;
             background: #ffffff;
-            padding: 12px;
-            transition: 0.25s ease;
+            padding: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .product-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #f8f9fa;
         }
 
         .product-image img {
             width: 100%;
             height: 210px;
             object-fit: contain;
-            border-radius: 8px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
 
         /* ✅ Title */
@@ -148,35 +258,59 @@
             text-align: center;
             font-size: 15px;
             font-weight: 700;
-            margin: 10px 0 6px;
+            margin: 15px 0 10px;
+            color: #2c3e50;
         }
 
         /* ✅ CTA Button */
         .add-btn {
-            background: #000000;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             color: #fff;
-            padding: 8px 0;
-            border-radius: 6px;
+            padding: 10px 0;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             width: 100%;
-            transition: 0.25s;
+            transition: all 0.3s ease;
             text-transform: uppercase;
+            font-size: 13px;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
         }
 
         .add-btn:hover {
-            background: #005bb8;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         /* ✅ Footer */
         footer {
             width: 100%;
-            background: #31383f;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: #ffffff;
             text-align: center;
-            padding: 35px 15px;
+            padding: 40px 15px;
             font-size: 14px;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        footer h6 {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #fff;
         }
 
         /* ✅ RESPONSIVE DESIGN */
@@ -216,7 +350,7 @@
 </head>
 
 <!-- thin sub-nav -->
-<div class="nav-bottom text-white small py-1" style="background:#025a09;">
+<div class="nav-bottom text-white small py-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
   <div class="container d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-4">
       <div class="d-flex align-items-center">
@@ -243,8 +377,8 @@
 
   <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
     <!-- Logo (static) -->
-    <a href="/" class="text-black fw-bold fs-4 text-decoration-none d-flex align-items-center">
-      <i class="fas fa-shopping-cart me-2"></i> Savers Grocery
+    <a href="/" class="text-black fw-bold fs-4 text-decoration-none d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+      <i class="fas fa-shopping-cart me-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i> Savers Grocery
     </a>
 
     <!-- Search (only the category <select> is dynamic) -->
@@ -273,7 +407,7 @@
 </header>
 
 <!-- thin sub-nav (keeps static links) -->
-<div class="nav-bottom text-white small py-1" style="background:#025a09;">
+<div class="nav-bottom text-white small py-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
   <div class="container-fluid px-4 d-flex gap-4">
     <a href="# " class="text-white">Categories</a>
     <a href="#" class="text-white">Products</a>

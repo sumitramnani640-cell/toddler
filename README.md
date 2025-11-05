@@ -1,6 +1,6 @@
-# Savers Grocery Admin Panel
+# Savers Grocery Ecommerce Platform
 
-A complete admin panel for Savers Grocery built with Node.js, Express.js, EJS, and MySQL.
+A complete ecommerce platform with modern admin panel and attractive website built with Node.js, Express.js, EJS, and MySQL/SQLite.
 
 ## Features
 
@@ -47,12 +47,20 @@ A complete admin panel for Savers Grocery built with Node.js, Express.js, EJS, a
 ## Tech Stack
 
 - **Backend**: Node.js + Express.js
-- **Frontend**: EJS templating
-- **Database**: MySQL with Sequelize ORM
+- **Frontend**: EJS templating with modern responsive design
+- **Database**: MySQL/SQLite with Sequelize ORM
 - **Authentication**: Express-session
 - **File Upload**: Multer
-- **Styling**: AdminLTE + Bootstrap
+- **Styling**: AdminLTE + Bootstrap + Modern CSS (Gradients, Animations)
 - **Password Hashing**: bcryptjs
+
+## Modern Design Features
+
+- ✨ Beautiful gradient backgrounds and modern UI
+- 🎨 Smooth animations and transitions
+- 📱 Fully responsive design
+- 🎯 Intuitive user interface
+- 🚀 Fast and optimized performance
 
 ## Installation
 
