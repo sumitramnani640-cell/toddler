@@ -3,7 +3,7 @@ require('dotenv').config();
 
 // ✅ Initialize Sequelize connection
 const sequelize = new Sequelize(
-  process.env.DB_NAME || 'savers_grocery',
+  process.env.DB_NAME || 'ecommerce',
   process.env.DB_USER || 'root',
   process.env.DB_PASSWORD || '',
   {
