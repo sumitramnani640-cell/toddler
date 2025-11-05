@@ -63,23 +63,27 @@ const homeController = {
             });
 
             if (!category) {
-                return res.render("frontend/404", { 
+                return res.render("error", { 
                     title: "Category Not Found",
-                    message: "No category found"
+                    message: "No category found",
+                    layout: false
                 });
             }
             
 // return res.json(category);
-            res.render("frontend/test", {
-                title: category.name,
+            res.render("frontend/categories", {
+                title: `${category.name} - Savers Grocery`,
                 category,
-                products: category.products
+                products: category.products || [],
+                layout: false
             });
 
         } catch (error) {
             console.error("Frontend Category Page Error:", error);
-            res.render("frontend/500", {
+            res.render("error", {
                 title: "Error",
+                message: "An error occurred while loading the category",
+                layout: false
             });
         }
     }

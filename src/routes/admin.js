@@ -19,9 +19,7 @@ const requireAuth = (req, res, next) => {
     req.flash('error_msg', 'Please log in to access this page');
     res.redirect('/admin/login');
 };
-router.get('testing', (req, res) => {
-    res.send('Admin route is working');
-});
+// Test route (removed - was causing issues)
 // Public routes (no authentication required)
 router.get('/login', authController.showLogin);
 router.post('/login', authController.login);

@@ -44,10 +44,26 @@ app.use((req, res, next) => {
 });
 
 // View engine setup
-app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', 'layouts/admin');
+
+// Layout middleware - set layout based on route BEFORE expressLayouts processes it
+app.use((req, res, next) => {
+    // Frontend routes: no layout by default
+    if (!req.path.startsWith('/admin') || req.path.startsWith('/admin/login')) {
+        res.locals.layout = false;
+    } else {
+        // Admin routes: use admin layout (unless explicitly overridden in controller)
+        res.locals.layout = 'admin/layouts/admin';
+    }
+    next();
+});
+
+// Use express-ejs-layouts (must come after layout middleware)
+app.use(expressLayouts);
+
+// Method override for PUT/DELETE requests
+app.use(methodOverride('_method'));
 
 // Routes
 app.use('/admin', adminRoutes);
@@ -56,10 +72,11 @@ app.use('/', frontendRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render('error', { 
+    res.status(500).render('error', {
         title: 'Error',
         message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? err : {}
+        error: process.env.NODE_ENV === 'development' ? err : {},
+        layout: false
     });
 });
 
@@ -68,15 +85,15 @@ app.use((req, res) => {
     res.status(404).render('error', {
         title: 'Page Not Found',
         message: 'The page you are looking for does not exist.',
-        error: {}
+        error: {},
+        layout: false
     });
 });
 
 app.listen(PORT, () => {
     console.log(`Savers Grocery Admin Panel running on http://localhost:${PORT}`);
     console.log(`Admin panel available at http://localhost:${PORT}/admin`);
+    console.log(`Website available at http://localhost:${PORT}`);
 });
-
-app.use(methodOverride('_method'));
 
 module.exports = app;
