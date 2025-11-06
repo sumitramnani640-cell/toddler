@@ -1,0 +1,82 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-gift mr-2"></i>Product Feature Details: <%= product.name %>
+        </h3>
+        <div class="card-tools">
+          <a href="/admin/product-features/<%= product.id %>/edit" class="btn btn-warning btn-sm">
+            <i class="fas fa-edit mr-1"></i> Edit
+          </a>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-3">Feature Name:</dt>
+          <dd class="col-sm-9"><strong><%= product.name %></strong></dd>
+
+          <dt class="col-sm-3">Category Feature:</dt>
+          <dd class="col-sm-9"><%= product.category ? product.category.name : 'N/A' %></dd>
+
+          <dt class="col-sm-3">Link:</dt>
+          <dd class="col-sm-9">
+            <% if (product.link) { %>
+              <a href="<%= product.link %>" target="_blank"><%= product.link %></a>
+            <% } else { %>
+              <span class="text-muted">No link provided</span>
+            <% } %>
+          </dd>
+
+          <dt class="col-sm-3">Status:</dt>
+          <dd class="col-sm-9">
+            <span class="badge badge-<%= product.status === 'active' ? 'success' : 'secondary' %>">
+              <%= product.status %>
+            </span>
+          </dd>
+
+          <dt class="col-sm-3">Created:</dt>
+          <dd class="col-sm-9"><%= new Date(product.createdAt).toLocaleString() %></dd>
+
+          <dt class="col-sm-3">Updated:</dt>
+          <dd class="col-sm-9"><%= new Date(product.updatedAt).toLocaleString() %></dd>
+        </dl>
+      </div>
+
+      <div class="card-footer">
+        <a href="/admin/product-features" class="btn btn-secondary">
+          <i class="fas fa-arrow-left mr-1"></i> Back
+        </a>
+        <a href="/admin/product-features/<%= product.id %>/edit" class="btn btn-warning ml-2">
+          <i class="fas fa-edit mr-1"></i> Edit
+        </a>
+        <form action="/admin/product-features/<%= product.id %>" method="POST" class="d-inline ml-2">
+          <button type="submit" class="btn btn-danger delete-btn">
+            <i class="fas fa-trash mr-1"></i> Delete
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-tools mr-2"></i>Quick Actions
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="/admin/product-features/<%= product.id %>/edit" class="btn btn-warning mb-2">
+            <i class="fas fa-edit mr-1"></i> Edit Feature
+          </a>
+          <a href="/admin/product-features/create" class="btn btn-primary">
+            <i class="fas fa-plus mr-1"></i> Add New Feature
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

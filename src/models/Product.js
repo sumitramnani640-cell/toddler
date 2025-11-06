@@ -20,11 +20,11 @@ module.exports = (sequelize) => {
       },
 
       // ✅ For frontend URLs like /product/fresh-apples
-      slug: {
-        type: DataTypes.STRING(255),
-        allowNull: false,
-        unique: true
-      },
+    //   slug: {
+    //     type: DataTypes.STRING(255),
+    //     allowNull: false,
+    //     unique: true
+    //   },
 
       description: {
         type: DataTypes.TEXT,

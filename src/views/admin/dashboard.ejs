@@ -1,264 +1,254 @@
+<!-- views/admin/dashboard.ejs -->
+<% /* Dashboard page for admin */ %>
 
-<div class="row">
-    <!-- Statistics Cards -->
+<div class="container-fluid">
+  <div class="row">
+    <!-- Statistics Cards (first row) -->
     <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3><%= totalProducts %></h3>
-                <p>Total Products</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <a href="/admin/products" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3><%= totalProducts || 0 %></h3>
+          <p>Total Products</p>
         </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3><%= totalCategories %></h3>
-                <p>Categories</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-tags"></i>
-            </div>
-            <a href="/admin/categories" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3><%= totalCustomers %></h3>
-                <p>Customers</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <a href="/admin/customers" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3><%= totalBanners %></h3>
-                <p>Banners</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-images"></i>
-            </div>
-            <a href="/admin/banners" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
+        <div class="icon"><i class="fas fa-box"></i></div>
+        <a href="/admin/products" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
     </div>
 
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-success">
+        <div class="inner">
+          <h3><%= totalCategories || 0 %></h3>
+          <p>Categories</p>
+        </div>
+        <div class="icon"><i class="fas fa-tags"></i></div>
+        <a href="/admin/categories" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
 
-<div class="col-lg-3 col-6">
-        <div class="small-box bg-purple">
-          <div class="inner">
-             <h3><%= totalNewsletter %></h3>
-             <p>Newsletter</p>
-         </div>
-         <div class="icon">
-            <i class="fas fa-envelope"></i>
-         </div>
-         <a href="/admin/newsletter" class="small-box-footer">
-            More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-             </div>
-               </div>
-                
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-warning">
+        <div class="inner">
+          <h3><%= totalCustomers || 0 %></h3>
+          <p>Customers</p>
+        </div>
+        <div class="icon"><i class="fas fa-users"></i></div>
+        <a href="/admin/customers" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
 
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-danger">
+        <div class="inner">
+          <h3><%= totalBanners || 0 %></h3>
+          <p>Banners</p>
+        </div>
+        <div class="icon"><i class="fas fa-images"></i></div>
+        <a href="/admin/banners" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
 
-<div class="col-lg-3 col-6">
-  <div class="small-box bg-orange">
+    <!-- Category Features (NEW) -->
+    <div class="col-lg-3 col-6">
+      <div class="small-box" style="background-color:#20c997; color:#fff;">
+        <div class="inner">
+          <h3><%= typeof totalCategoryFeatures !== 'undefined' ? totalCategoryFeatures : 0 %></h3>
+          <p>Category Features</p>
+        </div>
+        <div class="icon"><i class="fas fa-layer-group"></i></div>
+        <a href="/admin/category-features" class="small-box-footer" style="color:#fff;">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Product Features (NEW) -->
+ <div class="col-lg-3 col-6">
+  <div class="small-box bg-purple">
     <div class="inner">
-      <h3><%= totalOrder %></h3>
-      <p>Total Orders</p>
+      <h3><%= totalProductFeatures || 0 %></h3>
+      <p>Product Features</p>
     </div>
-    <div class="icon">
-      <i class="fas fa-shopping-cart"></i>
-    </div>
-    <a href="/admin/Orders" class="small-box-footer">
+    <div class="icon"><i class="fas fa-gift"></i></div>
+    <a href="/admin/product-features" class="small-box-footer">
       More info <i class="fas fa-arrow-circle-right"></i>
     </a>
   </div>
 </div>
-</div>
 
-<div class="row">
-    <!-- Recent Products -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-box mr-2"></i>Recent Products
-                </h3>
-                <div class="card-tools">
-                    <a href="/admin/products" class="btn btn-tool">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Category</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (recentProducts && recentProducts.length > 0) { %>
-                                <% recentProducts.forEach(product => { %>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <% if (product.image) { %>
-                                                    <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image mr-2">
-                                                <% } else { %>
-                                                    <div class="product-image mr-2 bg-light d-flex align-items-center justify-content-center">
-                                                        <i class="fas fa-image text-muted"></i>
-                                                    </div>
-                                                <% } %>
-                                                <div>
-                                                    <strong><%= product.name %></strong>
-                                                    <br>
-                                                    <small class="text-muted">Stock: <%= product.stock %></small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><%= product.category ? product.category.name : 'N/A' %></td>
-                                        <td>$<%= parseFloat(product.price).toFixed(2) %></td>
-                                        <td>
-                                            <span class="badge badge-<%= product.status === 'active' ? 'success' : 'secondary' %> status-badge">
-                                                <%= product.status %>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No products found</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="/admin/products" class="btn btn-primary btn-sm">View All Products</a>
-            </div>
+
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-purple">
+        <div class="inner">
+          <h3><%= totalNewsletter || 0 %></h3>
+          <p>Newsletter</p>
         </div>
+        <div class="icon"><i class="fas fa-envelope"></i></div>
+        <a href="/admin/newsletter" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
     </div>
 
-    <!-- Recent Customers -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-users mr-2"></i>Recent Customers
-                </h3>
-                <div class="card-tools">
-                    <a href="/admin/customers" class="btn btn-tool">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Customer</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (recentCustomers && recentCustomers.length > 0) { %>
-                                <% recentCustomers.forEach(customer => { %>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="product-image mr-2 bg-primary d-flex align-items-center justify-content-center text-white rounded-circle">
-                                                    <%= customer.name.charAt(0).toUpperCase() %>
-                                                </div>
-                                                <strong><%= customer.name %></strong>
-                                            </div>
-                                        </td>
-                                        <td><%= customer.email %></td>
-                                        <td><%= customer.phone || 'N/A' %></td>
-                                        <td>
-                                            <small class="text-muted">
-                                                <%= new Date(customer.createdAt).toLocaleDateString() %>
-                                            </small>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No customers found</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="/admin/customers" class="btn btn-primary btn-sm">View All Customers</a>
-            </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box bg-orange">
+        <div class="inner">
+          <h3><%= totalOrder || 0 %></h3>
+          <p>Total Orders</p>
         </div>
+        <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+        <a href="/admin/orders" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="row">
+  <!-- Recent Products & Recent Customers -->
+  <div class="row mt-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-box mr-2"></i>Recent Products</h3>
+          <div class="card-tools">
+            <a href="/admin/products" class="btn btn-tool"><i class="fas fa-plus"></i></a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (recentProducts && recentProducts.length > 0) { %>
+                  <% recentProducts.forEach(product => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (product.image) { %>
+                            <img src="/uploads/<%= product.image %>" alt="<%= product.name %>" class="product-image mr-2" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">
+                          <% } else { %>
+                            <div class="product-image mr-2 bg-light d-flex align-items-center justify-content-center" style="width:48px;height:48px;border-radius:4px;">
+                              <i class="fas fa-image text-muted"></i>
+                            </div>
+                          <% } %>
+                          <div>
+                            <strong><%= product.name %></strong><br>
+                            <small class="text-muted">Stock: <%= product.stock || 0 %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td><%= product.category ? product.category.name : 'N/A' %></td>
+               <td>
+  $<%= (isNaN(Number(product.price)) ? '0.00' : Number(product.price).toFixed(2)) %>
+</td>
+
+                      <td>
+                        <span class="badge badge-<%= product.status === 'active' ? 'success' : 'secondary' %>">
+                          <%= product.status %>
+                        </span>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">No products found</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer text-center">
+          <a href="/admin/products" class="btn btn-primary btn-sm">View All Products</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-users mr-2"></i>Recent Customers</h3>
+          <div class="card-tools">
+            <a href="/admin/customers" class="btn btn-tool"><i class="fas fa-plus"></i></a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (recentCustomers && recentCustomers.length > 0) { %>
+                  <% recentCustomers.forEach(customer => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="product-image mr-2 bg-primary d-flex align-items-center justify-content-center text-white rounded-circle" style="width:40px;height:40px;">
+                            <%= (customer.name && customer.name.length) ? customer.name.charAt(0).toUpperCase() : '?' %>
+                          </div>
+                          <strong><%= customer.name %></strong>
+                        </div>
+                      </td>
+                      <td><%= customer.email %></td>
+                      <td><%= customer.phone || 'N/A' %></td>
+                      <td><small class="text-muted"><%= new Date(customer.createdAt).toLocaleDateString() %></small></td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">No customers found</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer text-center">
+          <a href="/admin/customers" class="btn btn-primary btn-sm">View All Customers</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mt-3">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-line mr-2"></i>Quick Actions
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 col-sm-6">
-                        <a href="/admin/products/create" class="btn btn-info btn-block mb-2">
-                            <i class="fas fa-plus mr-2"></i>Add Product
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="/admin/categories/create" class="btn btn-success btn-block mb-2">
-                            <i class="fas fa-plus mr-2"></i>Add Category
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="/admin/banners/create" class="btn btn-warning btn-block mb-2">
-                            <i class="fas fa-plus mr-2"></i>Add Banner
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="/" class="btn btn-primary btn-block mb-2" target="_blank">
-                            <i class="fas fa-external-link-alt mr-2"></i>View Website
-                        </a>
-                    </div>
-
-                    
-                </div>
-            </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fas fa-chart-line mr-2"></i>Quick Actions</h3>
         </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 col-sm-6 mb-2">
+              <a href="/admin/products/create" class="btn btn-info btn-block"><i class="fas fa-plus mr-2"></i>Add Product</a>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+              <a href="/admin/categories/create" class="btn btn-success btn-block"><i class="fas fa-plus mr-2"></i>Add Category</a>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+              <a href="/admin/banners/create" class="btn btn-warning btn-block"><i class="fas fa-plus mr-2"></i>Add Banner</a>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-2">
+              <a href="/" class="btn btn-primary btn-block" target="_blank"><i class="fas fa-external-link-alt mr-2"></i>View Website</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
 </div>
+
+<!-- Optional inline CSS for product-image sizing (move to main CSS file if preferred) -->
+<style>
+  .product-image { display:inline-block; }
+  .badge-success { background-color:#28a745; color:#fff; }
+  .badge-secondary { background-color:#6c757d; color:#fff; }
+</style>
