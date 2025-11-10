@@ -1,60 +1,72 @@
+// src/controllers/frontend/productController.js
 const { Product, Category } = require('../../models');
+const { Op } = require('sequelize');
 
 const productController = {
   show: async (req, res) => {
     try {
-      const id = req.params.id;
+      const identifier = req.params.identifier;
+      if (!identifier) {
+        req.flash && req.flash('error_msg', 'Invalid product identifier');
+        return res.redirect('/');
+      }
 
-      // Find product by ID (no slug)
+      // Detect whether Product model has a slug column
+      const hasSlug = !!(Product && Product.rawAttributes && Product.rawAttributes.slug);
+
+      let where;
+      const isNumeric = /^[0-9]+$/.test(String(identifier));
+      if (isNumeric) {
+        where = { id: Number(identifier) };
+      } else if (hasSlug) {
+        where = { slug: identifier };
+      } else {
+        // fallback (try name search) — but numeric id route preferred
+        where = { name: { [Op.like]: identifier } };
+      }
+
+      // Include category using alias that matches your associations.
+      // If your association uses a different alias, change 'category' to that alias.
       const product = await Product.findOne({
-        where: { id, status: 'active' },
-        include: [
-          {
-            model: Category,
-            as: 'category',
-            where: { status: 'active' },
-            required: false
-          }
-        ]
+        where,
+        include: [{ model: Category, as: 'category' }],
       });
 
       if (!product) {
-        return res.render('error', {
-          title: 'Product Not Found',
-          message: 'No product found',
-          layout: false
-        });
+        req.flash && req.flash('error_msg', 'Product not found');
+        return res.redirect('/');
       }
 
-      // Fetch related products (same category)
+      // Related products: same category (exclude current)
       let relatedProducts = [];
-      if (product.category && product.category.id) {
+      const categoryId = product.category_id || (product.category && product.category.id);
+      if (categoryId) {
         relatedProducts = await Product.findAll({
           where: {
-            category_id: product.category.id,
-            status: 'active',
-            id: { [require('sequelize').Op.ne]: product.id }
+            category_id: categoryId,
+            id: { [Op.ne]: product.id },
           },
           limit: 8,
-          order: [['createdAt', 'DESC']]
         });
       }
 
-      res.render('frontend/product', {
+      // Categories for offcanvas nav (optional)
+      const categories = await Category.findAll({ where: { status: 'active' } });
+
+      // Render - update view name if your file is at a different path
+      return res.render('frontend/product', {
+        layout: false,            // or true if you use a layout
         title: `${product.name} - Savers Grocery`,
         product,
         relatedProducts,
-        layout: false
+        categories,
       });
-    } catch (error) {
-      console.error('Frontend Product Page Error:', error);
-      res.render('error', {
-        title: 'Error',
-        message: 'An error occurred while loading the product',
-        layout: false
-      });
+    } catch (err) {
+      console.error('Frontend Product Page Error:', err);
+      req.flash && req.flash('error_msg', 'Error loading product page');
+      return res.redirect('/');
     }
-  }
+  },
 };
 
 module.exports = productController;

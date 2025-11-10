@@ -11,6 +11,8 @@ router.get('/', homeController.index);
 router.post('/subscribe', newsletterController.subscribe);
 router.get('/shop/:slug', categoryController.show);
 router.get('/category/:slug', homeController.show);
-router.get('/:slug', productController.show);
+// router.get('/:slug', productController.show);
+router.get('/product/:identifier', productController.show);
+
 
 module.exports = router;
