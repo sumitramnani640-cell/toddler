@@ -1,159 +1,186 @@
-const { CategoryFeature, ProductFeature } = require('../../models');
+// src/controllers/admin/productFeatureController.js
+const { ProductFeature, CategoryFeature } = require('../../models');
 const fs = require('fs');
 const path = require('path');
 
 const uploadPath = path.join(__dirname, '../../../public/uploads');
-
-// Ensure uploads dir exists
+// ensure upload folder exists
 if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
 
-const categoryFeatureController = {
-  // List all category features
+const productFeatureController = {
+  // List all product features (renders admin/productFeature/index.ejs expecting `products`)
   index: async (req, res) => {
     try {
-      const categories = await CategoryFeature.findAll({
-        include: [{ model: ProductFeature, as: 'products' }],
+      const products = await ProductFeature.findAll({
+        include: [{ model: CategoryFeature, as: 'category' }], // use alias 'category' (see your association)
         order: [['id', 'DESC']],
       });
-      res.render('admin/categoryFeature/index', {
+
+      res.render('admin/productFeature/index', {
         layout: 'admin/layouts/admin',
-        title: 'Category Features',
-        categories,
+        title: 'Product Features',
+        products, // EJS expects `products`
       });
     } catch (err) {
-      console.error('CategoryFeature.index error:', err);
-      req.flash('error_msg', 'Error fetching category features');
+      console.error('ProductFeature.index error:', err);
+      req.flash('error_msg', 'Error fetching product features');
       res.redirect('/admin/dashboard');
     }
   },
 
   // Show create form
-  create: (req, res) => {
-    res.render('admin/categoryFeature/form', {
-      layout: 'admin/layouts/admin',
-      title: 'Add Category Feature',
-      category: {},
-      action: 'create',
-    });
-  },
-
-  // Store new category feature
-  store: async (req, res) => {
+  create: async (req, res) => {
     try {
-      const { name, description, status } = req.body;
-      const image = req.file ? req.file.filename : null;
+      // load active category features for dropdown
+      const categories = await CategoryFeature.findAll({ where: { status: 'active' } });
 
-      await CategoryFeature.create({ name, description, image, status });
-
-      req.flash('success_msg', 'Category Feature added successfully!');
-      res.redirect('/admin/category-features');
+      res.render('admin/productFeature/form', {
+        layout: 'admin/layouts/admin',
+        title: 'Add Product Feature',
+        action: 'create',
+        feature: {}, // empty feature for form
+        categories,
+      });
     } catch (err) {
-      console.error('CategoryFeature.store error:', err);
-      req.flash('error_msg', 'Error creating category feature');
-      res.redirect('/admin/category-features');
+      console.error('ProductFeature.create error:', err);
+      req.flash('error_msg', 'Error loading form');
+      res.redirect('/admin/product-features');
     }
   },
 
-  // Show single category feature (detail)
+  // Store new product feature
+  store: async (req, res) => {
+    try {
+      const { name, description, status, categoryFeatureId } = req.body;
+      const image = req.file ? req.file.filename : null;
+
+      await ProductFeature.create({
+        name,
+        description,
+        image,
+        status: status || 'inactive',
+        category_feature_id: categoryFeatureId || null, // if your DB field is snake_case
+        categoryFeatureId: categoryFeatureId || null,   // and if it's camelCase depending on model
+      });
+
+      req.flash('success_msg', 'Product Feature added successfully!');
+      res.redirect('/admin/product-features');
+    } catch (err) {
+      console.error('ProductFeature.store error:', err);
+      req.flash('error_msg', 'Error creating product feature');
+      res.redirect('/admin/product-features');
+    }
+  },
+
+  // Show single product feature
   show: async (req, res) => {
     try {
-      const category = await CategoryFeature.findByPk(req.params.id, {
-        include: [{ model: ProductFeature, as: 'products' }],
+      const feature = await ProductFeature.findByPk(req.params.id, {
+        include: [{ model: CategoryFeature, as: 'category' }],
       });
-      if (!category) {
-        req.flash('error_msg', 'Category Feature not found');
-        return res.redirect('/admin/category-features');
+
+      if (!feature) {
+        req.flash('error_msg', 'Product Feature not found');
+        return res.redirect('/admin/product-features');
       }
-      res.render('admin/categoryFeature/show', {
+
+      res.render('admin/productFeature/show', {
         layout: 'admin/layouts/admin',
-        title: `Category Feature - ${category.name}`,
-        category,
+        title: `Product Feature - ${feature.name}`,
+        feature,
       });
     } catch (err) {
-      console.error('CategoryFeature.show error:', err);
-      req.flash('error_msg', 'Error fetching category feature');
-      res.redirect('/admin/category-features');
+      console.error('ProductFeature.show error:', err);
+      req.flash('error_msg', 'Error fetching product feature');
+      res.redirect('/admin/product-features');
     }
   },
 
   // Show edit form
   edit: async (req, res) => {
     try {
-      const category = await CategoryFeature.findByPk(req.params.id);
-      if (!category) {
-        req.flash('error_msg', 'Category Feature not found');
-        return res.redirect('/admin/category-features');
+      const feature = await ProductFeature.findByPk(req.params.id);
+      if (!feature) {
+        req.flash('error_msg', 'Product Feature not found');
+        return res.redirect('/admin/product-features');
       }
-      res.render('admin/categoryFeature/form', {
+      const categories = await CategoryFeature.findAll({ where: { status: 'active' } });
+
+      res.render('admin/productFeature/form', {
         layout: 'admin/layouts/admin',
-        title: 'Edit Category Feature',
-        category,
+        title: 'Edit Product Feature',
         action: 'edit',
+        feature,
+        categories,
       });
     } catch (err) {
-      console.error('CategoryFeature.edit error:', err);
+      console.error('ProductFeature.edit error:', err);
       req.flash('error_msg', 'Error loading edit form');
-      res.redirect('/admin/category-features');
+      res.redirect('/admin/product-features');
     }
   },
 
-  // Update category feature
+  // Update product feature
   update: async (req, res) => {
     try {
-      const { name, description, status } = req.body;
-      const category = await CategoryFeature.findByPk(req.params.id);
+      const { name, description, status, categoryFeatureId } = req.body;
+      const feature = await ProductFeature.findByPk(req.params.id);
 
-      if (!category) {
-        req.flash('error_msg', 'Category Feature not found');
-        return res.redirect('/admin/category-features');
+      if (!feature) {
+        req.flash('error_msg', 'Product Feature not found');
+        return res.redirect('/admin/product-features');
       }
 
-      // If new file uploaded, remove old image
-      if (req.file && category.image) {
-        const oldPath = path.join(uploadPath, category.image);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-        category.image = req.file.filename;
-      } else if (req.file) {
-        category.image = req.file.filename;
+      // handle image replacement
+      if (req.file) {
+        if (feature.image) {
+          const oldPath = path.join(uploadPath, feature.image);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
+        feature.image = req.file.filename;
       }
 
-      category.name = name;
-      category.description = description;
-      category.status = status;
-      await category.save();
+      feature.name = name;
+      feature.description = description;
+      feature.status = status || 'inactive';
+      // set both possible field names - adjust to your model field name if necessary
+      feature.category_feature_id = categoryFeatureId || null;
+      feature.categoryFeatureId = categoryFeatureId || null;
 
-      req.flash('success_msg', 'Category Feature updated successfully!');
-      res.redirect('/admin/category-features');
+      await feature.save();
+
+      req.flash('success_msg', 'Product Feature updated successfully!');
+      res.redirect('/admin/product-features');
     } catch (err) {
-      console.error('CategoryFeature.update error:', err);
-      req.flash('error_msg', 'Error updating category feature');
-      res.redirect('/admin/category-features');
+      console.error('ProductFeature.update error:', err);
+      req.flash('error_msg', 'Error updating product feature');
+      res.redirect('/admin/product-features');
     }
   },
 
-  // Delete category feature
+  // Delete product feature (POST to /admin/product-features/:id/delete)
   destroy: async (req, res) => {
     try {
-      const category = await CategoryFeature.findByPk(req.params.id);
-      if (!category) {
-        req.flash('error_msg', 'Category Feature not found');
-        return res.redirect('/admin/category-features');
+      const feature = await ProductFeature.findByPk(req.params.id);
+      if (!feature) {
+        req.flash('error_msg', 'Product Feature not found');
+        return res.redirect('/admin/product-features');
       }
 
-      if (category.image) {
-        const imgPath = path.join(uploadPath, category.image);
+      if (feature.image) {
+        const imgPath = path.join(uploadPath, feature.image);
         if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
       }
 
-      await category.destroy();
-      req.flash('success_msg', 'Category Feature deleted successfully!');
-      res.redirect('/admin/category-features');
+      await feature.destroy();
+      req.flash('success_msg', 'Product Feature deleted successfully!');
+      res.redirect('/admin/product-features');
     } catch (err) {
-      console.error('CategoryFeature.destroy error:', err);
-      req.flash('error_msg', 'Error deleting category feature');
-      res.redirect('/admin/category-features');
+      console.error('ProductFeature.destroy error:', err);
+      req.flash('error_msg', 'Error deleting product feature');
+      res.redirect('/admin/product-features');
     }
   },
 };
 
-module.exports = categoryFeatureController;
+module.exports = productFeatureController;
