@@ -9,6 +9,49 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/frontend/css/style.css">
+
+  <style>
+    /* Sidebar styles */
+    .page-with-sidebar {
+      min-height: calc(100vh - 160px); /* header + footer space */
+    }
+    .sidebar {
+      min-height: 500px;
+      border-right: 1px solid #e9ecef;
+      padding-top: 10px;
+    }
+    .sidebar .list-group-item {
+      border: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .sidebar .list-group-item.active {
+      background-color: transparent;
+      color: #198754;
+      font-weight: 600;
+    }
+    /* Product card tweaks */
+    .card-img-top {
+      height: 160px;
+      object-fit: contain;
+      padding: 16px;
+      background: #fff;
+    }
+
+    /* keep the existing inline tweaks */
+    .top-bar, .sub-bar { background-color: #2f8a4a; }
+    .main-header .btn-success { background-color: #198754; border-color: #198754; }
+    .category-nav .nav-link { color: #000; font-weight: 500; }
+    .category-nav .nav-link:hover { color: #198754; }
+
+    /* Responsive: sticky sidebar on larger screens */
+    @media (min-width: 768px) {
+      .sidebar {
+        position: sticky;
+        top: 90px; /* below header */
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -40,12 +83,9 @@
           <button class="btn btn-light d-md-none" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
           </button>
-          <!-- <a href="/" class="d-flex align-items-center text-decoration-none">
-            <img src="/assets/logo (1).png" alt="Savers Grocery" style="height:48px; width:auto;">
-          </a> -->
-              <a href="/" class="text-black fw-bold fs-4 text-decoration-none d-flex align-items-center">
-      <i class="fas fa-shopping-cart me-2"></i> Savers Grocery
-    </a>
+          <a href="/" class="text-black fw-bold fs-4 text-decoration-none d-flex align-items-center">
+            <i class="fas fa-shopping-cart me-2"></i> Savers Grocery
+          </a>
         </div>
 
         <!-- Search bar -->
@@ -58,9 +98,6 @@
 
         <!-- Buttons / actions -->
         <div class="d-flex align-items-center gap-2">
-          <!-- <a href="/horeca" class="btn btn-danger text-white d-none d-md-inline-block">Horeca</a> -->
-          <!-- <a href="/bulk" class="btn btn-outline-success d-none d-md-inline-block">Bulk Savings</a> -->
-
           <a href="/login" class="d-flex align-items-center text-decoration-none text-dark">
             <i class="fas fa-user-circle fs-5 me-1"></i>
             <span class="d-none d-lg-inline">Login &amp; Register</span>
@@ -89,87 +126,135 @@
         <div><i class="fas fa-map-marker-alt me-1"></i> Deliver to: <strong>Dubai Festival City – Dubai</strong></div>
       </div>
     </div>
-
- <!-- Category navigation -->
-<div class="category-nav border-top bg-light">
-  <div class="container">
-    <nav class="nav py-2 overflow-auto align-items-center">
-      <!-- 🏠 Home link with icon -->
-      <a class="nav-link px-2 d-flex align-items-center" href="/">
-        <i class="fas fa-home me-1"></i> Home
-      </a>
-
-      <!-- › Category name -->
-      <span class="nav-link px-2 fw-bold text-dark">
-        <i class="fas fa-angle-right text-secondary mx-1"></i>
-        <%= category.name %>
-      </span>
-
-      <!-- Other categories -->
-      <% if (typeof categories !== 'undefined') { %>
-        <% categories.forEach(cat => { %>
-          <a class="nav-link px-2" href="/shop/<%= cat.slug %>"><%= cat.name %></a>
-        <% }) %>
-      <% } %>
-    </nav>
-  </div>
-</div>
-
-
-    <!-- Offcanvas mobile menu -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">Menu</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="list-unstyled">
-          <li><a href="/" class="d-block py-2 text-dark">Home</a></li>
-          <% if (typeof categories !== 'undefined') { %>
-            <% categories.forEach(cat => { %>
-              <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
-            <% }) %>
-          <% } %>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Inline tweaks -->
-    <style>
-      .top-bar, .sub-bar { background-color: #2f8a4a; }
-      .main-header .btn-success { background-color: #198754; border-color: #198754; }
-      .category-nav .nav-link { color: #000; font-weight: 500; }
-      .category-nav .nav-link:hover { color: #198754; }
-    </style>
   </header>
   <!-- ✅ HEADER END -->
 
-  <!-- ✅ CATEGORY CONTENT -->
-  <div class="container py-4">
-    <!-- <h3 class="mb-4 fw-bold text-dark"><%= category.name %></h3> -->
-    <div class="row g-4">
-      <% if (products && products.length > 0) { %>
-        <% products.forEach(product => { %>
-          <div class="col-md-3 col-6">
-            <div class="card shadow-sm h-100">
-              <img src="/uploads/products/<%= product.image || 'placeholder.jpg' %>"
-                   class="card-img-top"
-                   alt="<%= product.name %>">
-              <div class="card-body text-center">
-                <h6 class="fw-bold text-truncate"><%= product.name %></h6>
-                <p class="text-success fw-bold">₹<%= product.price %></p>
-                <a href="/product/<%= product.slug %>" class="btn btn-dark btn-sm w-100">
-                  View Product
-                </a>
-              </div>
+  <!-- PAGE CONTENT WITH SIDEBAR -->
+  <div class="container page-with-sidebar py-4">
+    <div class="row">
+      <!-- SIDEBAR: visible md+ ; on small screens we'll use an offcanvas to show categories -->
+      <aside class="col-md-3 d-none d-md-block sidebar">
+        <div class="mb-3">
+          <h5 class="fw-bold mb-3"><i class="fas fa-list me-2"></i> Categories</h5>
+
+          <div class="list-group">
+            <a href="/" class="list-group-item list-group-item-action d-flex align-items-center">
+              <i class="fas fa-home me-2 text-muted"></i> Home
+            </a>
+
+            <!-- category breadcrumb / current -->
+            <div class="list-group-item d-flex align-items-center">
+              <i class="fas fa-angle-right me-2 text-muted"></i>
+              <strong><%= category.name %></strong>
             </div>
+
+            <% if (typeof categories !== 'undefined') { %>
+              <% categories.forEach(cat => { %>
+                <a href="/shop/<%= cat.slug %>" class="list-group-item list-group-item-action d-flex align-items-center">
+                  <span class="flex-fill"><%= cat.name %></span>
+                </a>
+              <% }) %>
+            <% } %>
           </div>
-        <% }) %>
-      <% } else { %>
-        <div class="col-12 text-center">
-          <h5 class="text-muted py-5">No products found in this category</h5>
         </div>
-      <% } %>
+
+        <!-- optional filters or info -->
+        <!-- <div class="mt-4">
+          <h6>Filter</h6>
+        </div> -->
+      </aside>
+
+      <!-- MAIN: products -->
+      <main class="col-md-9 col-12">
+        <!-- On small screens show a compact category bar + offcanvas toggle -->
+        <div class="d-flex d-md-none align-items-center justify-content-between mb-3">
+          <div>
+            <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#categoriesOffcanvas">
+              <i class="fas fa-list me-1"></i> Categories
+            </button>
+          </div>
+          <div class="text-muted small align-self-center">
+            <strong><%= category.name %></strong>
+          </div>
+        </div>
+
+        <!-- Products grid -->
+<div class="row justify-content-start g-3">
+  <% if (products && products.length > 0) { %>
+    <% products.slice(0, 15).forEach(product => { %>
+      <div class="col-lg-4 col-md-6 col-sm-6 col-12 d-flex justify-content-center">
+        <div class="card shadow-sm text-center" style="width: 300px; border-radius: 10px; height: 420px;">
+          <img src="<%= product.image || '/images/placeholder.jpg' %>"  
+               class="card-img-top" 
+               alt="<%= product.name %>" 
+               style="height:300px; object-fit: contain; padding:10px;">
+          <div class="card-body p-2">
+            <h6 class="fw-semibold text-truncate mb-1" title="<%= product.name %>"><%= product.name %></h6>
+            <p class="text-success fw-bold mb-2">₹<%= product.price %></p>
+            <a href="/product/<%= product.id %>" class="btn btn-dark btn-sm w-100">View Product</a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="col-12 text-center">
+      <h5 class="text-muted py-5">No products found in this category</h5>
+    </div>
+  <% } %>
+</div>
+
+
+
+        <!-- Simple pagination placeholder if you want to implement server-side pages -->
+        <!-- Replace with actual pagination logic from your server -->
+        <% if (products && products.length > 15) { %>
+          <nav class="mt-4" aria-label="Products pagination">
+            <ul class="pagination justify-content-center">
+              <li class="page-item disabled"><a class="page-link">Previous</a></li>
+              <li class="page-item active"><a class="page-link">1</a></li>
+              <li class="page-item"><a class="page-link">2</a></li>
+              <li class="page-item"><a class="page-link">Next</a></li>
+            </ul>
+          </nav>
+        <% } %>
+      </main>
+    </div>
+  </div>
+
+  <!-- OFFCANVAS: categories for mobile -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="categoriesOffcanvas">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Categories</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="list-unstyled">
+        <li><a href="/" class="d-block py-2 text-dark"><i class="fas fa-home me-2"></i> Home</a></li>
+        <li class="py-2"><strong><i class="fas fa-angle-right me-2"></i><%= category.name %></strong></li>
+        <% if (typeof categories !== 'undefined') { %>
+          <% categories.forEach(cat => { %>
+            <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
+          <% }) %>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Offcanvas mobile menu (existing) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="list-unstyled">
+        <li><a href="/" class="d-block py-2 text-dark">Home</a></li>
+        <% if (typeof categories !== 'undefined') { %>
+          <% categories.forEach(cat => { %>
+            <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
+          <% }) %>
+        <% } %>
+      </ul>
     </div>
   </div>
 
