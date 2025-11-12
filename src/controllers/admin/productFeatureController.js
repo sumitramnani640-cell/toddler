@@ -1,5 +1,5 @@
 // src/controllers/admin/productFeatureController.js
-const { ProductFeature, CategoryFeature } = require('../../models');
+const { ProductFeature, Product, Category } = require('../../models');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,19 +7,31 @@ const uploadPath = path.join(__dirname, '../../../public/uploads');
 if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
 
 const productFeatureController = {
-  // List all product features -> render as `products`
+  // List all product features
   index: async (req, res) => {
     try {
-      const products = await ProductFeature.findAll({
-        // adjust 'as' to whichever alias you defined in your models (commonly 'category')
-        include: [{ model: CategoryFeature, as: 'category' }],
+      const features = await ProductFeature.findAll({
+        include: [
+          {
+            model: Product,
+            as: 'product',
+            attributes: ['id', 'name', 'slug'],
+            include: [
+              {
+                model: Category,
+                as: 'category',
+                attributes: ['id', 'name', 'slug'],
+              },
+            ],
+          },
+        ],
         order: [['id', 'DESC']],
       });
 
       res.render('admin/productFeature/index', {
         layout: 'admin/layouts/admin',
         title: 'Product Features',
-        products,               // <--- NOTE: view expects `products`
+        features,
       });
     } catch (err) {
       console.error('ProductFeature.index error:', err);
@@ -28,15 +40,20 @@ const productFeatureController = {
     }
   },
 
-  // Create form (needs categories to pick parent category feature)
+  // Create form
   create: async (req, res) => {
     try {
-      const categories = await CategoryFeature.findAll({ where: { status: 'active' } });
+      const products = await Product.findAll({
+        where: { status: 'active' },
+        attributes: ['id', 'name'],
+        order: [['name', 'ASC']],
+      });
+
       res.render('admin/productFeature/form', {
         layout: 'admin/layouts/admin',
         title: 'Add Product Feature',
-        product: {},           // empty product for the form
-        categories,
+        feature: {},
+        products,
         action: 'create',
       });
     } catch (err) {
@@ -49,15 +66,15 @@ const productFeatureController = {
   // Store new product feature
   store: async (req, res) => {
     try {
-      const { name, description, status, categoryFeatureId } = req.body;
+      const { productId, title, value, status } = req.body;
       const image = req.file ? req.file.filename : null;
 
       await ProductFeature.create({
-        name,
-        description,
+        product_id: productId,
+        title,
+        value,
         image,
         status: status || 'active',
-        category_feature_id: categoryFeatureId || null, // DB column (or use camel if your model maps differently)
       });
 
       req.flash('success_msg', 'Product Feature added successfully!');
@@ -72,17 +89,17 @@ const productFeatureController = {
   // Show single product feature
   show: async (req, res) => {
     try {
-      const product = await ProductFeature.findByPk(req.params.id, {
-        include: [{ model: CategoryFeature, as: 'category' }],
+      const feature = await ProductFeature.findByPk(req.params.id, {
+        include: [{ model: Product, as: 'product', include: [{ model: Category, as: 'category' }] }],
       });
-      if (!product) {
+      if (!feature) {
         req.flash('error_msg', 'Product Feature not found');
         return res.redirect('/admin/product-features');
       }
       res.render('admin/productFeature/show', {
         layout: 'admin/layouts/admin',
-        title: `Product Feature - ${product.name}`,
-        product,
+        title: `Product Feature - ${feature.title}`,
+        feature,
       });
     } catch (err) {
       console.error('ProductFeature.show error:', err);
@@ -94,17 +111,22 @@ const productFeatureController = {
   // Edit form
   edit: async (req, res) => {
     try {
-      const product = await ProductFeature.findByPk(req.params.id);
-      if (!product) {
+      const feature = await ProductFeature.findByPk(req.params.id);
+      if (!feature) {
         req.flash('error_msg', 'Product Feature not found');
         return res.redirect('/admin/product-features');
       }
-      const categories = await CategoryFeature.findAll({ where: { status: 'active' } });
+
+      const products = await Product.findAll({
+        where: { status: 'active' },
+        attributes: ['id', 'name'],
+      });
+
       res.render('admin/productFeature/form', {
         layout: 'admin/layouts/admin',
         title: 'Edit Product Feature',
-        product,
-        categories,
+        feature,
+        products,
         action: 'edit',
       });
     } catch (err) {
@@ -117,28 +139,26 @@ const productFeatureController = {
   // Update
   update: async (req, res) => {
     try {
-      const { name, description, status, categoryFeatureId } = req.body;
-      const product = await ProductFeature.findByPk(req.params.id);
-
-      if (!product) {
+      const { productId, title, value, status } = req.body;
+      const feature = await ProductFeature.findByPk(req.params.id);
+      if (!feature) {
         req.flash('error_msg', 'Product Feature not found');
         return res.redirect('/admin/product-features');
       }
 
-      // replace image if new uploaded
-      if (req.file && product.image) {
-        const oldPath = path.join(uploadPath, product.image);
+      if (req.file && feature.image) {
+        const oldPath = path.join(uploadPath, feature.image);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-        product.image = req.file.filename;
+        feature.image = req.file.filename;
       } else if (req.file) {
-        product.image = req.file.filename;
+        feature.image = req.file.filename;
       }
 
-      product.name = name;
-      product.description = description;
-      product.status = status;
-      product.category_feature_id = categoryFeatureId || null; // DB column
-      await product.save();
+      feature.product_id = productId;
+      feature.title = title;
+      feature.value = value;
+      feature.status = status;
+      await feature.save();
 
       req.flash('success_msg', 'Product Feature updated successfully!');
       res.redirect('/admin/product-features');
@@ -152,18 +172,18 @@ const productFeatureController = {
   // Delete
   destroy: async (req, res) => {
     try {
-      const product = await ProductFeature.findByPk(req.params.id);
-      if (!product) {
+      const feature = await ProductFeature.findByPk(req.params.id);
+      if (!feature) {
         req.flash('error_msg', 'Product Feature not found');
         return res.redirect('/admin/product-features');
       }
 
-      if (product.image) {
-        const imgPath = path.join(uploadPath, product.image);
+      if (feature.image) {
+        const imgPath = path.join(uploadPath, feature.image);
         if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
       }
 
-      await product.destroy();
+      await feature.destroy();
       req.flash('success_msg', 'Product Feature deleted successfully!');
       res.redirect('/admin/product-features');
     } catch (err) {

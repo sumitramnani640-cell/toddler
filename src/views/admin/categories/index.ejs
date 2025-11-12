@@ -20,6 +20,8 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Slug</th>
+                                <th>image</th>
+                                <th>banner_image</th>
                                 <th>Description</th>
                                 <th>Products</th>
                                 <th>Status</th>
@@ -36,6 +38,24 @@
                                         </td>
                                         <td>
                                             <code><%= category.slug %></code>
+                                        </td>
+                                          <td>
+                                            <span>
+                                                <% if (category.image) { %>
+                                                    <img src="/uploads/<%= category.image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
+                                                <% } else { %>
+                                                    <span class="text-muted">No image</span>
+                                                <% } %>
+                                        </td>
+
+                                        <td>
+                                            <span>
+                                                <% if (category.banner_image) { %>
+                                                    <img src="/uploads/<%= category.banner_image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
+                                                <% } else { %>
+                                                    <span class="text-muted">No image</span>
+                                                <% } %>
+                                            </span>
                                         </td>
                                         <td>
                                             <% if (category.description) { %>
@@ -54,6 +74,7 @@
                                                 <%= category.status %>
                                             </span>
                                         </td>
+                                      
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="/admin/categories/<%= category.id %>" class="btn btn-info btn-sm" title="View">

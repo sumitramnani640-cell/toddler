@@ -1,84 +1,199 @@
-
+<!-- views/admin/categories/edit.ejs -->
 <div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-edit mr-2"></i>Edit Category: <%= category.name %>
-                </h3>
-            </div>
-            <form action="/admin/categories/<%= category.id %>" method="POST">
-                <input type="hidden" name="_method" value="PUT">
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="name">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" name="name" value="<%= category.name %>" required>
-                        <small class="form-text text-muted">Enter a descriptive name for the category</small>
-                    </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-edit mr-2"></i>Edit Category: <%= category.name %>
+        </h3>
+      </div>
 
-                    <div class="form-group">
-                        <label for="slug">Slug <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="slug" name="slug" value="<%= category.slug %>" required>
-                        <small class="form-text text-muted">URL-friendly version of the name (lowercase, no spaces)</small>
-                    </div>
+      <form action="/admin/categories/<%= category.id %>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="PUT">
+        <div class="card-body">
+          <!-- Name -->
+          <div class="form-group">
+            <label for="name">Category Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= category.name %>" required>
+          </div>
 
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter category description"><%= category.description || '' %></textarea>
-                        <small class="form-text text-muted">Optional description for the category</small>
-                    </div>
+          <!-- Slug -->
+          <div class="form-group">
+            <label for="slug">Slug <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="slug" name="slug" value="<%= category.slug %>" required>
+            <small class="form-text text-muted">URL-friendly version of the name (lowercase, use hyphens)</small>
+          </div>
 
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select class="form-control" id="status" name="status">
-                            <option value="active" <%= category.status === 'active' ? 'selected' : '' %>>Active</option>
-                            <option value="inactive" <%= category.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
-                        </select>
-                    </div>
+          <!-- Description -->
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4"><%= category.description || '' %></textarea>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option value="active" <%= category.status === 'active' ? 'selected' : '' %>>Active</option>
+              <option value="inactive" <%= category.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+            </select>
+          </div>
+
+          <!-- IMAGES SECTION (2 columns) -->
+          <div class="row">
+            <!-- Category Image -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="image">Category Image</label>
+
+                <% if (category.image) { %>
+                  <div class="mb-2">
+                    <img src="<%= category.image %>" alt="Current category image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                    <p class="text-muted small">Current image</p>
+                  </div>
+                <% } %>
+
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="image" name="image" accept="image/*">
+                  <label class="custom-file-label" for="image">Choose new file (optional)</label>
                 </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save mr-1"></i> Update Category
-                    </button>
-                    <a href="/admin/categories" class="btn btn-secondary ml-2">
-                        <i class="fas fa-times mr-1"></i> Cancel
-                    </a>
+                <small class="form-text text-muted">Recommended square format (e.g., 600×600). Max 5MB.</small>
+
+                <div id="imagePreview" class="mt-2" style="display:none;">
+                  <img id="previewImg" src="" alt="Preview" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                  <p class="text-muted small">New image preview</p>
                 </div>
-            </form>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle mr-2"></i>Category Information
-                </h3>
+              </div>
             </div>
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Created:</dt>
-                    <dd class="col-sm-8"><%= new Date(category.createdAt).toLocaleDateString() %></dd>
-                    
-                    <dt class="col-sm-4">Updated:</dt>
-                    <dd class="col-sm-8"><%= new Date(category.updatedAt).toLocaleDateString() %></dd>
-                    
-                    <dt class="col-sm-4">ID:</dt>
-                    <dd class="col-sm-8"><%= category.id %></dd>
-                </dl>
+
+            <!-- Banner Image -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="banner_image">Banner / Cover Image</label>
+
+                <% if (category.banner_image) { %>
+                  <div class="mb-2">
+                    <img src="<%= category.banner_image %>" alt="Current banner image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                    <p class="text-muted small">Current banner</p>
+                  </div>
+                <% } %>
+
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="banner_image" name="banner_image" accept="image/*">
+                  <label class="custom-file-label" for="banner_image">Choose new file (optional)</label>
+                </div>
+                <small class="form-text text-muted">Recommended banner size ~1200×300. Max 5MB.</small>
+
+                <div id="bannerPreview" class="mt-2" style="display:none;">
+                  <img id="bannerPreviewImg" src="" alt="Banner Preview" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                  <p class="text-muted small">New banner preview</p>
+                </div>
+              </div>
             </div>
+          </div>
+          <!-- end images row -->
+
         </div>
+
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i> Update Category
+          </button>
+          <a href="/admin/categories" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-1"></i> Cancel
+          </a>
+        </div>
+      </form>
     </div>
+  </div>
+
+  <!-- Right column: info & quick actions -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-info-circle mr-2"></i>Category Information
+        </h3>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4">Created:</dt>
+          <dd class="col-sm-8"><%= new Date(category.createdAt).toLocaleString() %></dd>
+
+          <dt class="col-sm-4">Updated:</dt>
+          <dd class="col-sm-8"><%= new Date(category.updatedAt).toLocaleString() %></dd>
+
+          <dt class="col-sm-4">ID:</dt>
+          <dd class="col-sm-8"><%= category.id %></dd>
+
+          <dt class="col-sm-4">Products:</dt>
+          <dd class="col-sm-8"><span class="badge badge-info"><%= category.products ? category.products.length : 0 %> products</span></dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-tools mr-2"></i>Quick Actions</h3>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="/admin/categories/<%= category.id %>/edit" class="btn btn-warning">
+            <i class="fas fa-edit mr-1"></i> Edit
+          </a>
+          <a href="/admin/products/create" class="btn btn-primary">
+            <i class="fas fa-plus mr-1"></i> Add Product
+          </a>
+          <a href="/admin/categories" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-1"></i> Back to Categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    // Auto-generate slug from name
-    document.getElementById('name').addEventListener('input', function(e) {
-        const name = e.target.value;
-        const slug = name.toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-            .replace(/\s+/g, '-') // Replace spaces with hyphens
-            .replace(/-+/g, '-') // Replace multiple hyphens with single
-            .trim();
-        document.getElementById('slug').value = slug;
+  // Auto-generate slug from name (if you want same behavior)
+  (function() {
+    const nameEl = document.getElementById('name');
+    const slugEl = document.getElementById('slug');
+    if (!nameEl || !slugEl) return;
+    nameEl.addEventListener('input', function(e) {
+      const name = e.target.value;
+      const slug = name.toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      slugEl.value = slug;
     });
+  })();
+
+  // Preview + label update helper
+  function setupPreview(inputId, labelSelector, previewWrapId, previewImgId) {
+    const input = document.getElementById(inputId);
+    const label = document.querySelector(labelSelector);
+    const wrap = document.getElementById(previewWrapId);
+    const img = document.getElementById(previewImgId);
+    if (!input) return;
+
+    input.addEventListener('change', function(e) {
+      const file = input.files && input.files[0];
+      if (label) label.textContent = file ? file.name : 'Choose new file (optional)';
+      if (!file) {
+        if (wrap) wrap.style.display = 'none';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        if (img) img.src = evt.target.result;
+        if (wrap) wrap.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  setupPreview('image', 'label[for="image"].custom-file-label', 'imagePreview', 'previewImg');
+  setupPreview('banner_image', 'label[for="banner_image"].custom-file-label', 'bannerPreview', 'bannerPreviewImg');
 </script>

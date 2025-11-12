@@ -344,6 +344,96 @@ footer h6 {
     color: #fff;
 }
 
+
+
+/* container around all category blocks (optional) */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* category block spacing */
+.category-block {
+  margin-bottom: 2rem;
+}
+
+/* header row: title + view all */
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 0.75rem 0;
+}
+.category-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.view-all-btn {
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: #0b63d1;
+}
+
+/* product grid: responsive columns */
+.product-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+/* individual card */
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  overflow: hidden;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+/* clickable area fills card */
+.product-card > a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  padding: 10px; /* spacing inside card */
+}
+
+/* image container and sizing */
+.product-card img {
+  display: block;
+  width: 100%;
+  height: 160px;            /* fixed card image height — adjust as needed */
+  object-fit: cover;        /* important: crops image instead of stretching */
+  border-radius: 8px;
+}
+
+/* product info */
+.product-card h4 {
+  margin: 8px 0 4px;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  color: #0b63d1; /* link-like color you had */
+}
+.product-card .price {
+  font-size: 0.85rem;
+  color: #333;
+}
+
+/* hover */
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+/* mobile adjustments (if you want smaller images on tiny screens) */
+@media (max-width: 480px) {
+  .product-card img { height: 130px; }
+  .product-preview-grid { gap: 10px; }
+}
+
+
 /* ✅ RESPONSIVE DESIGN */
 @media (max-width: 991px) {
     .product-card {
@@ -445,7 +535,8 @@ footer h6 {
 </div>
 
 
-    <div class="main-container"> <!-- ✅ BANNERS -->
+    <div class="main-container">
+         <!-- ✅ BANNERS -->
         <% if (banners && banners.length> 0) { %> <section class="py-4">
                 <div class="container">
                     <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -460,323 +551,117 @@ footer h6 {
                 </div>
             </section>
             <% } %> <!-- ✅ CATEGORIES -->
-                <% if (categories && categories.length> 0) { %> <section id="categories" class="py-5 bg-light">
-                        <div class="container">
-                            <h3 class="mb-4 fw-bold text-center">Shop by Category</h3>
-                            <div class="row">
-                                <% categories.slice(0,8).forEach(cat=> { %> <div class="col-md-3 mb-4">
-                                        <div class="card category-card shadow-sm"> <img
-                                                src="/uploads/categories/<%= cat.image || 'placeholder.jpg' %>"
-                                                class="card-img-top" alt="">
-                                            <div class="card-body text-center">
-                                                <h6 class="fw-bold">
-                                                    <%= cat.name %>
-                                  <a href="/shop/<%= cat.slug %>" class="btn btn-sm btn-warning mt-2">View More</a>
+<% if (categories && categories.length > 0) { %>
+<section id="categories" class="py-5 bg-light">
+  <div class="container">
+    <h3 class="mb-4 fw-bold text-center">Shop by Category</h3>
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <% }) %>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <% } %> <!-- sea food -->
-                        <div class="category-section">
-                            <div class="category-header">
-                                <h2>Sea Food </h2> <a href="/category/Sea-Food" class="view-all">View All</a>
-                            </div>
-                            <div class="banner"> <img src="/uploads/banners/Sea-Food-1920x300 (2).jpg"
-                                    alt="Sea Food Banner"> </div>
-                        </div> </br>
-                        <div class="products-container"> <!-- Product Card 1 -->
-                            <div class="product-card shadow-sm">
-                                <div class="product-image"> <img
-                                        src="/uploads/products/product-1761652881184-844103241.jpg"
-                                        alt="Canned Tuna Fish"> </div>
-                                <div class="product-info">
-                                    <h6 class="product-title">Canned Tuna Fish</h6> <button class="add-btn">
-                                        <h6>View Product</h6>
-                                    </button>
-                                </div>
-                            </div> <!-- Product Card 2 -->
-                            <div class="product-card shadow-sm">
-                                <div class="product-image"> <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon">
-                                </div>
-                                <div class="product-info">
-                                    <h6 class="product-title">Fresh Salmon</h6> <button class="add-btn">
-                                        <h6>View Product</h6>
-                                    </button>
-                                </div>
-                            </div> <!-- Product Card 3 -->
-                            <div class="product-card shadow-sm">
-                                <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
-                                </div>
-                                <div class="product-info">
-                                    <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                                        <h6>View Product</h6>
-                                    </button>
-                                </div>
-                            </div> <!-- Product Card 3 -->
-                            <div class="product-card shadow-sm">
-                                <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel">
-                                </div>
-                                <div class="product-info">
-                                    <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                                        <h6>View Product</h6>
-                                    </button>
-                                </div>
-                            </div> <!-- Product Card 4 -->
-                            <div class="product-card shadow-sm">
-                                <div class="product-image"> <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp">
-                                </div>
-                                <div class="product-info">
-                                    <h6 class="product-title">Raw Shrimp</h6> <button class="add-btn">
-                                        <h6>View Product</h6>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-    </div> <!-- sea food -->
-    <div class="category-section">
-        <div class="category-header">
-            <h2>Meat And Cold Cuts </h2> <a href="/category/Meat" class="view-all">View All</a>
+    <div class="row">
+      <% categories.slice(0,8).forEach(cat => { %>
+        <div class="col-sm-6 col-md-3 mb-4">
+          <div class="card category-card shadow-sm">
+            <a href="/shop/<%= cat.slug %>" class="category-link d-block text-decoration-none text-reset">
+              <!-- cover image -->
+              <img
+                src="/uploads/categories/<%= cat.image || 'placeholder.jpg' %>"
+                alt="<%= cat.name %> category"
+                class="card-img-top category-img"
+                loading="lazy"
+              >
+
+              <div class="card-body text-center py-3">
+                <h6 class="fw-bold mb-2"><%= cat.name %></h6>
+
+                <!-- separate button (keeps proper semantics) -->
+                <span class="d-inline-block">
+                  <button type="button" class="btn btn-sm btn-warning view-more-btn" aria-label="View more <%= cat.name %>">
+                    View More
+                  </button>
+                </span>
+              </div>
+            </a>
+          </div>
         </div>
-        <div class="banner"> <img src="/uploads/banners/Meat-1920x300 (2).jpg" alt="Sea Food Banner"> </div>
-    </div> </br>
-    <div class="products-container"> <!-- Product Card 1 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/product-1761652881184-844103241.jpg"
-                    alt="Canned Tuna Fish"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Canned Tuna Fish</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 2 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Fresh Salmon</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-         <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-         <!-- Product Card 4 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Raw Shrimp</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
+      <% }) %>
     </div>
-    </div> <!-- sea food -->
-    <div class="category-section">
-        <div class="category-header">
-            <h2>Dairy And Eggs</h2> <a href="/category/dairy" class="view-all">View All</a>
-        </div>
-        <div class="banner"> <img src="\uploads\banners\dairynew-1920x300 (1).png" alt="Sea Food Banner"> </div>
-    </div> </br>
-    <div class="products-container"> 
-        <!-- Product Card 1 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="\uploads\products\product-1762411403792-740197554.jpg"
-                    alt="Canned Tuna Fish"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Canned Tuna Fish</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-         <!-- Product Card 2 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Fresh Salmon</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-         <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> 
-        <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> 
-        <!-- Product Card 4 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Raw Shrimp</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
+
+  </div>
+</section>
+<% } %>
+
+
+ <% categoriesWithPreview.slice(8, 13).forEach(({ category, previewProducts }) => { %>
+  <section class="category-block">
+    <div class="category-header">
+      <h2><%= category.name %></h2>
+
+      <a class="view-all-btn" href="/shop/<%= category.slug %>">View All</a>
     </div>
+    <br>
+    <br>
+
+    <div class="product-preview-grid">
+      <% previewProducts.forEach(product => { %>
+        <div class="product-card">
+          <a href="/product/<%= product.slug %>">
+            <% if (product.images && product.images.length) { %>
+              <img src="<%= product.images[0].filename %>" alt="<%= product.name %>">
+            <% } else { %>
+              <img src="/images/placeholder.png" alt="placeholder">
+            <% } %>
+            <h4><%= product.name %></h4>
+            <div class="price">₹ <%= product.price %></div>
+          </a>
+        </div>
+      <% }) %>
     </div>
-     <!-- sea food -->
-    <div class="category-section">
-        <div class="category-header">
-            <h2>Beverages </h2> <a href="/category/Beverage" class="view-all">View All</a>
+  </section>
+<% }) %>
+
+
+
+                    <!-- ✅ FEATURED PRODUCTS -->
+   <% if (featuredProducts && featuredProducts.length > 0) { %>
+<section id="products" class="py-5">
+  <div class="container">
+    <h3 class="mb-4 fw-bold text-center">Featured Products</h3>
+    <div class="row">
+      <% featuredProducts.slice(0, 4).forEach(function(prod) { %>
+        <div class="col-md-3 mb-4">
+          <div class="card product-card shadow-sm">
+            <img src="<%= prod.image %>" class="card-img-top" alt="<%= prod.name %>">
+            <div class="card-body">
+              <h6 class="fw-bold text-truncate"><%= prod.name %></h6>
+              <p class="text-muted small"><%= prod.description ? prod.description.substring(0,50) : '' %>...</p>
+
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-success fw-bold">$<%= prod.price %></span>
+                <span class="badge bg-<%= (prod.stock > 0) ? 'success' : 'danger' %>">
+                  <%= (prod.stock > 0) ? 'In Stock' : 'Out Of Stock' %>
+                </span>
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <!-- Example Like button -->
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary like-btn"
+                        data-product-id="<%= prod.id %>">
+                  <i class="bi bi-hand-thumbs-up"></i> <span class="like-text">Like</span>
+                </button>
+
+                <!-- Example View product -->
+                <a href="/product/<%= prod.slug %>" class="btn btn-sm btn-primary">View</a>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div class="banner"> <img src="/uploads/banners/Beverages-1920x300 (2).jpg" alt="Sea Food Banner"> </div>
-    </div> </br>
-    <div class="products-container"> <!-- Product Card 1 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/product-1761652881184-844103241.jpg"
-                    alt="Canned Tuna Fish"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Canned Tuna Fish</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-         <!-- Product Card 2 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Fresh Salmon</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/product-1761652881184-844103241.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> 
-        <!-- Product Card 4 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Raw Shrimp</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
+      <% }) %>
     </div>
-    </div>
-    </div> 
-    <!-- sea food -->
-    <div class="category-section">
-        <div class="category-header">
-            <h2>Household Essential</h2> <a href="/category/Meat" class="view-all">View All</a>
-        </div>
-        <div class="banner"> <img src="/uploads/banners/Household-1920x300 (2).jpg" alt="Sea Food Banner"> </div>
-    </div> </br>
-    <div class="products-container"> <!-- Product Card 1 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/product-1761652881184-844103241.jpg"
-                    alt="Canned Tuna Fish"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Canned Tuna Fish</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 2 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish2.jpg" alt="Fresh Salmon"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Fresh Salmon</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 3 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish3.jpg" alt="King Mackerel"> </div>
-            <div class="product-info">
-                <h6 class="product-title">King Mackerel</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div> <!-- Product Card 4 -->
-        <div class="product-card shadow-sm">
-            <div class="product-image"> <img src="/uploads/products/fish4.jpg" alt="Raw Shrimp"> </div>
-            <div class="product-info">
-                <h6 class="product-title">Raw Shrimp</h6> <button class="add-btn">
-                    <h6>View Product</h6>
-                </button>
-            </div>
-        </div>
-    </div>
-    </div> <!-- ✅ FEATURED PRODUCTS -->
-    <% if (featuredProducts && featuredProducts.length> 0) { %> <section id="products" class="py-5">
-            <div class="container">
-                <h3 class="mb-4 fw-bold text-center">Featured Products</h3>
-                <div class="row">
-                    <% featuredProducts.slice(0, 4).forEach(prod=> { %> <div class="col-md-3 mb-4">
-                            <div class="card product-card shadow-sm"> <img src="<%= prod.image %>" class="card-img-top"
-                                    alt="">
-                                <div class="card-body">
-                                    <h6 class="fw-bold text-truncate">
-                                        <%= prod.name %>
-                                    </h6>
-                                    <p class="text-muted small">
-                                        <%= prod.description?.substring(0,50) %>...
-                                    </p>
-                                    <div class="d-flex justify-content-between align-items-center"> <span
-                                            class="text-success fw-bold">$<%= prod.price %></span> <span
-                                            class="badge bg-<%= prod.stock>0 ? 'success' : 'danger' %>">
-                                            <%= prod.stock>0 ? 'In Stock' : 'Out Of Stock' %>
-                                        </span> </div>
-                                </div>
-                            </div>
-                        </div>
-                        <% }) %>
-                </div>
-            </div>
-        </section> 
-        <% } %>
+  </div>
+</section>
+<% } %>
+
             </div>
              <!-- ✅ AMAZON STYLE FOOTER -->
             <footer class="mt-5">
