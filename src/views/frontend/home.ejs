@@ -10,8 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
     <style>
-        /* RESET & BASE */
+    /* RESET & BASE */
 * {
     margin: 0;
     padding: 0;
@@ -164,74 +165,108 @@ html {
     border-radius: 0 !important;
 }
 
-/* ✅ CATEGORY SECTION */
-.category-section {
-    margin: 40px auto;
-    background: #ffffff;
-    padding: 20px 0;
-    max-width: 1200px;
+/* =========================
+   CATEGORY / PRODUCT STYLES
+   ========================= */
+
+/* Defaults for category area (keeps original visual) */
+.category-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(18, 38, 63, 0.06);
+    transition: transform .18s ease, box-shadow .18s ease;
+    padding: 15px;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
-.banner-carousel {
-    border-radius: 8px;
-    height: 200px;
-    object-fit: cover;
-    width: 100%;
-}
-
-.category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.category-header h2 {
-    font-size: 28px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #086615 0%, #0b5733 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    position: relative;
-}
-
-.category-header h2::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(135deg, #04580b 0%, #045533 100%);
-    border-radius: 2px;
-}
-
-.view-all {
-    font-size: 14px;
+/* center entire clickable card */
+.category-card > a {
+    display: block;
+    color: inherit;
     text-decoration: none;
-    color: #054e1d;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    padding: 8px 15px;
-    border-radius: 8px;
-    background: rgba(102, 126, 234, 0.1);
 }
 
-.view-all:hover {
-    color: #055709;
-    background: rgba(102, 126, 234, 0.2);
-    transform: translateX(5px);
-}
-
-/* ✅ PRODUCT GRID */
-.products-container {
+/* product-style image wrapper used when you want product-like cards */
+.category-card .category-img-wrap {
+    width: 100%;
+    height: 310px;              /* visual height — adjust as needed */
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
     display: flex;
-    gap: 20px;
+    align-items: center;
     justify-content: center;
-    padding: 20px 0;
+    padding: 15px;
 }
 
-/* ✅ PRODUCT CARD */
+/* THE IMAGE STYLE (same as product image look) */
+.category-card .category-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 10px;
+    transition: transform .3s ease;
+}
+
+/* zoom effect */
+.category-card:hover .category-img {
+    transform: scale(1.05);
+}
+
+/* title below image (optional) */
+.category-card h6,
+.category-card .category-title {
+    margin-top: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* ***************
+   IMAGE-ONLY SQUARE CARDS
+   Use these classes when you want image-only cards (no title, card equals image size)
+   *************** */
+
+/* container style for image-only category cards (square) */
+.category-card-img-only {
+    width: 100%;
+    aspect-ratio: 1 / 1;         /* perfect square */
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(18, 38, 63, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease, box-shadow .2s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* hover for image-only */
+.category-card-img-only:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba(18, 38, 63, 0.16);
+}
+
+/* image inside image-only card */
+.category-img-only {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;           /* fills the whole square */
+    display: block;
+    border-radius: 0;            /* image fills entire card */
+}
+
+/* If you want rectangular image-only (adjust aspect-ratio as needed) */
+/* .category-card-img-only { aspect-ratio: 4 / 3; } */
+
+/* =========================
+   PRODUCT CARD (existing styles preserved + cleaned duplicates)
+   ========================= */
+
 .product-card {
     width: 230px;
     border: none;
@@ -315,7 +350,7 @@ html {
     box-shadow: 0 5px 15px rgba(2, 80, 21, 0.4);
 }
 
-/* ✅ FOOTER */
+/* Footer */
 footer {
     width: 100%;
     background: linear-gradient(135deg, #045838 0%, #045234 100%);
@@ -343,8 +378,6 @@ footer h6 {
     margin-bottom: 15px;
     color: #fff;
 }
-
-
 
 /* container around all category blocks (optional) */
 .container {
@@ -383,7 +416,7 @@ footer h6 {
   align-items: start;
 }
 
-/* individual card */
+/* individual product-card override kept for product grid */
 .product-card {
   background: #fff;
   border-radius: 10px;
@@ -400,7 +433,7 @@ footer h6 {
   padding: 10px; /* spacing inside card */
 }
 
-/* image container and sizing */
+/* image container and sizing for generic product-card img */
 .product-card img {
   display: block;
   width: 100%;
@@ -433,8 +466,10 @@ footer h6 {
   .product-preview-grid { gap: 10px; }
 }
 
+/* =========================
+   RESPONSIVE ADJUSTMENTS
+   ========================= */
 
-/* ✅ RESPONSIVE DESIGN */
 @media (max-width: 991px) {
     .product-card {
         width: 200px;
@@ -453,6 +488,9 @@ footer h6 {
     .banner img {
         height: 200px;
     }
+
+    /* make image-only cards slightly shorter on narrow screens */
+    .category-card-img-only { aspect-ratio: 1 / 1; }
 }
 
 @media (max-width: 420px) {
@@ -464,8 +502,7 @@ footer h6 {
         height: 180px;
     }
 }
-
-    </style>
+</style>
 </head>
 
 <!-- thin sub-nav -->
@@ -550,37 +587,39 @@ footer h6 {
                     </div>
                 </div>
             </section>
-            <% } %> <!-- ✅ CATEGORIES -->
+            <% } %><!-- ✅ CATEGORIES -->
 <% if (categories && categories.length > 0) { %>
 <section id="categories" class="py-5 bg-light">
   <div class="container">
     <h3 class="mb-4 fw-bold text-center">Shop by Category</h3>
 
     <div class="row">
-      <% categories.slice(0,8).forEach(cat => { %>
+      <% categories.slice(0, 8).forEach(cat => { %>
         <div class="col-sm-6 col-md-3 mb-4">
-          <div class="card category-card shadow-sm">
-            <a href="/shop/<%= cat.slug %>" class="category-link d-block text-decoration-none text-reset">
-              <!-- cover image -->
-              <img
-                src="/uploads/categories/<%= cat.image || 'placeholder.jpg' %>"
-                alt="<%= cat.name %> category"
-                class="card-img-top category-img"
-                loading="lazy"
-              >
+          
+          <div class="card category-card">
 
-              <div class="card-body text-center py-3">
-                <h6 class="fw-bold mb-2"><%= cat.name %></h6>
+            <a href="/shop/<%= cat.slug %>" class="d-block text-reset text-decoration-none">
 
-                <!-- separate button (keeps proper semantics) -->
-                <span class="d-inline-block">
-                  <button type="button" class="btn btn-sm btn-warning view-more-btn" aria-label="View more <%= cat.name %>">
-                    View More
-                  </button>
-                </span>
+              <!-- 🔥 CATEGORY IMAGE ONLY -->
+              <div class="category-img-wrap">
+                <img 
+                  src="<%= cat.image ? cat.image : '/placeholder.jpg' %>?v=<%= cat.updatedAt ? cat.updatedAt.getTime() : Date.now() %>"
+                  alt="<%= cat.name %>"
+                  class="category-img"
+                  loading="lazy"
+                />
               </div>
+
+              <!-- ❌ Removed category name -->
+              <!-- <div class="card-body text-center">
+                <h6 class="fw-bold mb-2"><%= cat.name %></h6>
+              </div> -->
+
             </a>
+
           </div>
+
         </div>
       <% }) %>
     </div>
@@ -588,6 +627,9 @@ footer h6 {
   </div>
 </section>
 <% } %>
+
+
+
 
 
  <% categoriesWithPreview.slice(8, 13).forEach(({ category, previewProducts }) => { %>

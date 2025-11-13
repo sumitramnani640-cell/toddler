@@ -1,258 +1,306 @@
 // src/controllers/admin/categoryController.js
-const path = require('path');
-const fs = require('fs');
-const { Category, Product } = require('../../models');
-const { Op } = require('sequelize');
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const { Category, Product } = require("../../models");
+const { Op } = require("sequelize");
 
-const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'categories');
+/* ---------------------------------------------
+   UPLOAD FOLDERS
+--------------------------------------------- */
+const categoryDir = path.join(process.cwd(), "public", "uploads", "categories");
+const bannerDir = path.join(process.cwd(), "public", "uploads", "banner_image");
 
-// ensure uploads folder exists
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+if (!fs.existsSync(categoryDir)) fs.mkdirSync(categoryDir, { recursive: true });
+if (!fs.existsSync(bannerDir)) fs.mkdirSync(bannerDir, { recursive: true });
 
-/**
- * Helper to delete a stored banner file given a public path like '/uploads/categories/filename.jpg'
- */
-function deleteBannerIfExists(publicPath) {
+/* ---------------------------------------------
+   MULTER STORAGE (choose destination by fieldname)
+--------------------------------------------- */
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (file.fieldname === "banner_image") cb(null, bannerDir);
+    else cb(null, categoryDir);
+  },
+  filename: (req, file, cb) => {
+    const prefix = file.fieldname === "banner_image" ? "banner-" : "image-";
+    const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, prefix + unique + ext);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowed = /^image\/(jpeg|jpg|png|gif|webp)$/;
+  if (allowed.test(file.mimetype)) cb(null, true);
+  else cb(new Error("Only image files allowed (JPG, PNG, WEBP, GIF)"));
+};
+
+// accept up to one file each for 'image' and 'banner_image'
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+}).fields([
+  { name: "image", maxCount: 1 },
+  { name: "banner_image", maxCount: 1 }
+]);
+
+/* ---------------------------------------------
+   UTILITIES
+--------------------------------------------- */
+function deleteFile(publicPath) {
   if (!publicPath) return;
-  const fname = path.basename(publicPath);
-  const full = path.join(uploadsDir, fname);
-  if (fs.existsSync(full)) {
-    try {
+
+  try {
+    // Remove query string if any, and remove host if full URL provided
+    const cleaned = publicPath.split("?")[0].replace(/^https?:\/\/[^/]+/, "");
+    const rel = cleaned.replace(/^\/+/, ""); // remove leading slash(es)
+    const full = path.join(process.cwd(), "public", rel);
+
+    if (fs.existsSync(full)) {
       fs.unlinkSync(full);
-    } catch (err) {
-      console.error('Failed to delete file:', full, err);
+      console.log("Deleted file:", full);
+    } else {
+      console.warn("File to delete not found:", full);
     }
+  } catch (e) {
+    console.error("deleteFile error:", e);
   }
 }
 
-/**
- * Build safe slug from given string (or return empty string)
- */
-function buildSlug(s) {
-  if (!s) return '';
-  return String(s).toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')   // remove special chars
-    .replace(/\s+/g, '-')           // spaces -> hyphens
-    .replace(/-+/g, '-')            // collapse multiple hyphens
-    .replace(/(^-|-$)/g, '');       // trim leading/trailing hyphens
+function slugify(str) {
+  return String(str || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
+/* ---------------------------------------------
+   CONTROLLER
+--------------------------------------------- */
 const categoryController = {
-  // List all categories
   index: async (req, res) => {
     try {
       const categories = await Category.findAll({
-        include: [{
-          model: Product,
-          as: 'products',
-          attributes: ['id']
-        }],
-        order: [['createdAt', 'DESC']]
+        include: [{ model: Product, as: "products", attributes: ["id"] }],
+        order: [["createdAt", "DESC"]],
       });
 
-      res.render('admin/categories/index', {
-        title: 'Categories - Savers Grocery Admin',
-        categories
+      res.render("admin/categories/index", {
+        title: "Categories - Admin",
+        categories,
       });
-
     } catch (error) {
-      console.error('Categories index error:', error);
-      req.flash('error_msg', 'Error loading categories');
-      res.redirect('/admin/dashboard');
+      console.error("Index error:", error);
+      req.flash("error_msg", "Error loading categories");
+      res.redirect("/admin/dashboard");
     }
   },
 
-  // Show create category form
   create: (req, res) => {
-    res.render('admin/categories/create', {
-      title: 'Add Category - Savers Grocery Admin'
+    res.render("admin/categories/create", { title: "Add Category" });
+  },
+
+  /* ---------------------------------------------
+     STORE CATEGORY (handle two uploads)
+  --------------------------------------------- */
+  store: (req, res) => {
+    upload(req, res, async function (err) {
+      if (err) {
+        console.error("Upload Error:", err);
+        req.flash("error_msg", err.message);
+        return res.redirect("/admin/categories/create");
+      }
+
+      try {
+        const { name, description, status } = req.body;
+
+        if (!name || name.trim() === "") {
+          req.flash("error_msg", "Category name is required");
+          return res.redirect("/admin/categories/create");
+        }
+
+        let slug = slugify(req.body.slug || name);
+
+        const exists = await Category.findOne({ where: { slug } });
+        if (exists) {
+          req.flash("error_msg", "Slug already exists");
+          return res.redirect("/admin/categories/create");
+        }
+
+        // build file paths if uploaded
+        const imageFile =
+          req.files && req.files.image && req.files.image[0]
+            ? `/uploads/categories/${req.files.image[0].filename}`
+            : null;
+
+        const bannerFile =
+          req.files && req.files.banner_image && req.files.banner_image[0]
+            ? `/uploads/banner_image/${req.files.banner_image[0].filename}`
+            : null;
+
+        await Category.create({
+          name,
+          slug,
+          description: description || null,
+          status: status || "active",
+          image: imageFile,
+          banner_image: bannerFile,
+        });
+
+        req.flash("success_msg", "Category created successfully");
+        res.redirect("/admin/categories");
+      } catch (error) {
+        console.error("Store Error:", error);
+        req.flash("error_msg", "Error creating category");
+        res.redirect("/admin/categories/create");
+      }
     });
   },
 
-  // Store new category (supports optional file upload in req.file)
-  store: async (req, res) => {
-    try {
-      const { name } = req.body;
-      // use provided slug or generate from name
-      const rawSlug = (req.body.slug || name || '').toString();
-      let slugValue = buildSlug(rawSlug);
-      if (!slugValue) slugValue = `cat-${Date.now()}`;
-
-      // Check if slug already exists
-      const existingCategory = await Category.findOne({
-        where: { slug: slugValue }
-      });
-
-      if (existingCategory) {
-        // remove uploaded file (if any) to avoid orphan
-        if (req.file) deleteBannerIfExists(`/uploads/categories/${req.file.filename}`);
-
-        req.flash('error_msg', 'A category with this slug already exists');
-        return res.redirect('/admin/categories/create');
-      }
-
-      const banner_image = req.file ? `/uploads/categories/${req.file.filename}` : null;
-      const description = req.body.description || null;
-      const status = req.body.status || 'active';
-
-      await Category.create({
-        name,
-        slug: slugValue,
-        description,
-        status,
-        banner_image
-      });
-
-      req.flash('success_msg', 'Category created successfully');
-      res.redirect('/admin/categories');
-
-    } catch (error) {
-      console.error('Category store error:', error);
-      if (req.file) deleteBannerIfExists(`/uploads/categories/${req.file.filename}`);
-      req.flash('error_msg', 'Error creating category');
-      res.redirect('/admin/categories/create');
-    }
-  },
-
-  // Show single category
+  /* ---------------------------------------------
+     SHOW CATEGORY
+  --------------------------------------------- */
   show: async (req, res) => {
     try {
       const category = await Category.findByPk(req.params.id, {
-        include: [{
-          model: Product,
-          as: 'products',
-          attributes: ['id', 'name', 'slug', 'price', 'image', 'category_id', 'stock', 'status', 'createdAt']
-        }]
+        include: [{ model: Product, as: "products", attributes: ["id", "name", "price"] }],
       });
 
       if (!category) {
-        req.flash('error_msg', 'Category not found');
-        return res.redirect('/admin/categories');
+        req.flash("error_msg", "Category not found");
+        return res.redirect("/admin/categories");
       }
 
-      res.render('admin/categories/show', {
-        title: `${category.name} - Savers Grocery Admin`,
-        category
+      res.render("admin/categories/show", {
+        title: `View ${category.name}`,
+        category,
       });
-
     } catch (error) {
-      console.error('Category show error:', error);
-      req.flash('error_msg', 'Error loading category');
-      res.redirect('/admin/categories');
+      console.error("Show error:", error);
+      req.flash("error_msg", "Error loading category");
+      res.redirect("/admin/categories");
     }
   },
 
-  // Show edit category form
+  /* ---------------------------------------------
+     EDIT CATEGORY
+  --------------------------------------------- */
   edit: async (req, res) => {
     try {
       const category = await Category.findByPk(req.params.id);
-
       if (!category) {
-        req.flash('error_msg', 'Category not found');
-        return res.redirect('/admin/categories');
+        req.flash("error_msg", "Category not found");
+        return res.redirect("/admin/categories");
       }
 
-      res.render('admin/categories/edit', {
-        title: `Edit ${category.name} - Savers Grocery Admin`,
-        category
+      res.render("admin/categories/edit", {
+        title: `Edit ${category.name}`,
+        category,
       });
-
     } catch (error) {
-      console.error('Category edit form error:', error);
-      req.flash('error_msg', 'Error loading edit form');
-      res.redirect('/admin/categories');
+      console.error("Edit error:", error);
+      req.flash("error_msg", "Error loading edit page");
+      res.redirect("/admin/categories");
     }
   },
 
-  // Update category (supports optional file upload in req.file)
-  update: async (req, res) => {
-    try {
-      const category = await Category.findByPk(req.params.id);
-      if (!category) {
-        // cleanup uploaded file if any
-        if (req.file) deleteBannerIfExists(`/uploads/categories/${req.file.filename}`);
-
-        req.flash('error_msg', 'Category not found');
-        return res.redirect('/admin/categories');
-      }
-
-      const { name, description } = req.body;
-      const rawSlug = (req.body.slug || name || '').toString();
-      let slugValue = buildSlug(rawSlug);
-      if (!slugValue) slugValue = `cat-${Date.now()}`;
-
-      // Check if slug already exists (excluding current category)
-      const existingCategory = await Category.findOne({
-        where: {
-          slug: slugValue,
-          id: { [Op.ne]: category.id }
-        }
-      });
-
-      if (existingCategory) {
-        if (req.file) deleteBannerIfExists(`/uploads/categories/${req.file.filename}`);
-        req.flash('error_msg', 'A category with this slug already exists');
+  /* ---------------------------------------------
+     UPDATE CATEGORY (handle two uploads)
+  --------------------------------------------- */
+  update: (req, res) => {
+    upload(req, res, async function (err) {
+      if (err) {
+        console.error("Upload error (update):", err);
+        req.flash("error_msg", err.message);
         return res.redirect(`/admin/categories/${req.params.id}/edit`);
       }
 
-      // If a new file was uploaded, remove the old banner and set new one
-      if (req.file) {
-        if (category.banner_image) deleteBannerIfExists(category.banner_image);
-        category.banner_image = `/uploads/categories/${req.file.filename}`;
+      try {
+        console.log("Update files:", req.files);
+        console.log("Update body:", req.body);
+
+        const category = await Category.findByPk(req.params.id);
+        if (!category) {
+          req.flash("error_msg", "Category not found");
+          return res.redirect("/admin/categories");
+        }
+
+        const { name, description, status } = req.body;
+
+        let slug = slugify(req.body.slug || name);
+        const exists = await Category.findOne({
+          where: { slug, id: { [Op.ne]: category.id } },
+        });
+
+        if (exists) {
+          req.flash("error_msg", "Slug already exists");
+          return res.redirect(`/admin/categories/${category.id}/edit`);
+        }
+
+        // handle regular image (stored in /uploads/categories)
+        if (req.files && req.files.image && req.files.image[0]) {
+          if (category.image) deleteFile(category.image);
+          category.image = `/uploads/categories/${req.files.image[0].filename}`;
+        }
+
+        // handle banner image (stored in /uploads/banner_image)
+        if (req.files && req.files.banner_image && req.files.banner_image[0]) {
+          if (category.banner_image) deleteFile(category.banner_image);
+          category.banner_image = `/uploads/banner_image/${req.files.banner_image[0].filename}`;
+        }
+
+        // update other fields
+        category.name = name || category.name;
+        category.slug = slug;
+        category.description = typeof description !== "undefined" ? description : category.description;
+        category.status = status || category.status;
+
+        await category.save();
+
+        req.flash("success_msg", "Category updated successfully");
+        res.redirect("/admin/categories");
+      } catch (error) {
+        console.error("Update error:", error);
+        req.flash("error_msg", "Error updating category");
+        res.redirect(`/admin/categories/${req.params.id}/edit`);
       }
-
-      // Update fields
-      category.name = name || category.name;
-      category.slug = slugValue;
-      category.description = typeof description !== 'undefined' ? description : category.description;
-      category.status = req.body.status || 'active';
-
-      await category.save();
-
-      req.flash('success_msg', 'Category updated successfully');
-      res.redirect('/admin/categories');
-
-    } catch (error) {
-      console.error('Category update error:', error);
-      if (req.file) deleteBannerIfExists(`/uploads/categories/${req.file.filename}`);
-      req.flash('error_msg', 'Error updating category');
-      res.redirect(`/admin/categories/${req.params.id}/edit`);
-    }
+    });
   },
 
-  // Delete category
+  /* ---------------------------------------------
+     DELETE CATEGORY
+  --------------------------------------------- */
   destroy: async (req, res) => {
     try {
       const category = await Category.findByPk(req.params.id);
       if (!category) {
-        req.flash('error_msg', 'Category not found');
-        return res.redirect('/admin/categories');
+        req.flash("error_msg", "Category not found");
+        return res.redirect("/admin/categories");
       }
 
-      // Check if category has products
-      const productCount = await Product.count({
-        where: { category_id: category.id }
-      });
-
-      if (productCount > 0) {
-        req.flash('error_msg', 'Cannot delete category with existing products');
-        return res.redirect('/admin/categories');
+      const count = await Product.count({ where: { category_id: category.id } });
+      if (count > 0) {
+        req.flash("error_msg", "Cannot delete category with products");
+        return res.redirect("/admin/categories");
       }
 
-      // delete banner file if exists
-      if (category.banner_image) deleteBannerIfExists(category.banner_image);
+      if (category.image) deleteFile(category.image);
+      if (category.banner_image) deleteFile(category.banner_image);
 
       await category.destroy();
 
-      req.flash('success_msg', 'Category deleted successfully');
-      res.redirect('/admin/categories');
-
+      req.flash("success_msg", "Category deleted successfully");
+      res.redirect("/admin/categories");
     } catch (error) {
-      console.error('Category delete error:', error);
-      req.flash('error_msg', 'Error deleting category');
-      res.redirect('/admin/categories');
+      console.error("Delete error:", error);
+      req.flash("error_msg", "Error deleting");
+      res.redirect("/admin/categories");
     }
-  }
+  },
 };
 
 module.exports = categoryController;

@@ -184,7 +184,7 @@
     <% products.slice(0, 15).forEach(product => { %>
       <div class="col-lg-4 col-md-6 col-sm-6 col-12 d-flex justify-content-center">
         <div class="card shadow-sm text-center" style="width: 300px; border-radius: 10px; height: 420px;">
-          <img src="<%= product.image || '/images/placeholder.jpg' %>"  
+          <img src="<%= product.image || 'placeholder.jpg' %>"  
                class="card-img-top" 
                alt="<%= product.name %>" 
                style="height:300px; object-fit: contain; padding:10px;">
