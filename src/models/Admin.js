@@ -8,6 +8,7 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
+
         name: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -16,6 +17,7 @@ module.exports = (sequelize) => {
                 len: [2, 100]
             }
         },
+
         email: {
             type: DataTypes.STRING(100),
             allowNull: false,
@@ -25,6 +27,7 @@ module.exports = (sequelize) => {
                 notEmpty: true
             }
         },
+
         password: {
             type: DataTypes.STRING(255),
             allowNull: false,
@@ -33,19 +36,46 @@ module.exports = (sequelize) => {
                 len: [6, 255]
             }
         },
+
         role: {
             type: DataTypes.ENUM('admin', 'super_admin'),
             defaultValue: 'admin',
             allowNull: false
         },
+
         status: {
             type: DataTypes.ENUM('active', 'inactive'),
             defaultValue: 'active',
             allowNull: false
+        },
+
+        /** --------------------------
+         *  OTP + Verification Fields
+         * --------------------------*/
+
+        is_verified: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+
+        otp: {
+            type: DataTypes.STRING,
+            allowNull: true  // Store hashed OTP
+        },
+
+        otp_expires: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+
+        otp_purpose: {
+            type: DataTypes.ENUM('registration', 'forgot_password'),
+            allowNull: true
         }
     }, {
         tableName: 'admins',
         timestamps: true,
+
         hooks: {
             beforeCreate: async (admin) => {
                 if (admin.password) {
@@ -60,14 +90,18 @@ module.exports = (sequelize) => {
         }
     });
 
-    // Instance methods
+    // Compare password
     Admin.prototype.comparePassword = async function(candidatePassword) {
         return await bcrypt.compare(candidatePassword, this.password);
     };
 
+    // Remove password (and OTP fields!)
     Admin.prototype.toJSON = function() {
         const values = Object.assign({}, this.get());
         delete values.password;
+        delete values.otp;
+        delete values.otp_expires;
+        delete values.otp_purpose;
         return values;
     };
 
