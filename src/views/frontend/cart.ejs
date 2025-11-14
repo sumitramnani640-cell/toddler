@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "Shopping Cart" %></title>
+
+  <!-- Bootstrap + Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- 🔥 SAME CSS AS HOME PAGE -->
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body,html{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#fff; color:#222; }
+
+    .container{ max-width:1200px; margin:auto; padding:0 1rem; }
+
+    /* Top thin nav */
+    .nav-bottom{ background:#1b683f; color:white; }
+    .nav-bottom a{ color:white; text-decoration:none; }
+
+    /* HEADER */
+    header.site-header{ background:#fff; padding:12px 0; border-bottom:1px solid #eee; }
+    .site-logo { font-weight:700; color:#0b662e; font-size:1.25rem; display:flex; align-items:center; gap:.5rem }
+
+    /* CATEGORIES BAR */
+    .categories-bar{ background:#fff; border-bottom:1px solid #eee; }
+    .category-link:hover{ text-decoration:underline; }
+
+    /* CART UI */
+    .cart-item-box{ border:1px solid #eee; border-radius:10px; padding:15px; margin-bottom:20px; background:#fff; }
+    .cart-thumb{ width:80px; height:80px; border-radius:6px; object-fit:cover; }
+    .summary-box{ border:1px solid #eee; padding:20px; border-radius:8px; background:#fff; }
+    .promo-box{ background:#e8f7ea; border-left:5px solid #0b662e; padding:12px; border-radius:6px; }
+    .btn-checkout{ background:#d62828; color:#fff; width:100%; padding:12px; font-weight:bold; border:none; border-radius:6px; }
+  </style>
+</head>
+
+<body>
+
+  <!-- 🔥 THIN TOP BAR (same as home) -->
+  <div class="nav-bottom text-white small py-2">
+    <div class="container d-flex justify-content-between">
+      <div class="d-flex gap-4">
+        <div><i class="fas fa-truck me-2"></i>Fast & Free Delivery</div>
+        <div><i class="fas fa-shopping-basket me-2"></i>Thousands of products</div>
+      </div>
+      <div>
+        <i class="fas fa-phone me-2"></i>
+        <a href="tel:+971542526215" class="text-white">+971-542526215</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔥 HEADER ( SAME AS YOUR HOME PAGE ) -->
+  <header class="site-header">
+    <div class="container d-flex align-items-center gap-3">
+
+      <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
+
+      <!-- SEARCH BAR -->
+      <form class="search-form d-flex flex-grow-1" action="/search" method="GET">
+        <select name="category" class="form-select w-auto me-2" style="min-width:130px;">
+          <option value="">All Categories</option>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat.slug %>" <%= category === cat.slug ? 'selected' : '' %>><%= cat.name %></option>
+          <% }) %>
+        </select>
+
+        <input type="text" name="q" class="form-control" placeholder="Search products..." value="<%= q || '' %>">
+
+        <button class="btn ms-2" style="background:#0b662e;color:#fff;">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+
+      <!-- LOGIN -->
+      <a href="/login" class="d-flex align-items-center text-decoration-none" style="color:#0b662e;">
+        <i class="fas fa-user me-1"></i> Login & Register
+      </a>
+
+      <!-- CART -->
+      <a href="/cart" class="position-relative" style="color:#0b662e;">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+          <%= cartCount || 0 %>
+        </span>
+      </a>
+    </div>
+  </header>
+
+  <!-- 🔥 GREEN DELIVERY BAR -->
+  <div class="nav-bottom text-white small py-2" style="background:#1b683f;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div><i class="fas fa-truck"></i> Next Standard Delivery Today 6:00 PM-10:00 PM</div>
+      <div><i class="fas fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
+    </div>
+  </div>
+
+  <!-- 🔥 CATEGORIES BAR -->
+  <div class="categories-bar py-2">
+    <div class="container d-flex align-items-center gap-4 flex-wrap">
+
+      <div class="dropdown">
+        <button class="btn btn-link text-dark fw-semibold dropdown-toggle p-0" data-bs-toggle="dropdown">
+          All Category
+        </button>
+        <ul class="dropdown-menu">
+          <% categories.forEach(cat => { %>
+            <li><a class="dropdown-item" href="/category/<%= cat.slug %>"><%= cat.name %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <div class="d-flex align-items-center gap-4 flex-wrap">
+        <% categories.slice(0,8).forEach(cat => { %>
+          <a href="/category/<%= cat.slug %>" class="text-dark category-link"><%= cat.name %></a>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SHOPPING CART SECTION ========== -->
+  <div class="container py-4">
+
+    <h4 class="fw-bold mb-3">Shopping Cart</h4>
+
+    <div class="row g-4">
+      <!-- LEFT CART ITEMS -->
+      <div class="col-lg-8">
+
+        <% if (!cart || !cart.items || cart.items.length === 0) { %>
+          <div class="alert alert-info">Your cart is empty.</div>
+        <% } else { %>
+
+          <% cart.items.forEach(item => { %>
+            <div class="cart-item-box d-flex gap-3">
+
+              <img src="<%= item.imageUrl %>" class="cart-thumb">
+
+              <div class="flex-grow-1">
+                <h6><%= item.name %></h6>
+                <div class="text-muted small"><%= item.sku || '' %></div>
+                <div class="fw-bold text-success">AED <%= item.price %></div>
+
+                <div class="d-flex align-items-center mt-2 gap-2">
+
+                  <form method="POST" action="/cart/update" class="d-flex gap-2">
+                    <input type="hidden" name="itemId" value="<%= item.id %>">
+                    <button name="op" value="dec" class="btn btn-light border">-</button>
+                    <input type="text" name="qty" value="<%= item.qty %>" class="form-control" style="width:60px;">
+                    <button name="op" value="inc" class="btn btn-light border">+</button>
+                  </form>
+
+                  <form action="/cart/remove" method="POST">
+                    <input type="hidden" name="itemId" value="<%= item.id %>">
+                    <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
+                  </form>
+
+                </div>
+              </div>
+
+            </div>
+          <% }) %>
+
+          <!-- COUPON -->
+          <div class="mt-4">
+            <h6>USE COUPON CODE</h6>
+            <form method="POST" action="/cart/apply-coupon" class="row g-2">
+              <div class="col-md-8"><input type="text" name="coupon" class="form-control"></div>
+              <div class="col-md-4"><button class="btn btn-success w-100">Apply Coupon</button></div>
+            </form>
+          </div>
+
+        <% } %>
+
+      </div>
+
+      <!-- RIGHT SUMMARY -->
+      <div class="col-lg-4">
+        <div class="promo-box mb-3">
+          <strong>Free delivery over AED 200</strong><br>
+          <small>When you choose Standard grocery delivery</small>
+        </div>
+
+        <div class="summary-box">
+          <h6>Order Summary</h6>
+
+          <div class="d-flex justify-content-between">
+            <span>Subtotal:</span>
+            <span>AED <%= subtotal.toFixed(2) %></span>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <span>VAT (5%):</span>
+            <span>AED <%= vat.toFixed(2) %></span>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between fw-bold">
+            <span>Total:</span>
+            <span>AED <%= total.toFixed(2) %></span>
+          </div>
+
+          <button class="btn-checkout mt-3">CHECKOUT ALL</button>
+
+          <div class="alert alert-warning small mt-3">
+            A minimum order of AED150 is required for groceries.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 🔥 FOOTER ( SAME AS HOME PAGE ) -->
+  <footer class="mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-3"><h6>Get to Know Us</h6><a href="#">About</a></div>
+        <div class="col-sm-3"><h6>Connect</h6><a href="#">Facebook</a></div>
+        <div class="col-sm-3"><h6>Sell with us</h6><a href="#">Sell</a></div>
+        <div class="col-sm-3"><h6>Help</h6><a href="#">Support</a></div>
+      </div>
+      <div class="text-center small mt-4">
+        © <%= new Date().getFullYear() %> Savers Grocery — All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

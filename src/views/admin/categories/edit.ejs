@@ -48,7 +48,8 @@
 
                 <% if (category.image) { %>
                   <div class="mb-2">
-                    <img src="/admin/category<%= category.image %>" alt="Current category image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                    <!-- Use the exact stored web path -->
+                    <img src="<%= category.image %>" alt="Current category image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
                     <p class="text-muted small">Current image</p>
                   </div>
                 <% } %>
@@ -73,7 +74,8 @@
 
                 <% if (category.banner_image) { %>
                   <div class="mb-2">
-                    <img src="/admin/banner_image<%= category.banner_image %>" alt="Current banner image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                    <!-- Use the exact stored web path -->
+                    <img src="<%= category.banner_image %>" alt="Current banner image" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
                     <p class="text-muted small">Current banner</p>
                   </div>
                 <% } %>
@@ -85,7 +87,7 @@
                 <small class="form-text text-muted">Recommended banner size ~1200×300. Max 5MB.</small>
 
                 <div id="bannerPreview" class="mt-2" style="display:none;">
-                  <img id="bannerPreviewImg" src="" alt="Banner Preview" class="img-thumbnail" style="max-width:100%; height:150px; object-fit:cover;">
+                  <img id="bannerPreviewImg" src="" alt="Banner Preview" class="img-thumbnail" style="max-width:100%; height:300px; object-fit:cover;">
                   <p class="text-muted small">New banner preview</p>
                 </div>
               </div>
@@ -173,7 +175,9 @@
   // Preview + label update helper
   function setupPreview(inputId, labelSelector, previewWrapId, previewImgId) {
     const input = document.getElementById(inputId);
-    const label = document.querySelector(labelSelector);
+    // try matching .custom-file-label first, fallback to label[for="..."]
+    let label = document.querySelector(labelSelector);
+    if (!label) label = document.querySelector('label[for="' + inputId + '"]');
     const wrap = document.getElementById(previewWrapId);
     const img = document.getElementById(previewImgId);
     if (!input) return;
