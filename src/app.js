@@ -1,3 +1,4 @@
+// src/app.js
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -9,91 +10,78 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Import routes
+// routes
 const adminRoutes = require('./routes/admin');
 const frontendRoutes = require('./routes/frontend');
 
-// Import database connection
+// init DB/models
 require('./models/index');
 
-// Middleware
+// parsers + static
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Session configuration
+// sessions + flash
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'savers-grocery-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false, // Set to true if using HTTPS
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+  secret: process.env.SESSION_SECRET || 'savers-grocery-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, maxAge: 24*60*60*1000 }
 }));
-
-// Flash messages
 app.use(flash());
 
-// Global variables for flash messages
+// expose flash/user to views
 app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    res.locals.user = req.session.user || null;
-    next();
+  res.locals.success_msg = req.flash('success_msg') || [];
+  res.locals.error_msg = req.flash('error_msg') || [];
+  res.locals.user = req.session.user || null;
+  next();
 });
 
-// View engine setup
+// ejs setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Layout middleware - set layout based on route BEFORE expressLayouts processes it
+// IMPORTANT: disable global layout so express-ejs-layouts won't try to render "layout.ejs"
+app.set('layout', false);
+
+// choose layout per-request BEFORE expressLayouts
 app.use((req, res, next) => {
-    // Frontend routes: no layout by default
-    if (!req.path.startsWith('/admin') || req.path.startsWith('/admin/login')) {
-        res.locals.layout = false;
-    } else {
-        // Admin routes: use admin layout (unless explicitly overridden in controller)
-        res.locals.layout = 'admin/layouts/admin';
-    }
-    next();
+  const isAdminRoute = req.path.startsWith('/admin');
+  const adminPublic = ['/admin/login', '/admin/forgot-password']; // public admin pages, no layout
+  const isAdminPublic = adminPublic.some(p => req.path === p || req.path.startsWith(p + '/'));
+
+  if (isAdminRoute && !isAdminPublic) {
+    res.locals.layout = 'admin/layouts/admin'; // src/views/admin/layouts/admin.ejs
+  } else {
+    res.locals.layout = false;
+  }
+  next();
 });
 
-// Use express-ejs-layouts (must come after layout middleware)
+// enable layouts
 app.use(expressLayouts);
 
-// Method override for PUT/DELETE requests
+// method override
 app.use(methodOverride('_method'));
 
-// Routes
+// routes
 app.use('/admin', adminRoutes);
 app.use('/', frontendRoutes);
 
-// Error handling middleware
+// error handlers
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).render('error', {
-        title: 'Error',
-        message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? err : {},
-        layout: false
-    });
+  console.error(err.stack);
+  res.status(500).render('error', { title: 'Error', message: 'Something went wrong', error: process.env.NODE_ENV === 'development' ? err : {}, layout: false });
 });
-
-// 404 handler
 app.use((req, res) => {
-    res.status(404).render('error', {
-        title: 'Page Not Found',
-        message: 'The page you are looking for does not exist.',
-        error: {},
-        layout: false
-    });
+  res.status(404).render('error', { title: 'Not Found', message: 'Page not found', error: {}, layout: false });
 });
 
+// start
 app.listen(PORT, () => {
-    console.log(`Savers Grocery Admin Panel running on http://localhost:${PORT}`);
-    console.log(`Admin panel available at http://localhost:${PORT}/admin`);
-    console.log(`Website available at http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
 
 module.exports = app;

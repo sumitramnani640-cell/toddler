@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= title || 'Register - Saver Grocery' %></title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { background: #fff; font-family: "Segoe UI", Roboto, Arial; color:#222; }
+    .topbar { background: #225f40; color:#fff; font-size: .9rem; }
+    .brand-bar { background: #ffffff; border-bottom: 4px solid #1b683f; }
+     .site-logo { font-weight:700; color:#0b662e; font-size:1.25rem; display:flex; align-items:center; gap:.5rem }
+    .nav-bottom { background:#1b683f; color:#fff; font-size:.95rem; padding:6px 0; }
+    .breadcrumb-area { background: transparent; padding: 12px 0; }
+    .page-title { font-weight:700; margin-bottom: 18px; }
+    .card-sidebar { border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .form-section { border-top:1px solid #eee; padding-top:16px; margin-bottom: 18px; }
+    .field-label { font-size:.9rem; color:#333; }
+    .tin-field { background:#f7fbfe; }
+    .footer { background: #fff; padding: 40px 0 80px; border-top: 1px solid #eee; }
+    .alert-inline { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <% 
+  // Defensive defaults
+  var form = (typeof form !== 'undefined' && form) ? form : {};
+  var errors = (typeof errors !== 'undefined' && Array.isArray(errors)) ? errors : [];
+  var messages = (typeof messages !== 'undefined' && messages) ? messages : {};
+  var flashSuccess = (typeof success_msg !== 'undefined' && Array.isArray(success_msg)) ? success_msg : [];
+  var flashError = (typeof error_msg !== 'undefined' && Array.isArray(error_msg)) ? error_msg : [];
+  %>
+
+   <!-- thin topbar -->
+  <div class="nav-bottom text-white small py-2">
+    <div class="container d-flex justify-content-between">
+      <div class="d-flex gap-4">
+        <div><i class="fas fa-truck me-2"></i>Fast &amp; Free Delivery</div>
+        <div><i class="fas fa-shopping-basket me-2"></i>Thousands of products</div>
+      </div>
+      <div><i class="fas fa-phone me-2"></i><a href="tel:+971542526215" class="text-white text-decoration-none">+971-542526215</a></div>
+    </div>
+  </div>
+
+<div class="container d-flex align-items-center gap-3">
+      <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
+
+
+
+  <!-- Brand -->
+  
+      <div class="flex-grow-1 mx-4">
+        <form class="d-flex" role="search" action="/search" method="get">
+          <input class="form-control me-2" name="q" type="search" placeholder="Search Products">
+          <button class="btn btn-success"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <div class="d-flex gap-3">
+       
+        <a href="/login" class="btn btn-link"><i class="fa fa-user"></i> Login & Register</a>
+        <a href="/cart" class="btn btn-link"><i class="fa fa-shopping-cart"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Bar -->
+  <div class="nav-bottom">
+    <div class="container d-flex">
+      <div class="me-3"><i class="fas fa-map-marker-alt"></i> Deliver to: Dubai Festival City</div>
+      <nav class="ms-auto">
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item me-3 text-white">All Category</li>
+          <li class="list-inline-item me-3 text-white">Fresh Food</li>
+          <li class="list-inline-item me-3 text-white">Beverages</li>
+          <li class="list-inline-item me-3 text-white">Bakery</li>
+          <li class="list-inline-item me-3 text-white">Frozen Food</li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="container breadcrumb-area">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/"><i class="fa fa-home"></i></a></li>
+      <li class="breadcrumb-item">Account</li>
+      <li class="breadcrumb-item active">Register</li>
+    </ol>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container my-4">
+    <div class="row">
+
+      <!-- Left -->
+      <div class="col-lg-8">
+        <h3 class="page-title">REGISTER ACCOUNT</h3>
+        <p>If you already have an account, <a href="/login">login here</a>.</p>
+
+        <!-- Flash messages -->
+        <div>
+          <% if (flashSuccess.length) { flashSuccess.forEach(m => { %>
+            <div class="alert alert-success alert-inline"><%= m %></div>
+          <% }) } %>
+
+          <% if (flashError.length) { flashError.forEach(m => { %>
+            <div class="alert alert-danger alert-inline"><%= m %></div>
+          <% }) } %>
+
+          <% if (errors.length) { errors.forEach(e => { %>
+            <div class="alert alert-danger alert-inline"><%= e.msg %></div>
+          <% }) } %>
+        </div>
+
+        <!-- Registration Form -->
+        <div class="form-section">
+          <h6>Your Personal Details</h6>
+
+          <form id="registerForm" action="/register" method="post">
+
+            <% if (typeof csrfToken !== 'undefined') { %>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <% } %>
+
+            <div class="row g-3">
+
+              <!-- First Name -->
+              <div class="col-md-6">
+                <label class="field-label">* First Name</label>
+                <input name="name" value="<%= form.name || '' %>" class="form-control <%= errors.find(e=>e.field==='name') ? 'is-invalid' : '' %>" required>
+                <% const eName = errors.find(e=>e.field==='name'); if (eName) { %>
+                  <div class="invalid-feedback"><%= eName.msg %></div>
+                <% } %>
+              </div>
+
+              <!-- Last Name -->
+              <div class="col-md-6">
+                <label class="field-label">Last Name</label>
+                <input name="last_name" value="<%= form.last_name || '' %>" class="form-control">
+              </div>
+
+              <!-- Email -->
+              <div class="col-12">
+                <label class="field-label">* Email</label>
+                <input name="email" value="<%= form.email || '' %>" type="email" class="form-control <%= errors.find(e=>e.field==='email') ? 'is-invalid' : '' %>" required>
+                <% const eEmail = errors.find(e=>e.field==='email'); if (eEmail) { %>
+                  <div class="invalid-feedback"><%= eEmail.msg %></div>
+                <% } %>
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-6">
+                <label class="field-label">* Telephone</label>
+                <div class="input-group">
+                  <span class="input-group-text"><img src="https://flagcdn.com/16x12/in.png">&nbsp;+91</span>
+                  <input name="phone" value="<%= form.phone || '' %>" class="form-control <%= errors.find(e=>e.field==='phone') ? 'is-invalid' : '' %>">
+                </div>
+              </div>
+
+              <!-- TIN -->
+              <div class="col-md-6">
+                <label class="field-label">TIN</label>
+                <input name="tin" value="<%= form.tin || '' %>" class="form-control tin-field">
+              </div>
+
+              <div class="col-12"><hr></div>
+
+              <!-- Password -->
+              <div class="col-md-6">
+                <label class="field-label">* Password</label>
+                <input name="password" type="password" class="form-control <%= errors.find(e=>e.field==='password') ? 'is-invalid' : '' %>" required>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="col-md-6">
+                <label class="field-label">* Confirm Password</label>
+                <input name="password_confirm" type="password" class="form-control <%= errors.find(e=>e.field==='password_confirm') ? 'is-invalid' : '' %>" required>
+              </div>
+
+              <!-- Newsletter -->
+              <div class="col-12 mt-3">
+                <h6>Newsletter</h6>
+                <input type="radio" name="subscribe" value="yes" <%= form.subscribe === 'yes' ? 'checked' : '' %>> Yes
+                <input type="radio" name="subscribe" value="no" <%= form.subscribe !== 'yes' ? 'checked' : '' %>> No
+              </div>
+
+              <!-- Agree -->
+              <div class="col-12 mt-3 d-flex">
+                <div class="form-check">
+                  <input class="form-check-input" name="agree" type="checkbox" id="agreePolicy" <%= form.agree ? 'checked' : '' %> required>
+                  <label class="form-check-label" for="agreePolicy">I agree to the Privacy Policy</label>
+                </div>
+                <button class="btn btn-success ms-auto">Continue</button>
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="col-lg-4">
+        <div class="card card-sidebar p-3">
+          <h6><i class="fa fa-user-circle"></i> ACCOUNT SETTINGS</h6>
+          <ul class="list-unstyled">
+            <li><a href="/login">Login</a></li>
+            <li><a href="/register">Register</a></li>
+            <li><a href="/forgot-password">Forgot Password</a></li>
+            <li><a href="/my-account">My Account</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Modal for Success -->
+  <div class="modal fade" id="serverSuccessModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fa fa-check-circle text-success me-2"></i>Success</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="serverSuccessModalBody"></div>
+        <div class="modal-footer">
+          <a href="/login" class="btn btn-success">OK</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="small text-muted">Saver Grocery — Quality groceries at best prices.</p>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Modal Trigger -->
+  <script>
+    (function(){
+      var msgs = <%- JSON.stringify(flashSuccess) %>;
+      if (msgs && msgs.length) {
+        document.getElementById('serverSuccessModalBody').innerHTML =
+          msgs.map(m => '<div>'+m+'</div>').join('');
+        new bootstrap.Modal(document.getElementById('serverSuccessModal')).show();
+      }
+    })();
+  </script>
+
+</body>
+</html>

@@ -15,23 +15,23 @@ const sequelize = new Sequelize(
   }
 );
 
-// import model factories
+// import model factories (use the exact filenames)
 const AdminModel = require('./Admin');
 const ProductModel = require('./Product');
 const CategoryModel = require('./Category');
 const BannerModel = require('./Banner');
-const UserModel = require('./User');
+const UserModel = require('./User');         // <-- fixed: use ./User (singular)
 const OrderModel = require('./Order');
 const NewsletterModel = require('./Newsletter');
 const CategoryFeatureModel = require('./CategoryFeature');
 const ProductFeatureModel = require('./ProductFeature');
 
-// initialize models (pass sequelize, DataTypes if your files expect them)
+// initialize models (pass sequelize, DataTypes)
 const Admin = AdminModel(sequelize, DataTypes);
 const Product = ProductModel(sequelize, DataTypes);
 const Category = CategoryModel(sequelize, DataTypes);
 const Banner = BannerModel(sequelize, DataTypes);
-const User = UserModel(sequelize, DataTypes);
+const User = UserModel(sequelize, DataTypes); // <-- singular User
 const Order = OrderModel(sequelize, DataTypes);
 const Newsletter = NewsletterModel(sequelize, DataTypes);
 const CategoryFeature = CategoryFeatureModel(sequelize, DataTypes);
@@ -43,14 +43,16 @@ const models = {
   Product,
   Category,
   Banner,
-  User,
+  User,              // <-- key is 'User' (matches models.User)
   Order,
   Newsletter,
   CategoryFeature,
   ProductFeature
 };
 
-// Run each model's associate() if present
+// Optional diagnostic (uncomment while debugging)
+// console.log('Loaded models:', Object.keys(models));
+
 Object.keys(models).forEach((name) => {
   if (typeof models[name].associate === 'function') {
     models[name].associate(models);
@@ -61,7 +63,6 @@ Object.keys(models).forEach((name) => {
   try {
     await sequelize.authenticate();
     console.log('Database connection has been established successfully.');
-    // WARNING: sync alters DB; use carefully in production. You can run sync({ alter: true }) in dev.
     await sequelize.sync();
     console.log('Database synchronized successfully.');
   } catch (error) {

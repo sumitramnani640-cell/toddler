@@ -1,31 +1,27 @@
-const { DataTypes } = require('sequelize');
-// const Order = require('../../models/Order');
-// const User = require('../../models/User');
-
-module.exports = (sequelize) => {
+// src/models/Order.js
+module.exports = (sequelize, DataTypes) => {
   const Order = sequelize.define('Order', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    userid: {
+
+    // recommended: use user_id as FK column (consistent, clear)
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'users', // actual DB table name (lowercase plural)
         key: 'id',
       },
     },
-    totalAmount: {
+
+    total_amount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    // payment_method: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false,
-    //   defaultValue: 'COD', // Cash on Delivery by default
-    // },
+
     status: {
       type: DataTypes.ENUM('pending', 'processing', 'completed', 'cancelled'),
       defaultValue: 'pending',
@@ -38,15 +34,19 @@ module.exports = (sequelize) => {
   }, {
     tableName: 'orders',
     timestamps: true,
+    underscored: true // optional: maps camelCase model attrs to snake_case DB columns
   });
 
-  // ✅ Associations
-  Order.associate = (models) => {
+  // Associations — executed by models/index.js after all models are defined
+  Order.associate = function(models) {
+    // models.User must exist (check models/index.js loads User)
     Order.belongsTo(models.User, {
-      foreignKey: 'userid',
+      foreignKey: 'user_id',
       as: 'user',
       onDelete: 'CASCADE',
     });
+
+    // Example: Order.hasMany(models.OrderItem, { foreignKey: 'order_id', as: 'items' });
   };
 
   return Order;

@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Account - Saver Grocery</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { font-family: "Segoe UI", Roboto, Arial; color:#222; background:#fff; }
+
+    .topbar { background:#225f40; color:#fff; font-size:.9rem; padding:.35rem 0; }
+    .brand-bar { background:#fff; border-bottom:4px solid #1b683f; padding:12px 0; }
+    .nav-bottom { background:#1b683f; color:#fff; padding:.45rem 0; font-size:.95rem; }
+
+    .breadcrumb-area { padding:10px 0; }
+
+    .dashboard-card {
+      border:1px solid #e6e6e6;
+      padding:20px;
+      border-radius:8px;
+      transition:.2s;
+      background:#fff;
+    }
+    .dashboard-card:hover { border-color:#1b683f; }
+
+    .dashboard-card i {
+      font-size:35px;
+      color:#1b683f;
+      margin-bottom:10px;
+    }
+
+    .sidebar-box {
+      border-radius:8px; border:1px solid #e6e6e6;
+      background:#fff; padding:15px;
+    }
+    
+    .footer { padding:40px 0; border-top:1px solid #eee; }
+  </style>
+</head>
+
+<body>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="container d-flex justify-content-between">
+      <div><i class="fas fa-truck"></i> Fast & Free Delivery</div>
+      <div><i class="fas fa-phone"></i> +971-542526215</div>
+    </div>
+  </div>
+
+  <!-- Brand + search -->
+  <div class="brand-bar">
+    <div class="container d-flex align-items-center justify-content-between">
+      <img src="https://via.placeholder.com/160x50?text=Saver+Logo" style="height:50px;">
+
+      <div class="flex-grow-1 mx-4">
+        <form class="d-flex">
+          <input class="form-control" placeholder="Search Products">
+          <button class="btn btn-success ms-2"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <div class="d-flex gap-3 align-items-center">
+        <button class="btn btn-outline-success">Horeca</button>
+        <a class="btn btn-link"><i class="fa fa-user"></i> Account</a>
+        <a class="btn btn-link"><i class="fa fa-shopping-cart"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delivery band -->
+  <div class="nav-bottom">
+    <div class="container d-flex justify-content-between">
+      <div><i class="fa fa-clock"></i> Next Standard Delivery Today 6:00 PM - 10:00 PM</div>
+      <div><i class="fa fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="container py-2 border-bottom">
+    <div class="d-flex gap-4">
+      <span>All Category ▾</span>
+      <span>Fresh Food</span>
+      <span>Beverages</span>
+      <span>Bakery</span>
+      <span>Frozen Food</span>
+      <span>Pet Supplies</span>
+      <span>Fruits & Vegetables</span>
+      <span>Food Cupboard</span>
+      <span>Bio & Organic Food</span>
+      <span>Health And Fitness</span>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="container breadcrumb-area">
+    <nav>
+      <ol class="breadcrumb p-0">
+        <li class="breadcrumb-item"><a><i class="fa fa-home"></i></a></li>
+        <li class="breadcrumb-item active">Account</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="container my-4">
+    <div class="row g-4">
+
+      <!-- LEFT Main Cards -->
+      <div class="col-lg-9">
+
+        <h4 class="mb-3">My Account</h4>
+
+        <div class="row g-4">
+
+          <!-- Edit account -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-user-pen"></i>
+              <h6>Edit your account information</h6>
+              <span class="text-muted small">Edit Your Account</span>
+            </div>
+          </div>
+
+          <!-- Change password -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-lock"></i>
+              <h6>Change your password</h6>
+              <span class="text-muted small">Change Your Password</span>
+            </div>
+          </div>
+
+          <!-- Modify Address -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-location-dot"></i>
+              <h6>Modify your address book entries</h6>
+              <span class="text-muted small">Edit Your Address</span>
+            </div>
+          </div>
+
+          <!-- Newsletter -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-envelope-open-text"></i>
+              <h6>Subscribe / Unsubscribe newsletter</h6>
+              <span class="text-muted small">Subscribe for Newsletter</span>
+            </div>
+          </div>
+        </div>
+
+
+        <h4 class="mt-5 mb-3">My Orders</h4>
+
+        <div class="row g-4">
+          <!-- Order history -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-list"></i>
+              <h6>View your order history</h6>
+              <span class="text-muted small">See Your Order History</span>
+            </div>
+          </div>
+
+          <!-- Return requests -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-rotate-left"></i>
+              <h6>View your return requests</h6>
+              <span class="text-muted small">See Your Return</span>
+            </div>
+          </div>
+
+          <!-- Transactions -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-receipt"></i>
+              <h6>Your Transactions</h6>
+              <span class="text-muted small">See Your Transactions</span>
+            </div>
+          </div>
+
+          <!-- Wishlist -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-heart"></i>
+              <h6>Your Wishlist</h6>
+              <span class="text-muted small">Wishlist</span>
+            </div>
+          </div>
+
+          <!-- Pre-order -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-clipboard-check"></i>
+              <h6>Pre-Order List</h6>
+              <span class="text-muted small">See Your Pre-Order List</span>
+            </div>
+          </div>
+
+          <!-- Enquiry -->
+          <div class="col-md-6">
+            <div class="dashboard-card">
+              <i class="fa fa-question-circle"></i>
+              <h6>Enquiry List</h6>
+              <span class="text-muted small">See Your Enquiry List</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="col-lg-3">
+        <div class="sidebar-box mb-4">
+          <h6><i class="fa fa-user-circle"></i> ACCOUNT SETTINGS</h6>
+          <ul class="list-unstyled mt-3">
+            <li><a>My Account</a></li>
+            <li><a>Edit Account</a></li>
+            <li><a>Password</a></li>
+            <li><a>Address Book</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box mb-4">
+          <h6><i class="fa fa-boxes-stacked"></i> MY ORDERS</h6>
+          <ul class="list-unstyled mt-3">
+            <li><a>Order History</a></li>
+            <li><a>Returns</a></li>
+            <li><a>Transactions</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-box">
+          <h6><i class="fa fa-heart"></i> MY STUFF</h6>
+          <ul class="list-unstyled mt-3">
+            <li><a>Wishlist</a></li>
+            <li><a>Newsletter</a></li>
+          </ul>
+          <hr>
+          <a class="text-danger"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row gy-4">
+
+        <div class="col-md-4">
+          <img src="https://via.placeholder.com/160x48?text=Saver+Logo" class="mb-3">
+          <p class="small text-muted">
+            Saver Grocery is the first food grocery in the region operating on a discount model...
+          </p>
+          <p class="small m-0"><i class="fa fa-map-marker-alt"></i> DSP Warehouse Complex, Al Barsha South, Dubai</p>
+          <p class="small m-0"><i class="fa fa-phone"></i> +971-542526215</p>
+          <p class="small m-0"><i class="fa fa-envelope"></i> info@savergrocery.com</p>
+        </div>
+
+        <div class="col-md-2">
+          <h6>INFORMATION</h6>
+          <ul class="list-unstyled small">
+            <li><a>About Us</a></li>
+            <li><a>Delivery Information</a></li>
+            <li><a>Privacy Policy</a></li>
+            <li><a>Terms & Conditions</a></li>
+            <li><a>Refund Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-2">
+          <h6>MY ACCOUNT</h6>
+          <ul class="list-unstyled small">
+            <li><a>My Account</a></li>
+            <li><a>Order History</a></li>
+            <li><a>Wishlist</a></li>
+            <li><a>Sitemap</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-4">
+          <h6>SIGN UP FOR NEWSLETTER</h6>
+          <form class="d-flex mb-2">
+            <input class="form-control me-2" placeholder="Your email">
+            <button class="btn btn-success">Subscribe</button>
+          </form>
+          <img src="https://via.placeholder.com/120x40?text=Google+Play">
+          <img src="https://via.placeholder.com/120x40?text=App+Store">
+        </div>
+
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
