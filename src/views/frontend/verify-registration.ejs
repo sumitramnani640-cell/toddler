@@ -9,21 +9,66 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
   <style>
-    body { font-family: "Segoe UI", Roboto, Arial; color:#222; background:#f8f9fa; }
+    body { font-family: "Segoe UI", Roboto, Arial; color:#222; background:#fff; }
+
+    .topbar { background:#225f40; color:#fff; font-size:.9rem; padding:.35rem 0; }
     .brand-bar { background:#fff; border-bottom:4px solid #1b683f; padding:12px 0; }
-    .card-box { border:1px solid #e6e6e6; border-radius:8px; padding:18px; background:#fff; }
-    .small-muted { color:#6c757d; }
+    .nav-bottom { background:#1b683f; color:#fff; padding:.45rem 0; font-size:.95rem; }
+
+    .card-box { border:1px solid #e6e6e6; border-radius:8px; padding:22px; background:#fff; }
     .btn-success { background:#1b683f; border-color:#1b683f; }
+
+    .footer { padding:40px 0; border-top:1px solid #eee; background:#fff; }
+    .logo-small { height:42px; }
+
+    @media (max-width: 991px) { .brand-bar .search { margin-top:12px; } }
   </style>
 </head>
 <body>
 
-  <div class="brand-bar">
-    <div class="container d-flex align-items-center justify-content-between">
-      <img src="/images/logo.png" alt="Saver Grocery" style="height:48px;" onerror="this.src='https://via.placeholder.com/160x48?text=Saver+Logo'">
+  <!-- ===================== TOPBAR ===================== -->
+  <div class="topbar">
+    <div class="container d-flex justify-content-between">
+      <div><i class="fas fa-truck"></i> Fast & Free Delivery</div>
+      <div><i class="fas fa-phone"></i> +971-542526215</div>
     </div>
   </div>
 
+  <!-- ===================== BRAND BAR ===================== -->
+  <div class="brand-bar">
+    <div class="container d-flex align-items-center justify-content-between">
+      <a href="/" class="d-flex align-items-center gap-3">
+        <img src="/images/logo.png" alt="Saver Grocery" style="height:50px;"
+             onerror="this.src='https://via.placeholder.com/160x50?text=Saver+Logo'">
+      </a>
+
+      <div class="flex-grow-1 mx-4">
+        <form class="d-flex" method="GET" action="/search">
+          <input class="form-control me-2" type="search" name="q" placeholder="Search Products">
+          <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+      </div>
+
+      <div class="d-flex gap-3 align-items-center">
+
+
+    </div>
+  </div>
+
+  <!-- ===================== CATEGORY NAV ===================== -->
+  <div class="nav-bottom">
+    <div class="container d-flex align-items-center">
+      <div class="me-3"><i class="fas fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
+      <ul class="list-inline mb-0 ms-auto">
+        <!-- <li class="list-inline-item text-white me-3">All Category</li>
+        <li class="list-inline-item text-white me-3">Fresh Food</li>
+        <li class="list-inline-item text-white me-3">Beverages</li>
+        <li class="list-inline-item text-white me-3">Bakery</li> -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN ===================== -->
   <main class="container my-5">
     <div class="row justify-content-center">
       <div class="col-md-7 col-lg-6">
@@ -31,57 +76,53 @@
         <div class="card-box">
 
           <h4 class="mb-3">Verify Your Account</h4>
-          <p class="small-muted">
-            We sent an OTP to your email and phone (if provided). Enter it below to complete registration.
+          <p class="text-muted small">
+            We sent an OTP to your email (and phone if available). Enter it below to complete registration.
           </p>
 
-          <!-- show flash messages -->
+          <!-- FLASH MESSAGES -->
           <div class="mt-2 mb-3">
-            <% const flashSuccess = (messages && messages.success_msg) || (typeof success_msg !== 'undefined' && success_msg) || []; %>
-            <% const flashError = (messages && messages.error_msg) || (typeof error_msg !== 'undefined' && error_msg) || []; %>
-
-            <% if (Array.isArray(flashSuccess) && flashSuccess.length) { %>
-              <% flashSuccess.forEach(m => { %>
+            <% if (success_msg && success_msg.length) { %>
+              <% success_msg.forEach(m => { %>
                 <div class="alert alert-success"><%= m %></div>
               <% }) %>
             <% } %>
 
-            <% if (Array.isArray(flashError) && flashError.length) { %>
-              <% flashError.forEach(m => { %>
+            <% if (error_msg && error_msg.length) { %>
+              <% error_msg.forEach(m => { %>
                 <div class="alert alert-danger"><%= m %></div>
               <% }) %>
             <% } %>
           </div>
 
-          <!-- OTP form -->
-          <form action="/verify-registration/<%= userId %>" method="post" class="row g-3">
-            <% if (typeof csrfToken !== 'undefined') { %>
-              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <% } %>
+          <!-- OTP FORM -->
+          <form action="/verify-registration/<%= userId %>" method="POST" class="row g-3">
 
             <div class="col-12">
               <label class="form-label">Enter OTP</label>
-              <input name="otp" type="text" maxlength="8" required class="form-control" placeholder="Enter the 4-6 digit OTP">
+              <input name="otp"
+                     type="text"
+                     maxlength="8"
+                     required
+                     class="form-control"
+                     placeholder="Enter 4–6 digit OTP">
             </div>
 
             <div class="col-12 d-flex align-items-center">
               <button type="submit" class="btn btn-success">Verify</button>
 
-              <form action="/verify-registration/<%= userId %>/resend" method="post" class="ms-3">
-                <% if (typeof csrfToken !== 'undefined') { %>
-                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <% } %>
-                <button type="submit" class="btn btn-outline-secondary">Resend OTP</button>
-              </form>
+              <a href="/verify-registration/<%= userId %>/resend"
+                 class="btn btn-outline-secondary ms-3">Resend OTP</a>
 
               <a href="/login" class="ms-auto small">Back to login</a>
             </div>
+
           </form>
 
-          <hr class="my-3">
+          <hr class="my-4">
 
-          <p class="small text-muted mb-0">
-            If you did not receive the OTP, check your spam folder or click <strong>Resend OTP</strong>.
+          <p class="text-muted small mb-0">
+            Didn’t receive the code? Check your spam folder or click <strong>Resend OTP</strong>.
           </p>
 
         </div>
@@ -89,6 +130,53 @@
       </div>
     </div>
   </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row gy-4">
+
+        <div class="col-md-4">
+          <img src="/images/logo.png" alt="Saver Grocery"
+               class="logo-small mb-3"
+               onerror="this.src='https://via.placeholder.com/160x48?text=Saver+Logo'">
+          <p class="small text-muted">
+            Saver Grocery is the first food grocery in the region operating on a discount model.
+          </p>
+        </div>
+
+        <div class="col-md-2">
+          <h6>INFORMATION</h6>
+          <ul class="list-unstyled small">
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/delivery-info">Delivery Information</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms & Conditions</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-2">
+          <h6>MY ACCOUNT</h6>
+          <ul class="list-unstyled small">
+            <li><a href="/my-account">My Account</a></li>
+            <li><a href="/orders">Order History</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+            <li><a href="/sitemap">Sitemap</a></li>
+          </ul>
+        </div>
+
+        <div class="col-md-4">
+          <h6>SIGN UP FOR NEWSLETTER</h6>
+          <p class="small text-muted">Never miss promotions and offers.</p>
+          <form class="d-flex" method="POST" action="/subscribe">
+            <input class="form-control me-2" placeholder="Your email" name="email" required>
+            <button class="btn btn-success">Subscribe</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
