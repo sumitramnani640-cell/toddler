@@ -162,31 +162,71 @@
 
 
 <div class="dropdown position-relative">
-  <a class="d-flex align-items-center text-decoration-none login-btn"
-     style="color:#0b662e; cursor:pointer;"
-     id="loginDropdown"
-     data-bs-toggle="dropdown"
-     aria-expanded="false">
-    <i class="fas fa-user me-1"></i> Login & Register
-  </a>
 
-  <div class="dropdown-menu dropdown-menu-end p-3 shadow"
-       aria-labelledby="loginDropdown"
-       style="min-width:230px; border-radius:10px;">
+  <% if (!user) { %>
+    <!-- 🚫 NOT LOGGED IN -->
+    <a class="d-flex align-items-center text-decoration-none login-btn"
+       style="color:#0b662e; cursor:pointer;"
+       id="loginDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+      <i class="fas fa-user me-1"></i> Login & Register
+    </a>
 
-    <h6 class="mb-1">Your Account</h6>
-    <p class="small text-muted mb-2">Access account and manage orders</p>
+    <div class="dropdown-menu dropdown-menu-end p-3 shadow"
+         aria-labelledby="loginDropdown"
+         style="min-width:230px; border-radius:10px;">
 
-    <div class="d-flex flex-column gap-2">
-      <a href="/register" class="btn btn-sm btn-outline-dark w-100">
-        <i class="fa fa-user-plus me-1"></i> Register
-      </a>
-      <a href="/login" class="btn btn-sm btn-success w-100">
-        <i class="fa fa-sign-in-alt me-1"></i> Login
-      </a>
+      <h6 class="mb-1">Your Account</h6>
+      <p class="small text-muted mb-2">Access account and manage orders</p>
+
+      <div class="d-flex flex-column gap-2">
+        <a href="/register" class="btn btn-sm btn-outline-dark w-100">
+          <i class="fa fa-user-plus me-1"></i> Register
+        </a>
+        <a href="/login" class="btn btn-sm btn-success w-100">
+          <i class="fa fa-sign-in-alt me-1"></i> Login
+        </a>
+      </div>
+
     </div>
 
-  </div>
+  <% } else { %>
+    <!-- ✅ LOGGED IN USER -->
+    <a class="d-flex align-items-center text-decoration-none login-btn"
+       style="color:#0b662e; cursor:pointer;"
+       id="accountDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+      <i class="fas fa-user-circle me-1"></i> <%= user.name %>
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-end p-3 shadow"
+         aria-labelledby="accountDropdown"
+         style="min-width:230px; border-radius:10px;">
+
+      <h6 class="mb-1">Hello, <%= user.name %></h6>
+      <p class="small text-muted mb-2">Manage your account</p>
+
+      <div class="d-flex flex-column gap-2">
+        <a href="/account" class="btn btn-sm btn-outline-dark w-100">
+          <i class="fa fa-user me-1"></i> My Account
+        </a>
+
+        <a href="/orders" class="btn btn-sm btn-outline-dark w-100">
+          <i class="fa fa-box me-1"></i> My Orders
+        </a>
+
+        <form action="/logout" method="POST" class="d-inline w-100">
+          <button class="btn btn-sm btn-danger w-100">
+            <i class="fa fa-sign-out-alt me-1"></i> Logout
+          </button>
+        </form>
+      </div>
+
+    </div>
+  <% } %>
+
 </div>
 
 
