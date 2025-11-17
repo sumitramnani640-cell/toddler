@@ -49,29 +49,6 @@ module.exports = (sequelize) => {
             allowNull: false
         },
 
-        /** --------------------------
-         *  OTP + Verification Fields
-         * --------------------------*/
-
-        is_verified: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
-
-        otp: {
-            type: DataTypes.STRING,
-            allowNull: true  // Store hashed OTP
-        },
-
-        otp_expires: {
-            type: DataTypes.DATE,
-            allowNull: true
-        },
-
-        otp_purpose: {
-            type: DataTypes.ENUM('registration', 'forgot_password'),
-            allowNull: true
-        }
     }, {
         tableName: 'admins',
         timestamps: true,

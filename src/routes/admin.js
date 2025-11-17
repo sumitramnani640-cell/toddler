@@ -14,26 +14,41 @@ const NewsletterController = require('../controllers/admin/NewsletterController'
 const categoryFeatureController = require('../controllers/admin/categoryFeatureController');
 const productFeatureController = require('../controllers/admin/productFeatureController');
 
-
 // -------------------------------
 // DEBUG LOGGER (optional - remove in production)
 // -------------------------------
 router.use((req, res, next) => {
   // runs for all /admin/* requests
-  // console.log(`[ADMIN ROUTES] ${req.method} ${req.originalUrl} session.admin=${!!(req.session && req.session.admin)}`);
+  console.log(`[ADMIN ROUTES] ${req.method} ${req.originalUrl}`);
+  console.log(`[ADMIN ROUTES] session keys:`, Object.keys(req.session || {}));
+  console.log(`[ADMIN ROUTES] session.admin=`, !!(req.session && req.session.admin));
+  console.log(`[ADMIN ROUTES] session.adminUser=`, !!(req.session && req.session.adminUser));
   next();
 });
-
 
 // ===============================
 //  ADMIN AUTH MIDDLEWARE (whitelist-safe)
 // ===============================
 const requireAdmin = (req, res, next) => {
-  // mounted at /admin so req.path will be like '/login', '/logout', '/'
-  const publicPaths = ['/login', '/logout']; // add other public admin paths here if needed
-  if (publicPaths.includes(req.path)) return next();
+  // mounted at /admin so req.path will be like '/login', '/logout', '/dashboard', '/reset-password/123'
+  const publicPrefixes = [
+    '/login',
+    '/logout',
+    '/forgot-password',
+    '/reset-password' // allows /reset-password and /reset-password/:id
+  ];
 
-  if (req.session && req.session.admin && req.session.admin.id) {
+  // allow public routes (exact or prefix match)
+  if (publicPrefixes.some(p => req.path === p || req.path.startsWith(p + '/'))) {
+    return next();
+  }
+
+  // Accept either session.admin or session.adminUser (backwards compatible)
+  const hasAdmin =
+    req.session &&
+    ((req.session.admin && req.session.admin.id) || (req.session.adminUser && req.session.adminUser.id));
+
+  if (hasAdmin) {
     return next();
   }
 
@@ -41,28 +56,30 @@ const requireAdmin = (req, res, next) => {
   return res.redirect('/admin/login');
 };
 
-
 // ===============================
 //  PUBLIC ROUTES (no admin auth required)
 // ===============================
 router.get('/login', authController.showLogin);
 router.post('/login', authController.login);
 
-// Optionally a GET logout and POST logout - depends on your implementation
+// Optionally a GET logout and POST logout
 router.get('/logout', authController.logout);
 router.post('/logout', authController.logout);
 
+// forgot/reset routes (if you have them)
+router.get('/forgot-password', authController.showForgotPassword);
+router.post('/forgot-password', authController.sendForgotPasswordOtp);
+router.get('/reset-password/:adminId', authController.showResetPassword);
+router.post('/reset-password/:adminId', authController.verifyForgotPasswordOtpAndReset);
 
 // ===============================
 //  PROTECT ALL ROUTES BELOW
 // ===============================
 router.use(requireAdmin);
 
-
 // Dashboard
 router.get('/', dashboardController.index);
 router.get('/dashboard', dashboardController.index);
-
 
 // -------------------------------
 // PRODUCTS
@@ -142,6 +159,5 @@ router.get('/product-features/:id', productFeatureController.show);
 router.get('/product-features/:id/edit', productFeatureController.edit);
 router.post('/product-features/:id', productFeatureController.update);
 router.post('/product-features/:id/delete', productFeatureController.destroy);
-
 
 module.exports = router;

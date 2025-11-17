@@ -28,8 +28,7 @@
 </head>
 <body>
 
-  <% 
-  // Defensive defaults
+  <% // Defensive defaults
   var form = (typeof form !== 'undefined' && form) ? form : {};
   var errors = (typeof errors !== 'undefined' && Array.isArray(errors)) ? errors : [];
   var messages = (typeof messages !== 'undefined' && messages) ? messages : {};
@@ -52,7 +51,7 @@
 <div class="container d-flex align-items-center gap-3">
       <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
 
-
+ 
   <!-- Brand -->
   
       <div class="flex-grow-1 mx-4">
@@ -147,7 +146,6 @@
               </div>
 
               <!-- Email -->
-
               <div class="col-12">
                 <label class="field-label">* Email</label>
                 <input name="email" value="<%= form.email || '' %>" type="email" class="form-control <%= errors.find(e=>e.field==='email') ? 'is-invalid' : '' %>" required>
@@ -155,6 +153,7 @@
                   <div class="invalid-feedback"><%= eEmail.msg %></div>
                 <% } %>
               </div>
+
 
               <!-- Phone -->
               <div class="col-md-6">
@@ -165,13 +164,16 @@
                 </div>
               </div>
 
+
               <!-- TIN -->
               <div class="col-md-6">
                 <label class="field-label">TIN</label>
                 <input name="tin" value="<%= form.tin || '' %>" class="form-control tin-field">
               </div>
 
+
               <div class="col-12"><hr></div>
+
 
               <!-- Password -->
               <div class="col-md-6">
@@ -179,11 +181,13 @@
                 <input name="password" type="password" class="form-control <%= errors.find(e=>e.field==='password') ? 'is-invalid' : '' %>" required>
               </div>
 
+
               <!-- Confirm Password -->
               <div class="col-md-6">
                 <label class="field-label">* Confirm Password</label>
                 <input name="password_confirm" type="password" class="form-control <%= errors.find(e=>e.field==='password_confirm') ? 'is-invalid' : '' %>" required>
               </div>
+
 
               <!-- Newsletter -->
               <div class="col-12 mt-3">
@@ -200,11 +204,9 @@
                 </div>
                 <button class="btn btn-success ms-auto">Continue</button>
               </div>
-
             </div>
           </form>
         </div>
-
       </div>
 
       <!-- Right Sidebar -->
@@ -219,7 +221,6 @@
           </ul>
         </div>
       </div>
-
     </div>
   </main>
 
@@ -260,6 +261,5 @@
       }
     })();
   </script>
-
 </body>
 </html>

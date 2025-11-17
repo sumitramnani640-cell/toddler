@@ -1,8 +1,19 @@
+// src/controllers/admin/dashboardController.js
 const { Product, Category, Banner, User, Order, Newsletter, CategoryFeature, ProductFeature } = require('../../models');
 
 const dashboardController = {
   index: async (req, res) => {
     try {
+      // Accept either admin or adminUser (backwards compatible)
+      const hasAdmin = req.session && ((req.session.admin && req.session.admin.id) || (req.session.adminUser && req.session.adminUser.id));
+      console.log('dashboardController.index: session keys=', Object.keys(req.session || {}));
+      console.log('dashboardController.index: hasAdmin=', !!hasAdmin);
+
+      if (!hasAdmin) {
+        req.flash('error_msg', 'Please log in to access the admin panel');
+        return res.redirect('/admin/login');
+      }
+
       const [
         totalProducts,
         totalCategories,
@@ -19,7 +30,6 @@ const dashboardController = {
         Banner.count(),
         Order.count(),
         Newsletter.count(),
-        // new counts
         CategoryFeature.count(),
         ProductFeature.count()
       ]);
@@ -40,7 +50,7 @@ const dashboardController = {
         attributes: ['id', 'name', 'email', 'phone', 'createdAt']
       });
 
-      res.render('admin/dashboard', {
+      return res.render('admin/dashboard', {
         title: 'Dashboard - Savers Grocery Admin',
         totalProducts,
         totalCategories,
@@ -50,15 +60,22 @@ const dashboardController = {
         totalNewsletter,
         recentProducts,
         recentCustomers,
-        // new stats passed to view
         totalCategoryFeatures,
-        totalProductFeatures
+        totalProductFeatures,
+        layout: 'admin/layouts/admin'
       });
 
     } catch (error) {
       console.error('Dashboard error:', error);
-      req.flash('error_msg', 'Error loading dashboard');
-      res.redirect('/admin/login');
+
+      // Render an error page inside admin area instead of redirecting to login.
+      // This prevents potential redirect loops and gives the admin useful feedback.
+      res.status(500).render('admin/error', {
+        title: 'Admin - Error',
+        message: 'Failed to load dashboard. Please try again later.',
+        error: process.env.NODE_ENV === 'development' ? error : {},
+        layout: 'admin/layouts/admin'
+      });
     }
   }
 };

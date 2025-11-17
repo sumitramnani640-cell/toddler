@@ -10,76 +10,159 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// routes
+// Routers
 const adminRoutes = require('./routes/admin');
 const frontendRoutes = require('./routes/frontend');
 
-// init DB/models
+// Initialize DB/models
 require('./models/index');
 
-// parsers + static
+// -----------------------------
+// Parsers + Static
+// -----------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// sessions + flash
-app.use(session({
+// -----------------------------
+// FRONTEND SESSION (global)
+// -----------------------------
+const frontendSession = session({
   secret: process.env.SESSION_SECRET || 'savers-grocery-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24*60*60*1000 }
-}));
+  cookie: {
+    secure: false, // set true in production with HTTPS
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  }
+});
+app.use(frontendSession);
 app.use(flash());
 
-// expose flash/user to views
+// -----------------------------
+// Expose flash/session to views (frontend defaults)
+// -----------------------------
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg') || [];
   res.locals.error_msg = req.flash('error_msg') || [];
-  res.locals.user = req.session.user || null;
+
+  // frontend user info stored in frontend session (connect.sid)
+  res.locals.user = req.session && req.session.user ? req.session.user : null;
+
+  // adminUser will be set when admin session is active (handled later)
+  res.locals.adminUser = null;
   next();
 });
 
-// ejs setup
+// -----------------------------
+// EJS + Layouts
+// -----------------------------
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// IMPORTANT: disable global layout so express-ejs-layouts won't try to render "layout.ejs"
-app.set('layout', false);
+// Default: no global layout for frontend
+app.set('layout', true);
 
-// choose layout per-request BEFORE expressLayouts
+// Dynamic layout selection — admin-only layout
 app.use((req, res, next) => {
-  const isAdminRoute = req.path.startsWith('/admin');
-  const adminPublic = ['/admin/login', '/admin/forgot-password']; // public admin pages, no layout
-  const isAdminPublic = adminPublic.some(p => req.path === p || req.path.startsWith(p + '/'));
+  try {
+    const isAdminRoute = req.path.startsWith('/admin');
+    const adminPublic = [
+      '/admin/login',
+      '/admin/forgot-password',
+      '/admin/reset-password'
+    ];
 
-  if (isAdminRoute && !isAdminPublic) {
-    res.locals.layout = 'admin/layouts/admin'; // src/views/admin/layouts/admin.ejs
-  } else {
+    const isAdminPublic = adminPublic.some(p => req.path === p || req.path.startsWith(p + '/'));
+
+    if (isAdminRoute && !isAdminPublic) {
+      // Protected admin pages: use admin layout
+      res.locals.layout = 'admin/layouts/admin';
+    } else {
+      // Frontend and admin public pages: no layout by default
+      res.locals.layout = false;
+    }
+  } catch (err) {
     res.locals.layout = false;
   }
   next();
 });
 
-// enable layouts
+// Optional debug to print chosen layout for each request
+// Uncomment while debugging layout issues
+// app.use((req, res, next) => {
+//   console.log(`[LAYOUT] ${req.method} ${req.path} -> layout:`, res.locals.layout);
+//   next();
+// });
+
+// Mount express-ejs-layouts AFTER res.locals.layout is set
 app.use(expressLayouts);
 
-// method override
+// Method override for form verbs
 app.use(methodOverride('_method'));
 
-// routes
-app.use('/admin', adminRoutes);
+// -----------------------------
+// FRONTEND ROUTES (TOP)
+// -----------------------------
 app.use('/', frontendRoutes);
 
-// error handlers
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).render('error', { title: 'Error', message: 'Something went wrong', error: process.env.NODE_ENV === 'development' ? err : {}, layout: false });
-});
-app.use((req, res) => {
-  res.status(404).render('error', { title: 'Not Found', message: 'Page not found', error: {}, layout: false });
+// -----------------------------
+// ADMIN SESSION (isolated)
+// -----------------------------
+const adminSession = session({
+  name: process.env.ADMIN_SESSION_NAME || 'admin.sid',
+  secret: process.env.ADMIN_SESSION_SECRET || 'admin-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false, // set to true in production with HTTPS
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  }
 });
 
-// start
+// -----------------------------
+// ADMIN ROUTES (BOTTOM) - use isolated admin session
+// -----------------------------
+app.use(
+  '/admin',
+  adminSession,
+  (req, res, next) => {
+    // Expose admin session user to views only for admin routes
+    res.locals.adminUser = req.session && req.session.adminUser ? req.session.adminUser : null;
+    next();
+  },
+  adminRoutes
+);
+
+// -----------------------------
+// Error handlers
+// -----------------------------
+app.use((err, req, res, next) => {
+  console.error('ERROR HANDLER:', err && (err.stack || err));
+  const details = process.env.NODE_ENV === 'development' ? err : {};
+  res.status(500).render('error', {
+    title: 'Error',
+    message: 'Something went wrong',
+    error: details,
+    layout: false
+  });
+});
+
+// 404
+app.use((req, res) => {
+  res.status(404).render('error', {
+    title: 'Not Found',
+    message: 'Page not found',
+    error: {},
+    layout: false
+  });
+});
+
+// -----------------------------
+// Start server
+// -----------------------------
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

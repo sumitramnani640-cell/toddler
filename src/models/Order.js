@@ -1,52 +1,55 @@
-// src/models/Order.js
+'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const Order = sequelize.define('Order', {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.INTEGER.UNSIGNED,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
 
-    // recommended: use user_id as FK column (consistent, clear)
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    // matches your DB column "userId"
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
       references: {
-        model: 'users', // actual DB table name (lowercase plural)
-        key: 'id',
-      },
+        model: 'users', // table name in DB
+        key: 'id'
+      }
     },
 
-    total_amount: {
+    // matches your DB column "totalAmount"
+    totalAmount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
+      defaultValue: 0
     },
 
     status: {
-      type: DataTypes.ENUM('pending', 'processing', 'completed', 'cancelled'),
-      defaultValue: 'pending',
-    },
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'pending'
+    }
 
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
-    },
+    // createdAt and updatedAt will be handled automatically by Sequelize
   }, {
     tableName: 'orders',
     timestamps: true,
-    underscored: true // optional: maps camelCase model attrs to snake_case DB columns
+    underscored: false // IMPORTANT: your DB uses camelCase columns
   });
 
-  // Associations — executed by models/index.js after all models are defined
-  Order.associate = function(models) {
-    // models.User must exist (check models/index.js loads User)
+  // Associations (models/index.js will call this after all models are loaded)
+  Order.associate = (models) => {
+    // userId column is used as FK
     Order.belongsTo(models.User, {
-      foreignKey: 'user_id',
+      foreignKey: 'userId',
       as: 'user',
-      onDelete: 'CASCADE',
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
     });
 
-    // Example: Order.hasMany(models.OrderItem, { foreignKey: 'order_id', as: 'items' });
+    // add other associations here if needed (order items, payments, etc.)
+    // e.g. Order.hasMany(models.OrderItem, { foreignKey: 'orderId', as: 'items' });
   };
 
   return Order;

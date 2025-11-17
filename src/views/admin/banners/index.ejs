@@ -1,84 +1,123 @@
+<% /* admin/banners index — content-only, to be injected into admin layout */ %>
 
 <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-images mr-2"></i>Banners Management
-                </h3>
-                <div class="card-tools">
-                    <a href="/admin/banners/create" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus mr-1"></i> Add Banner
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Image</th>
-                                <th>Title</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (banners && banners.length > 0) { %>
-                                <% banners.forEach(banner => { %>
-                                    <tr>
-                                        <td><%= banner.id %></td>
-                                        <td>
-                                            <% if (banner.image) { %>
-                                                <img src="<%= banner.image %>" alt="<%= banner.title %>" class="banner-image">
-                                            <% } else { %>
-                                                <div class="banner-image bg-light d-flex align-items-center justify-content-center">
-                                                    <i class="fas fa-image text-muted"></i>
-                                                </div>
-                                            <% } %>
-                                        </td>
-                                        <td>
-                                            <strong><%= banner.title %></strong>
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-<%= banner.status === 'active' ? 'success' : 'secondary' %> status-badge">
-                                                <%= banner.status %>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">
-                                                <%= new Date(banner.createdAt).toLocaleDateString() %>
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <a href="/admin/banners/<%= banner.id %>" class="btn btn-info btn-sm" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="/admin/banners/<%= banner.id %>/edit" class="btn btn-warning btn-sm" title="Edit">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="/admin/banners/<%= banner.id %>" method="POST" class="d-inline">
-                                                    <input type="hidden" name="_method" value="DELETE">
-                                                    <button type="submit" class="btn btn-danger btn-sm delete-btn" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            <% } else { %>
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted">No banners found</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h3 class="card-title">
+          <i class="fas fa-images mr-2" aria-hidden="true"></i>
+          Banners Management
+        </h3>
+
+        <div class="card-tools">
+          <a href="/admin/banners/create" class="btn btn-primary btn-sm" aria-label="Add banner">
+            <i class="fas fa-plus mr-1" aria-hidden="true"></i> Add Banner
+          </a>
         </div>
+      </div>
+
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped table-hover" role="table" aria-label="Banners table">
+            <thead class="thead-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Image</th>
+                <th scope="col">Title</th>
+                <th scope="col">Status</th>
+                <th scope="col">Created</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% if (banners && banners.length > 0) { %>
+                <% banners.forEach(function(banner) { %>
+                  <tr>
+                    <td><%= banner.id %></td>
+
+                    <td>
+                      <% if (banner.image) { %>
+                        <img
+                          src="<%= banner.image %>"
+                          alt="<%= banner.title %>"
+                          class="banner-image"
+                          style="max-width:150px; height:auto; object-fit:cover; border-radius:4px;"
+                        >
+                      <% } else { %>
+                        <div class="banner-image-placeholder d-flex align-items-center justify-content-center" style="width:150px; height:80px; background:#f8f9fa; border-radius:4px;">
+                          <i class="fas fa-image text-muted" aria-hidden="true"></i>
+                        </div>
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <strong><%= banner.title %></strong>
+                      <% if (banner.description) { %>
+                        <div class="small text-muted"><%= banner.description.substring(0,120) %><%= banner.description.length>120 ? '…' : '' %></div>
+                      <% } %>
+                    </td>
+
+                    <td>
+                      <span class="badge <%= banner.status === 'active' ? 'badge-success' : 'badge-secondary' %>">
+                        <%= banner.status %>
+                      </span>
+                    </td>
+
+                    <td>
+                      <small class="text-muted"><%= new Date(banner.createdAt).toLocaleDateString() %></small>
+                    </td>
+
+                    <td>
+                      <div class="btn-group" role="group" aria-label="Banner actions">
+                        <a href="/admin/banners/<%= banner.id %>" class="btn btn-info btn-sm" title="View" aria-label="View banner">
+                          <i class="fas fa-eye" aria-hidden="true"></i>
+                        </a>
+                        <a href="/admin/banners/<%= banner.id %>/edit" class="btn btn-warning btn-sm" title="Edit" aria-label="Edit banner">
+                          <i class="fas fa-edit" aria-hidden="true"></i>
+                        </a>
+
+                        <form action="/admin/banners/<%= banner.id %>" method="POST" class="d-inline delete-form" style="display:inline;">
+                          <input type="hidden" name="_method" value="DELETE">
+                          <button type="submit" class="btn btn-danger btn-sm delete-btn" title="Delete" aria-label="Delete banner">
+                            <i class="fas fa-trash" aria-hidden="true"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" class="text-center text-muted">No banners found</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<script>
+  (function () {
+    // Confirm before delete — uses event delegation
+    document.addEventListener('click', function (e) {
+      if (!e.target) return;
+
+      // find the closest delete button
+      const btn = e.target.closest && e.target.closest('.delete-btn');
+      if (!btn) return;
+
+      e.preventDefault();
+
+      // show a confirm dialog
+      if (confirm('Are you sure you want to permanently delete this banner?')) {
+        // submit the form
+        const form = btn.closest('form.delete-form');
+        if (form) form.submit();
+      }
+    }, false);
+  })();
+</script>

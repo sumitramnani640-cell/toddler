@@ -1,9 +1,9 @@
-// src/models/Product.js
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-  const { Sequelize } = sequelize;
+const { Op } = require('sequelize'); // for queries
+const SequelizePkg = require('sequelize'); // if you need constructor elsewhere
 
+module.exports = (sequelize, DataTypes) => {
   // slugify helper (safe)
   function slugify(value) {
     if (!value && value !== 0) return '';
@@ -23,11 +23,10 @@ module.exports = (sequelize, DataTypes) => {
     let candidate = base;
     let counter = 1;
 
-    // use let for existing so we can update it in the loop
     let existing = await Model.findOne({
       where: {
         slug: candidate,
-        ...(excludeId ? { id: { [Sequelize.Op.ne]: excludeId } } : {})
+        ...(excludeId ? { id: { [Op.ne]: excludeId } } : {})
       },
       attributes: ['id']
     });
@@ -38,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       existing = await Model.findOne({
         where: {
           slug: candidate,
-          ...(excludeId ? { id: { [Sequelize.Op.ne]: excludeId } } : {})
+          ...(excludeId ? { id: { [Op.ne]: excludeId } } : {})
         },
         attributes: ['id']
       });
@@ -93,32 +92,33 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'products',
     timestamps: true,
-    underscored: false,
-    hooks: {
-      beforeValidate: async (product) => {
-        // if slug present and non-empty -> normalize it
-        if (product.slug && String(product.slug).trim() !== '') {
-          product.slug = slugify(product.slug);
-        }
-
-        // if slug missing or empty, generate
-        if ((!product.slug || String(product.slug).trim() === '') && product.name) {
-          const excludeId = product.id || null;
-          product.slug = await generateUniqueSlug(product.name, Product, excludeId);
-        }
-
-        // final fallback
-        if (!product.slug || String(product.slug).trim() === '') {
-          product.slug = `product-${Date.now()}`;
-        }
-      }
-    }
+    underscored: false
   });
 
-  // associations (if your index.js wires them differently, keep that)
+  // associations
   Product.associate = function(models) {
     Product.belongsTo(models.Category, { foreignKey: 'category_id', as: 'category' });
   };
+
+  // Register hooks AFTER Product is defined so `Product` is available inside the hook
+  Product.beforeValidate(async (product, options) => {
+    // normalize provided slug
+    if (product.slug && String(product.slug).trim() !== '') {
+      product.slug = slugify(product.slug);
+    }
+
+    // if slug missing or empty, generate
+    if ((!product.slug || String(product.slug).trim() === '') && product.name) {
+      const excludeId = product.id || null;
+      // pass Product (the model) to generator so uniqueness checks work
+      product.slug = await generateUniqueSlug(product.name, Product, excludeId);
+    }
+
+    // final fallback
+    if (!product.slug || String(product.slug).trim() === '') {
+      product.slug = `product-${Date.now()}`;
+    }
+  });
 
   return Product;
 };
