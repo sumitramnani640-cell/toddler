@@ -61,33 +61,8 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Default: no global layout for frontend
-app.set('layout', true);
-
-// Dynamic layout selection — admin-only layout
-app.use((req, res, next) => {
-  try {
-    const isAdminRoute = req.path.startsWith('/admin');
-    const adminPublic = [
-      '/admin/login',
-      '/admin/forgot-password',
-      '/admin/reset-password'
-    ];
-
-    const isAdminPublic = adminPublic.some(p => req.path === p || req.path.startsWith(p + '/'));
-
-    if (isAdminRoute && !isAdminPublic) {
-      // Protected admin pages: use admin layout
-      res.locals.layout = 'admin/layouts/admin';
-    } else {
-      // Frontend and admin public pages: no layout by default
-      res.locals.layout = false;
-    }
-  } catch (err) {
-    res.locals.layout = false;
-  }
-  next();
-});
+// Default: disable global layout; routes will opt in
+app.set('layout', false);
 
 // Optional debug to print chosen layout for each request
 // Uncomment while debugging layout issues
@@ -96,8 +71,34 @@ app.use((req, res, next) => {
 //   next();
 // });
 
-// Mount express-ejs-layouts AFTER res.locals.layout is set
+// Mount express-ejs-layouts before custom layout wrapper
 app.use(expressLayouts);
+
+// Automatically choose layout per request
+app.use((req, res, next) => {
+  const originalRender = res.render;
+  const isAdminRoute = req.originalUrl.startsWith('/admin');
+
+  res.render = function renderWithLayout(view, options, callback) {
+    let opts = options;
+    let cb = callback;
+
+    if (typeof opts === 'function') {
+      cb = opts;
+      opts = {};
+    }
+
+    opts = opts || {};
+
+    if (typeof opts.layout === 'undefined') {
+      opts.layout = isAdminRoute ? 'admin/layouts/admin' : false;
+    }
+
+    return originalRender.call(this, view, opts, cb);
+  };
+
+  next();
+});
 
 // Method override for form verbs
 app.use(methodOverride('_method'));
