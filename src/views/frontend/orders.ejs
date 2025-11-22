@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order History - Saver Grocery</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    .dashboard-card {
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background: #fff;
+      transition: 0.2s;
+    }
+    .dashboard-card:hover {
+      background: #f9f9f9;
+    }
+  </style>
+
+</head>
+<body>
+
+<!-- ====================== HEADER ====================== -->
+<header>
+  <div class="bg-dark text-white py-1 small text-center">
+    Fast & Free Delivery | Shop from over thousand products
+  </div>
+
+  <div class="container py-3 d-flex align-items-center justify-content-between">
+
+    <a href="/">
+      <img src="/assets/img/logo.png" alt="SAVER GROCERY" height="50">
+    </a>
+
+    <div class="flex-grow-1 mx-4">
+      <form action="/search" method="GET" class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search Products">
+        <button class="btn btn-success">
+          <i class="fa fa-search"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <a href="/account" class="text-dark text-decoration-none">
+        <i class="fa fa-user"></i> Account
+      </a>
+
+      <a href="/cart" class="text-dark position-relative text-decoration-none">
+        <i class="fa fa-shopping-cart"></i>
+        <span class="badge bg-success position-absolute top-0 start-100 translate-middle">
+          1
+        </span>
+      </a>
+    </div>
+
+  </div>
+
+  <nav class="bg-success text-white py-2">
+    <div class="container d-flex gap-4 small">
+      <a href="#" class="text-white">All Category</a>
+      <a href="#" class="text-white">Fresh Food</a>
+      <a href="#" class="text-white">Beverages</a>
+      <a href="#" class="text-white">Bakery</a>
+      <a href="#" class="text-white">Frozen Food</a>
+      <a href="#" class="text-white">Pet Supplies</a>
+      <a href="#" class="text-white">Fruits & Vegetables</a>
+      <a href="#" class="text-white">Food Cupboard</a>
+      <a href="#" class="text-white">Organic Food</a>
+      <a href="#" class="text-white">Health & Fitness</a>
+    </div>
+  </nav>
+</header>
+
+
+
+<!-- ====================== ORDER HISTORY CONTENT ====================== -->
+
+<div class="container my-5">
+
+  <div class="mb-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Account</a></li>
+        <li class="breadcrumb-item active">Order History</li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="row">
+
+    <!-- TABLE -->
+    <div class="col-md-9">
+      <h5 class="fw-bold mb-3">ORDER HISTORY</h5>
+
+      <div class="table-responsive">
+        <table class="table table-bordered text-center">
+          <thead class="table-light">
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>No. of Products</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Date Added</th>
+              <th>View</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>#3298</td>
+              <td>sumit ramnani</td>
+              <td>4</td>
+              <td>Processing</td>
+              <td>AED380.29</td>
+              <td>22 Nov, 2025</td>
+              <td>
+                <a href="/order/3298" class="btn btn-success btn-sm">
+                  <i class="fa fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <span>Showing 1 to 1 of 1 (1 Pages)</span>
+        <a href="/account" class="btn btn-success">Continue</a>
+      </div>
+    </div>
+
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="col-md-3">
+      <div class="card p-3">
+
+        <h6 class="fw-bold mb-3">
+          <i class="fa fa-user text-success me-2"></i> ACCOUNT SETTINGS
+        </h6>
+        <ul class="list-unstyled mb-3">
+          <li><a href="/account" class="d-block py-1">My Account</a></li>
+          <li><a href="/account/edit" class="d-block py-1">Edit Account</a></li>
+          <li><a href="/account/password" class="d-block py-1">Password</a></li>
+          <li><a href="/account/address" class="d-block py-1">Address Book</a></li>
+        </ul>
+
+        <h6 class="fw-bold mt-4 mb-3">
+          <i class="fa fa-shopping-bag text-success me-2"></i> MY ORDERS
+        </h6>
+        <ul class="list-unstyled mb-3">
+          <li><a href="/orders" class="d-block py-1">Order History</a></li>
+          <li><a href="/returns" class="d-block py-1">Returns</a></li>
+          <li><a href="/transactions" class="d-block py-1">Transactions</a></li>
+        </ul>
+
+        <h6 class="fw-bold mt-4 mb-3">
+          <i class="fa fa-folder text-success me-2"></i> MY STUFF
+        </h6>
+        <ul class="list-unstyled mb-3">
+          <li><a href="/wishlist" class="d-block py-1">Wishlist</a></li>
+          <li><a href="/newsletter" class="d-block py-1">Newsletter</a></li>
+        </ul>
+
+        <a href="/logout" class="btn btn-outline-danger w-100 mt-3">
+          Logout
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- ====================== FOOTER ====================== -->
+
+<footer class="bg-light mt-5 pt-5 pb-3">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-4 mb-4">
+        <img src="/assets/img/logo.png" alt="SAVER GROCERY" height="55" class="mb-3">
+        <p class="small text-muted">
+          Saver Grocery is the first food grocery in the region operating
+          on a discount model, offering the best quality products to its
+          customers at the best price.
+        </p>
+      </div>
+
+      <div class="col-md-2 mb-4">
+        <h6 class="fw-bold mb-3">INFORMATION</h6>
+        <ul class="list-unstyled small">
+          <li><a href="/about" class="text-dark d-block py-1">About Us</a></li>
+          <li><a href="/delivery" class="text-dark d-block py-1">Delivery Information</a></li>
+          <li><a href="/privacy" class="text-dark d-block py-1">Privacy Policy</a></li>
+          <li><a href="/terms" class="text-dark d-block py-1">Terms & Conditions</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-2 mb-4">
+        <h6 class="fw-bold mb-3">MY ACCOUNT</h6>
+        <ul class="list-unstyled small">
+          <li><a href="/account" class="text-dark d-block py-1">My Account</a></li>
+          <li><a href="/orders" class="text-dark d-block py-1">Order History</a></li>
+          <li><a href="/wishlist" class="text-dark d-block py-1">Wishlist</a></li>
+          <li><a href="/contact" class="text-dark d-block py-1">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-4 mb-4">
+        <h6 class="fw-bold mb-3">SIGN UP FOR NEWSLETTER</h6>
+        <p class="small text-muted">No spam, ever.</p>
+        <form action="/subscribe" method="POST" class="input-group">
+          <input type="email" name="email" class="form-control" placeholder="Email">
+          <button class="btn btn-success">Subscribe</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="text-center small text-muted mt-3">
+    © 2025 Saver Grocery — All Rights Reserved.
+  </div>
+</footer>
+
+
+</body>
+</html>
