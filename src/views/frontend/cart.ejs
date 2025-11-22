@@ -77,9 +77,57 @@
       </form>
 
       <!-- LOGIN -->
-      <a href="/login" class="d-flex align-items-center text-decoration-none" style="color:#0b662e;">
-        <i class="fas fa-user me-1"></i> Login & Register
-      </a>
+     <!-- AUTH / USER MENU -->
+<% if (typeof user !== 'undefined' && user) { %>
+  <div class="d-flex align-items-center gap-3">
+    <a href="/account" class="text-decoration-none" style="color:#0b662e;">
+      <i class="fas fa-user me-1"></i> <%= user.name || user.email || 'My Account' %>
+    </a>
+
+    <button id="logoutBtn" class="btn btn-danger btn-sm w-100">
+    <i class="fa fa-sign-out-alt me-1"></i> Logout
+</button>
+
+<!-- Hidden form -->
+<form id="logoutForm" action="/logout" method="POST" class="d-none"></form>
+
+</form>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Do you want to log out from your account?',
+        icon: 'warning',
+        width: '320px',
+        padding: '0.8rem',
+        showCancelButton: true,
+        confirmButtonText: 'Logout',
+        cancelButtonText: 'Cancel',
+        buttonsStyling: false,
+        customClass: {
+            popup: 'rounded-3',
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById("logoutForm").submit();
+        }
+    });
+});
+</script>
+  </div>
+<% } else { %>
+  <a href="/login" class="d-flex align-items-center text-decoration-none" style="color:#0b662e;">
+    <i class="fas fa-user me-1"></i> Login & Register
+  </a>
+<% } %>
+
 
       <!-- CART -->
       <a href="/cart" class="position-relative" style="color:#0b662e;">
@@ -145,21 +193,34 @@
                 <div class="text-muted small"><%= item.sku || '' %></div>
                 <div class="fw-bold text-success">AED <%= item.price %></div>
 
-                <div class="d-flex align-items-center mt-2 gap-2">
+               <div class="d-flex align-items-center mt-2 gap-2">
 
-                  <form method="POST" action="/cart/update" class="d-flex gap-2">
-                    <input type="hidden" name="itemId" value="<%= item.id %>">
-                    <button name="op" value="dec" class="btn btn-light border">-</button>
-                    <input type="text" name="qty" value="<%= item.qty %>" class="form-control" style="width:60px;">
-                    <button name="op" value="inc" class="btn btn-light border">+</button>
-                  </form>
+  <!-- UPDATE QTY -->
+  <form method="POST" action="/cart/update" class="d-flex gap-2 align-items-center">
+  <!-- must send productId because controller reads req.body.productId -->
+  <input type="hidden" name="productId" value="<%= item.productId %>">
 
-                  <form action="/cart/remove" method="POST">
-                    <input type="hidden" name="itemId" value="<%= item.id %>">
-                    <button class="btn btn-outline-danger btn-sm"><i class="fas fa-trash"></i></button>
-                  </form>
+  <!-- decrement -> submits form with op=dec -->
+  <button type="submit" name="op" value="dec" class="btn btn-light border px-2">-</button>
 
-                </div>
+  <!-- numeric qty (Enter will submit form) -->
+  <input type="number" name="qty" value="<%= item.qty %>" min="0" class="form-control text-center" style="width:60px;">
+
+  <!-- increment -> submits form with op=inc -->
+  <button type="submit" name="op" value="inc" class="btn btn-light border px-2">+</button>
+</form>
+
+
+  <!-- REMOVE ITEM -->
+  <form action="/cart/remove" method="POST">
+    <input type="hidden" name="productId" value="<%= item.productId %>">
+    <button class="btn btn-outline-danger btn-sm">
+      <i class="fas fa-trash"></i>
+    </button>
+  </form>
+
+</div>
+
               </div>
 
             </div>
@@ -204,8 +265,10 @@
             <span>Total:</span>
             <span>AED <%= total.toFixed(2) %></span>
           </div>
-
-          <button class="btn-checkout mt-3">CHECKOUT ALL</button>
+<!-- Use a GET form -->
+<form action="/checkout" method="GET">
+  <button type="submit" class="btn btn-danger">CHECKOUT ALL</button>
+</form>
 
           <div class="alert alert-warning small mt-3">
             A minimum order of AED150 is required for groceries.

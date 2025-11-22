@@ -44,15 +44,64 @@
           </form>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-          <a href="/login" class="text-dark text-decoration-none d-flex align-items-center">
-            <i class="fas fa-user-circle fs-5 me-1"></i>
-            <span class="d-none d-lg-inline">Login &amp; Register</span>
-          </a>
-          <a href="/cart" class="btn btn-outline-secondary position-relative">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-          </a>
+    
+          <!-- LOGIN -->
+     <!-- AUTH / USER MENU -->
+<% if (typeof user !== 'undefined' && user) { %>
+  <div class="d-flex align-items-center gap-3">
+    <a href="/account" class="text-decoration-none" style="color:#0b662e;">
+      <i class="fas fa-user me-1"></i> <%= user.name || user.email || 'My Account' %>
+    </a>
+
+    <button id="logoutBtn" class="btn btn-danger btn-sm w-100">
+    <i class="fa fa-sign-out-alt me-1"></i> Logout
+</button>
+
+<!-- Hidden form -->
+<form id="logoutForm" action="/logout" method="POST" class="d-none"></form>
+
+</form>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Do you want to log out from your account?',
+        icon: 'warning',
+        width: '320px',
+        padding: '0.8rem',
+        showCancelButton: true,
+        confirmButtonText: 'Logout',
+        cancelButtonText: 'Cancel',
+        buttonsStyling: false,
+        customClass: {
+            popup: 'rounded-3',
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById("logoutForm").submit();
+        }
+    });
+});
+</script>
+  </div>
+<% } else { %>
+  <a href="/login" class="d-flex align-items-center text-decoration-none" style="color:#0b662e;">
+    <i class="fas fa-user me-1"></i> Login & Register
+  </a>
+<% } %>
+         <a href="/cart" class="position-relative" style="color:#0b662e;">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+          <%= cartCount || 0 %>
+        </span>
+      </a>
         </div>
       </div>
     </div>
@@ -149,7 +198,7 @@
               <p class="text-success fw-bold">₹<%= p?.price ? Number(p.price).toFixed(2) : '0.00' %></p>
 
               <% if (p?.id) { %>
-                <a href="/product/<%= p.id %>" class="btn btn-dark btn-sm w-100">View Product</a>
+                <a href="/product/<%= p.slug %>" class="btn btn-dark btn-sm w-100">View Product</a>
               <% } else { %>
                 <button class="btn btn-secondary btn-sm w-100" disabled>View Product</button>
               <% } %>

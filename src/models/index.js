@@ -1,4 +1,6 @@
 // src/models/index.js
+'use strict';
+
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 
@@ -20,7 +22,7 @@ const AdminModel = require('./Admin');
 const ProductModel = require('./Product');
 const CategoryModel = require('./Category');
 const BannerModel = require('./Banner');
-const UserModel = require('./User');         // <-- fixed: use ./User (singular)
+const UserModel = require('./User');
 const OrderModel = require('./Order');
 const NewsletterModel = require('./Newsletter');
 const CategoryFeatureModel = require('./CategoryFeature');
@@ -31,7 +33,7 @@ const Admin = AdminModel(sequelize, DataTypes);
 const Product = ProductModel(sequelize, DataTypes);
 const Category = CategoryModel(sequelize, DataTypes);
 const Banner = BannerModel(sequelize, DataTypes);
-const User = UserModel(sequelize, DataTypes); // <-- singular User
+const User = UserModel(sequelize, DataTypes);
 const Order = OrderModel(sequelize, DataTypes);
 const Newsletter = NewsletterModel(sequelize, DataTypes);
 const CategoryFeature = CategoryFeatureModel(sequelize, DataTypes);
@@ -43,15 +45,17 @@ const models = {
   Product,
   Category,
   Banner,
-  User,              // <-- key is 'User' (matches models.User)
+  User,
   Order,
   Newsletter,
   CategoryFeature,
   ProductFeature
 };
 
-// Optional diagnostic (uncomment while debugging)
-// console.log('Loaded models:', Object.keys(models));
+// Diagnostic logs (useful while debugging)
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Loaded models:', Object.keys(models));
+}
 
 Object.keys(models).forEach((name) => {
   if (typeof models[name].associate === 'function') {

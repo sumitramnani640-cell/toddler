@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "Checkout" %></title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    * { box-sizing: border-box; }
+    body,html{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#fff; color:#222; }
+
+    .container{ max-width:1200px; margin:auto; padding:0 1rem; }
+
+    /* header / top bars */
+    .nav-bottom{ background:#1b683f; color:white; }
+    .site-logo { font-weight:700; color:#0b662e; font-size:1.25rem; display:flex; align-items:center; gap:.5rem }
+
+    /* checkout spacing and card look */
+    .checkout-step { margin-bottom: 1rem; border-radius:6px; overflow:hidden; }
+    .checkout-step .step-header { padding:10px 14px; background:#eaf6ef; border:1px solid rgba(0,0,0,0.03); cursor:pointer }
+    .checkout-step .step-body { padding:18px; border:1px solid rgba(0,0,0,0.03); border-top:none; background:#f8faf8; display:none }
+    .checkout-step.active .step-body{ display:block }
+
+    .summary-box{ border:1px solid #eee; padding:20px; border-radius:8px; background:#fff; }
+    .promo-box{ background:#e8f7ea; border-left:5px solid #0b662e; padding:12px; border-radius:6px; }
+
+    .btn-checkout{ background:#d62828; color:#fff; width:100%; padding:12px; font-weight:bold; border:none; border-radius:6px; }
+
+    .small-muted { font-size:0.875rem; color:#6b6b6b; }
+
+    /* form spacing */
+    .checkout-form .form-group { margin-bottom: 1rem; }
+    .checkout-actions { display:flex; gap:12px; justify-content:flex-end; align-items:center; margin-top:12px; }
+
+    /* responsive tweaks */
+    @media (max-width: 768px) {
+      .site-logo { font-size:1rem; }
+      .checkout-actions { flex-direction:column; align-items:stretch; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="nav-bottom text-white small py-2">
+    <div class="container d-flex justify-content-between">
+      <div class="d-flex gap-4">
+        <div><i class="fas fa-truck me-2"></i>Fast &amp; Free Delivery</div>
+        <div><i class="fas fa-shopping-basket me-2"></i>Thousands of products</div>
+      </div>
+      <div><i class="fas fa-phone me-2"></i>+971-542526215</div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container d-flex align-items-center gap-3 py-3">
+      <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
+<% 
+  // defensive: ensure categories is always an array so the template cannot crash
+  const cats = (typeof categories !== 'undefined' && Array.isArray(categories)) ? categories : [];
+  const currentCategory = typeof category !== 'undefined' ? category : '';
+%>
+      <form class="search-form d-flex flex-grow-1" action="/search" method="GET">
+        <select name="category" class="form-select w-auto me-2" style="min-width:130px;">
+          <option value="">All Categories</option>
+          <% if (Array.isArray(categories)) { %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.slug %>" <%= (category === cat.slug) ? 'selected' : '' %>><%= cat.name %></option>
+            <% }) %>
+          <% } %>
+        </select>
+
+        <input type="text" name="q" class="form-control" placeholder="Search products..." value="<%= q || '' %>">
+        <button class="btn ms-2" style="background:#0b662e;color:#fff;">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+
+      <% if (user) { %>
+        <div class="text-success small-muted">Welcome, <strong><%= user.name || user.email %></strong></div>
+      <% } else { %>
+        <a href="/login" class="text-decoration-none" style="color:#0b662e;">Login &amp; Register</a>
+      <% } %>
+      <a href="/cart" class="position-relative ms-3" style="color:#0b662e;">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span id="cartBadge" class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle"><%= cartCount || 0 %></span>
+      </a>
+    </div>
+  </header>
+
+  <!-- DELIVERY BAR -->
+  <div class="nav-bottom text-white small py-2" style="background:#1b683f;">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div id="nextDelivery"> <i class="fas fa-truck"></i> Next Standard Delivery Today 6:00 PM-10:00 PM</div>
+      <div><i class="fas fa-map-marker-alt"></i> Deliver to: <span id="deliverAddr"><%= (cart && cart.shippingAddress && cart.shippingAddress.city) ? cart.shippingAddress.city + ' - ' + (cart.shippingAddress.area || '') : 'Dubai Festival City - Dubai' %></span></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="container py-4">
+    <nav class="mb-3 small-muted">
+      <a href="/">Home</a> &nbsp; / &nbsp; <a href="/cart">Shopping Cart</a> &nbsp; / &nbsp; Checkout
+    </nav>
+
+    <h3 class="mb-3">CHECKOUT</h3>
+
+   <% if (!user) { %>
+<!-- Step 1: Checkout Options -->
+<div class="checkout-step" data-step="1">
+  <div class="step-header d-flex justify-content-between align-items-center">
+    <div><strong>Step 1:</strong> Checkout Options</div>
+    <div class="small-muted">Choose guest or register</div>
+  </div>
+  <div class="step-body">
+    <form id="form-step-1" class="row g-3" method="POST" action="/checkout/options">
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="account_type" id="checkout-register" value="register">
+          <label class="form-check-label" for="checkout-register">Register Account (create and save details)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="account_type" id="checkout-guest" value="guest" checked>
+          <label class="form-check-label" for="checkout-guest">Guest Checkout</label>
+        </div>
+      </div>
+
+      <div class="col-12 checkout-actions">
+        <a href="/cart" class="btn btn-light">Back to Cart</a>
+        <button type="button" class="btn btn-success btn-next" data-next="2">Continue</button>
+      </div>
+    </form>
+  </div>
+</div>
+<% } %>
+
+
+    <!-- Step 2: Billing Details -->
+    <div class="checkout-step" data-step="2">
+      <div class="step-header d-flex justify-content-between align-items-center">
+        <div><strong>Step 2:</strong> Billing Details</div>
+        <div class="small-muted">Enter billing address</div>
+      </div>
+      <div class="step-body">
+        <form id="form-step-2" class="checkout-form" method="POST" action="/checkout/billing">
+          <!-- If user data available, prefill -->
+          <div class="row">
+            <div class="col-md-6 form-group">
+              <label for="firstName">First Name</label>
+              <input id="firstName" name="firstName" class="form-control" value="<%= (user && user.firstName) ? user.firstName : (user && user.name ? user.name.split(' ')[0] : '') %>">
+            </div>
+
+            <div class="col-md-6 form-group">
+              <label for="lastName">Last Name</label>
+              <input id="lastName" name="lastName" class="form-control" value="<%= (user && user.lastName) ? user.lastName : '' %>">
+            </div>
+
+            <div class="col-md-12 form-group">
+              <label for="company">Company</label>
+              <input id="company" name="company" class="form-control" value="<%= (user && user.company) ? user.company : '' %>">
+            </div>
+
+            <div class="col-md-12 form-group">
+              <label for="address1">Address 1</label>
+              <input id="address1" name="address1" class="form-control" value="<%= (user && user.address1) ? user.address1 : (cart && cart.shippingAddress ? cart.shippingAddress.address1 : '') %>">
+            </div>
+
+            <div class="col-md-12 form-group">
+              <label for="address2">Address 2</label>
+              <input id="address2" name="address2" class="form-control" value="<%= (user && user.address2) ? user.address2 : '' %>">
+            </div>
+
+            <div class="col-md-4 form-group">
+              <label for="city">City</label>
+              <input id="city" name="city" class="form-control" value="<%= (user && user.city) ? user.city : '' %>">
+            </div>
+
+            <div class="col-md-4 form-group">
+              <label for="postcode">Post Code</label>
+              <input id="postcode" name="postcode" class="form-control" value="<%= (user && user.postcode) ? user.postcode : '' %>">
+            </div>
+
+            <div class="col-md-4 form-group">
+              <label for="country">Country</label>
+              <select id="country" name="country" class="form-select">
+                <option value="United Arab Emirates" selected>United Arab Emirates</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="checkout-actions">
+            <a href="/cart" class="btn btn-light">Back</a>
+            <button type="button" class="btn btn-success btn-next" data-next="3">Continue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 3: Delivery Details -->
+    <div class="checkout-step" data-step="3">
+      <div class="step-header d-flex justify-content-between align-items-center">
+        <div><strong>Step 3:</strong> Delivery Details</div>
+        <div class="small-muted">Choose delivery address &amp; options</div>
+      </div>
+      <div class="step-body">
+        <form id="form-step-3" method="POST" action="/checkout/delivery">
+          <div class="form-group">
+            <label for="deliverySlot">Delivery Slot</label>
+            <select id="deliverySlot" name="deliverySlot" class="form-select">
+              <option value="standard">Standard (6:00 PM - 10:00 PM)</option>
+              <option value="express">Express (Next hour)</option>
+            </select>
+          </div>
+
+          <div class="checkout-actions">
+            <a class="btn btn-light" href="/checkout">Back</a>
+            <button type="button" class="btn btn-success btn-next" data-next="4">Continue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 4: Delivery Method -->
+    <div class="checkout-step" data-step="4">
+      <div class="step-header d-flex justify-content-between align-items-center">
+        <div><strong>Step 4:</strong> Delivery Method</div>
+        <div class="small-muted">Select shipping method</div>
+      </div>
+      <div class="step-body">
+        <form id="form-step-4" method="POST" action="/checkout/shipping">
+          <div class="form-check">
+            <input class="form-check-input shipping_method" type="radio" name="shipping_method" id="method-standard" value="standard" checked>
+            <label class="form-check-label" for="method-standard">Standard Delivery (AED 0)</label>
+          </div>
+          <div class="form-check mt-2">
+            <input class="form-check-input shipping_method" type="radio" name="shipping_method" id="method-express" value="express">
+            <label class="form-check-label" for="method-express">Express Delivery (AED 20)</label>
+          </div>
+
+          <div class="checkout-actions">
+            <a class="btn btn-light" href="/checkout">Back</a>
+            <button type="button" class="btn btn-success btn-next" data-next="5">Continue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 5: Payment Method -->
+    <div class="checkout-step" data-step="5">
+      <div class="step-header d-flex justify-content-between align-items-center">
+        <div><strong>Step 5:</strong> Payment Method</div>
+        <div class="small-muted">Choose how you want to pay</div>
+      </div>
+      <div class="step-body">
+        <form id="form-step-5" method="POST" action="/checkout/payment">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="payment_method" id="pay-card" value="card" checked>
+            <label class="form-check-label" for="pay-card">Credit / Debit Card</label>
+          </div>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="radio" name="payment_method" id="pay-cod" value="cod">
+            <label class="form-check-label" for="pay-cod">Cash on Delivery</label>
+          </div>
+
+          <div class="checkout-actions">
+            <a class="btn btn-light" href="/checkout">Back</a>
+            <button type="button" class="btn btn-success btn-next" data-next="6">Continue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 6: Confirm Order -->
+    <div class="checkout-step" data-step="6">
+      <div class="step-header d-flex justify-content-between align-items-center">
+        <div><strong>Step 6:</strong> Confirm Order</div>
+        <div class="small-muted">Review &amp; place your order</div>
+      </div>
+      <div class="step-body row">
+        <div class="col-lg-8">
+          <h5 class="mb-3">Your items</h5>
+
+          <% if (!cart || !cart.items || cart.items.length === 0) { %>
+            <div class="alert alert-info">Your cart is empty.</div>
+          <% } else { %>
+            <% cart.items.forEach((item, idx) => { %>
+              <div class="d-flex align-items-center mb-3 cart-item" data-price="<%= item.price %>" data-qty="<%= item.qty %>">
+                <img src="<%= item.imageUrl %>" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:6px;margin-right:12px;">
+                <div>
+                  <div class="fw-bold"><%= item.name %></div>
+                  <div class="small-muted">Qty: <span class="item-qty"><%= item.qty %></span> × AED <span class="item-price"><%= (item.price.toFixed ? item.price.toFixed(2) : item.price) %></span></div>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="promo-box mb-3">Free delivery over AED 200</div>
+
+          <div class="summary-box">
+            <h6>Order Summary</h6>
+
+            <div class="d-flex justify-content-between">
+              <span>Subtotal:</span>
+              <span>AED <span id="subtotal"><%= (typeof subtotal !== 'undefined' ? subtotal : (cart && cart.totalPrice) || 0).toFixed(2) %></span></span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <span>VAT (5%):</span>
+              <span>AED <span id="vat"><%= (typeof vat !== 'undefined' ? vat : 0).toFixed(2) %></span></span>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <span>Delivery:</span>
+              <span>AED <span id="shipping">0.00</span></span>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-between fw-bold">
+              <span>Total:</span>
+              <span>AED <span id="total"><%= (typeof total !== 'undefined' ? total : ((cart && cart.totalPrice) || 0)).toFixed(2) %></span></span>
+            </div>
+
+            <form id="confirmForm" method="POST" action="/checkout/confirm" class="mt-3">
+              <input type="hidden" name="subtotal" id="hiddenSubtotal">
+              <input type="hidden" name="vat" id="hiddenVat">
+              <input type="hidden" name="shipping" id="hiddenShipping">
+              <input type="hidden" name="total" id="hiddenTotal">
+              <button id="placeOrderBtn" type="submit" class="btn-checkout">PLACE ORDER</button>
+            </form>
+
+            <div id="minOrderMsg" class="alert alert-warning small mt-3" style="display:none">
+              A minimum order of AED150 is required for groceries.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-5">
+    <div class="container py-4">
+      <div class="row">
+        <div class="col-sm-3"><h6>Get to Know Us</h6><a href="#">About</a></div>
+        <div class="col-sm-3"><h6>Connect</h6><a href="#">Facebook</a></div>
+        <div class="col-sm-3"><h6>Sell with us</h6><a href="#">Sell</a></div>
+        <div class="col-sm-3"><h6>Help</h6><a href="#">Support</a></div>
+      </div>
+      <div class="text-center small mt-4">
+        © <%= new Date().getFullYear() %> Savers Grocery — All Rights Reserved
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Client-side dynamic behaviour for the EJS checkout page
+    (function(){
+      const steps = document.querySelectorAll('.checkout-step');
+      let currentStep = 1;
+
+      function showStep(n){
+        steps.forEach(s => s.classList.toggle('active', Number(s.dataset.step) === n));
+        // scroll to step header
+        const header = document.querySelector('.checkout-step.active .step-header');
+        if(header) header.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+
+      // open first step by default
+      showStep(currentStep);
+
+      // header toggles
+      document.querySelectorAll('.step-header').forEach(h => h.addEventListener('click', ()=>{
+        const parent = h.closest('.checkout-step');
+        const stepNum = Number(parent.dataset.step);
+        currentStep = stepNum;
+        showStep(currentStep);
+      }));
+
+      // next buttons
+      document.querySelectorAll('.btn-next').forEach(btn => btn.addEventListener('click', (e)=>{
+        const target = Number(btn.dataset.next);
+        // run validation if required (basic example)
+        if(target === 2){ /* no validation */ }
+        if(target === 3){ /* ensure billing filled? optional */ }
+        if(target > currentStep) currentStep = target;
+        showStep(currentStep);
+      }));
+
+      // compute totals dynamically from DOM (use server-rendered values as fallback)
+      function computeTotals(){
+        const itemEls = document.querySelectorAll('.cart-item');
+        let subtotal = 0;
+        itemEls.forEach(el =>{
+          const price = Number(el.dataset.price) || 0;
+          const qty = Number(el.dataset.qty) || 0;
+          subtotal += price * qty;
+        });
+
+        // vat 5%
+        const vat = +(subtotal * 0.05).toFixed(2);
+
+        // shipping based on selected shipping method
+        const shippingMethod = document.querySelector('.shipping_method:checked');
+        let shipping = 0;
+        if(shippingMethod && shippingMethod.value === 'express') shipping = 20;
+
+        // free delivery over AED 200
+        if(subtotal >= 200) shipping = 0;
+
+        const total = +(subtotal + vat + shipping).toFixed(2);
+
+        // write to DOM
+        document.getElementById('subtotal').innerText = subtotal.toFixed(2);
+        document.getElementById('vat').innerText = vat.toFixed(2);
+        document.getElementById('shipping').innerText = shipping.toFixed(2);
+        document.getElementById('total').innerText = total.toFixed(2);
+
+        // hidden fields for form submit
+        document.getElementById('hiddenSubtotal').value = subtotal.toFixed(2);
+        document.getElementById('hiddenVat').value = vat.toFixed(2);
+        document.getElementById('hiddenShipping').value = shipping.toFixed(2);
+        document.getElementById('hiddenTotal').value = total.toFixed(2);
+
+        // enforce minimum order amount (AED150)
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+        const minMsg = document.getElementById('minOrderMsg');
+        if(subtotal < 150){
+          placeOrderBtn.disabled = true;
+          minMsg.style.display = 'block';
+        } else {
+          placeOrderBtn.disabled = false;
+          minMsg.style.display = 'none';
+        }
+      }
+
+      // initial compute
+      computeTotals();
+
+      // recompute when shipping method changes
+      document.querySelectorAll('.shipping_method').forEach(r => r.addEventListener('change', computeTotals));
+
+      // If quantities or prices can change on page, observe or re-run computeTotals accordingly.
+
+      // OPTIONAL: intercept confirm submit to show a quick client-side validation or an AJAX call
+      const confirmForm = document.getElementById('confirmForm');
+      confirmForm.addEventListener('submit', function(e){
+        // small client-side guard: prevent accidental submits when cart empty
+        const subtotalVal = Number(document.getElementById('hiddenSubtotal').value || 0);
+        if(subtotalVal <= 0){
+          e.preventDefault();
+          alert('Your cart is empty. Add items before placing an order.');
+          return;
+        }
+
+        // Optionally: show a loading state on the button
+        const btn = document.getElementById('placeOrderBtn');
+        btn.innerText = 'Placing order...';
+        btn.disabled = true;
+
+        // If you want to submit via AJAX instead of regular POST, replace the below with fetch().
+        // Example (uncomment & adapt):
+        /*
+        e.preventDefault();
+        fetch('/checkout/confirm', {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify({
+            subtotal: document.getElementById('hiddenSubtotal').value,
+            vat: document.getElementById('hiddenVat').value,
+            shipping: document.getElementById('hiddenShipping').value,
+            total: document.getElementById('hiddenTotal').value,
+            // include other form values as needed
+          })
+        }).then(r=>r.json()).then(json=>{
+          // handle server response (redirect to success page, show error, etc.)
+        }).catch(err=>{
+          alert('There was a problem placing the order. Please try again.');
+          btn.disabled = false;
+          btn.innerText = 'PLACE ORDER';
+        })
+        */
+      });
+
+      // small enhancement: show/hide free delivery message dynamically
+      function updatePromo(){
+        const subtotal = Number(document.getElementById('subtotal').innerText || 0);
+        const promo = document.querySelector('.promo-box');
+        if(subtotal >= 200) promo.innerText = 'You qualify for free delivery!';
+        else promo.innerText = 'Free delivery over AED 200';
+      }
+      // observe subtotal element changes (simple interval) to update promo
+      setInterval(()=>{ updatePromo(); }, 800);
+
+      // small UX: update cart badge from server-rendered value (if cartCount variable available)
+      const cartBadge = document.getElementById('cartBadge');
+      // if server provides cartCount, it will already be rendered; this line ensures it's numeric
+      if(cartBadge){ cartBadge.innerText = '<%= cartCount || 0 %>'; }
+
+    })();
+  </script>
+
+</body>
+</html>

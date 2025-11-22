@@ -38,12 +38,29 @@ const frontendSession = session({
   }
 });
 app.use(frontendSession);
+
+// small debug after session established
+app.use((req, res, next) => {
+  console.log(
+    '[SESSION DEBUG] url=', req.originalUrl,
+    ' cookies=', !!req.headers.cookie,
+    ' sessionUser=', req.session && req.session.user ? JSON.stringify({ id: req.session.user.id, name: req.session.user.name }) : null,
+    ' cart=', req.session && req.session.cart ? `items:${(req.session.cart.items || []).length}` : 'none'
+  );
+  next();
+});
+
+// -----------------------------
+// flash (must come after session)
+// -----------------------------
 app.use(flash());
 
 // -----------------------------
 // Expose flash/session to views (frontend defaults)
+// Adds global cart + totals for all frontend views
 // -----------------------------
 app.use((req, res, next) => {
+  // flash messages
   res.locals.success_msg = req.flash('success_msg') || [];
   res.locals.error_msg = req.flash('error_msg') || [];
 
@@ -52,6 +69,30 @@ app.use((req, res, next) => {
 
   // adminUser will be set when admin session is active (handled later)
   res.locals.adminUser = null;
+
+  // --- cart defaults (always available in views) ---
+  const cart = (req.session && req.session.cart) ? req.session.cart : { items: [] };
+
+  // ensure items is an array
+  cart.items = Array.isArray(cart.items) ? cart.items : [];
+
+  // compute subtotal, vat, total
+  const subtotal = cart.items.reduce((sum, it) => {
+    const price = Number(it.price) || 0;
+    const qty = Number(it.qty) || 0;
+    return sum + price * qty;
+  }, 0);
+
+  const vat = +((subtotal * 0.05).toFixed(2));
+  const total = +((subtotal + vat).toFixed(2));
+
+  // expose to templates
+  res.locals.cart = cart;
+  res.locals.cartCount = cart.items.length;
+  res.locals.subtotal = subtotal;
+  res.locals.vat = vat;
+  res.locals.total = total;
+
   next();
 });
 
@@ -64,14 +105,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Default: disable global layout; routes will opt in
 app.set('layout', false);
 
-// Optional debug to print chosen layout for each request
-// Uncomment while debugging layout issues
-// app.use((req, res, next) => {
-//   console.log(`[LAYOUT] ${req.method} ${req.path} -> layout:`, res.locals.layout);
-//   next();
-// });
-
-// Mount express-ejs-layouts before custom layout wrapper
+// Mount express-ejs-layouts
 app.use(expressLayouts);
 
 // Automatically choose layout per request

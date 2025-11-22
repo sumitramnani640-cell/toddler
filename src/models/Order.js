@@ -1,3 +1,4 @@
+// src/models/Order.js
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -8,17 +9,12 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
 
-    // matches your DB column "userId"
     userId: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: true,
-      references: {
-        model: 'users', // table name in DB
-        key: 'id'
-      }
+      references: { model: 'users', key: 'id' }
     },
 
-    // matches your DB column "totalAmount"
     totalAmount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
@@ -29,18 +25,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: 'pending'
+    },
+
+    // store the ordered items as JSON
+    items: {
+      type: DataTypes.JSON,     // MySQL 5.7+ supports JSON; if you use older MySQL use TEXT instead
+      allowNull: false,
+      defaultValue: []
+    },
+
+    // screenshot URL or path
+    screenshotUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'screenshot_url'
     }
 
-    // createdAt and updatedAt will be handled automatically by Sequelize
+    // createdAt, updatedAt handled by Sequelize
   }, {
     tableName: 'orders',
     timestamps: true,
-    underscored: false // IMPORTANT: your DB uses camelCase columns
+    underscored: false
   });
 
-  // Associations (models/index.js will call this after all models are loaded)
   Order.associate = (models) => {
-    // userId column is used as FK
     Order.belongsTo(models.User, {
       foreignKey: 'userId',
       as: 'user',
@@ -48,8 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE'
     });
 
-    // add other associations here if needed (order items, payments, etc.)
-    // e.g. Order.hasMany(models.OrderItem, { foreignKey: 'orderId', as: 'items' });
+    // No OrderItem association — items stored in JSON column
   };
 
   return Order;

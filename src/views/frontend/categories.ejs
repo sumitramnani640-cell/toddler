@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= category.name %> - Savers Grocery</title>
+  <title><%= category && category.name ? category.name : 'Category' %> - Savers Grocery</title>
 
   <!-- Libraries -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -90,23 +90,34 @@
 
         <!-- Search bar -->
         <div class="flex-fill px-3 d-none d-md-block">
-          <form action="/search" method="GET" class="d-flex">
-            <input name="q" class="form-control me-2" type="search" placeholder="Search Products">
-            <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+          <form action="/search" method="GET" class="d-flex" role="search" aria-label="Site search">
+            <input name="q" class="form-control me-2" type="search" placeholder="Search Products" aria-label="Search products">
+            <button class="btn btn-success" type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
           </form>
         </div>
 
         <!-- Buttons / actions -->
-        <div class="d-flex align-items-center gap-2">
-          <a href="/login" class="d-flex align-items-center text-decoration-none text-dark">
-            <i class="fas fa-user-circle fs-5 me-1"></i>
-            <span class="d-none d-lg-inline">Login &amp; Register</span>
-          </a>
+        <!-- LOGIN -->
+     <!-- AUTH / USER MENU -->
+<% if (typeof user !== 'undefined' && user) { %>
+  <div class="d-flex align-items-center gap-3">
+    <a href="/account" class="text-decoration-none" style="color:#0b662e;">
+      <i class="fas fa-user me-1"></i> <%= user.name || user.email || 'My Account' %>
+    </a>
 
-          <a href="/cart" class="btn btn-outline-secondary position-relative" aria-label="Cart">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-          </a>
+      </div>
+     <% } else { %>
+      <a href="/login" class="d-flex align-items-center text-decoration-none" style="color:#0b662e;">
+     <i class="fas fa-user me-1"></i> Login & Register
+     </a>
+       <% } %>
+
+           <a href="/cart" class="position-relative" style="color:#0b662e;">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+          <%= cartCount || 0 %>
+        </span>
+      </a>
         </div>
       </div>
 
@@ -133,7 +144,7 @@
   <div class="container page-with-sidebar py-4">
     <div class="row">
       <!-- SIDEBAR: visible md+ ; on small screens we'll use an offcanvas to show categories -->
-      <aside class="col-md-3 d-none d-md-block sidebar">
+      <aside class="col-md-3 d-none d-md-block sidebar" aria-label="Categories">
         <div class="mb-3">
           <h5 class="fw-bold mb-3"><i class="fas fa-list me-2"></i> Categories</h5>
 
@@ -143,9 +154,9 @@
             </a>
 
             <!-- category breadcrumb / current -->
-            <div class="list-group-item d-flex align-items-center">
+            <div class="list-group-item d-flex align-items-center" aria-current="true">
               <i class="fas fa-angle-right me-2 text-muted"></i>
-              <strong><%= category.name %></strong>
+              <strong><%= category && category.name ? category.name : 'Category' %></strong>
             </div>
 
             <% if (typeof categories !== 'undefined') { %>
@@ -157,45 +168,96 @@
             <% } %>
           </div>
         </div>
-
-        <!-- optional filters or info -->
-        <!-- <div class="mt-4">
-          <h6>Filter</h6>
-        </div> -->
       </aside>
 
       <!-- MAIN: products -->
-      <main class="col-md-9 col-12">
+      <main class="col-md-9 col-12" aria-label="Products">
         <!-- On small screens show a compact category bar + offcanvas toggle -->
         <div class="d-flex d-md-none align-items-center justify-content-between mb-3">
           <div>
-            <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#categoriesOffcanvas">
+            <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#categoriesOffcanvas" aria-controls="categoriesOffcanvas">
               <i class="fas fa-list me-1"></i> Categories
             </button>
           </div>
           <div class="text-muted small align-self-center">
-            <strong><%= category.name %></strong>
+            <strong><%= category && category.name ? category.name : 'Category' %></strong>
           </div>
         </div>
 
-        <!-- Products grid -->
+      <!-- Products grid -->
 <div class="row justify-content-start g-3">
   <% if (products && products.length > 0) { %>
-    <% products.slice(0, 15).forEach(product => { %>
+
+    <% products.slice(0, 15).forEach(product => { 
+         const prodSlug = product.slug || product.id;
+         const prodImg = product.imageUrl || product.image || '/images/no-image.png';
+         const prodName = (product.name || 'Product').replace(/"/g, '&quot;');
+    %>
+
       <div class="col-lg-4 col-md-6 col-sm-6 col-12 d-flex justify-content-center">
-        <div class="card shadow-sm text-center" style="width: 300px; border-radius: 10px; height: 420px;">
-          <img src="<%= product.image || 'placeholder.jpg' %>"  
-               class="card-img-top" 
-               alt="<%= product.name %>" 
-               style="height:300px; object-fit: contain; padding:10px;">
-          <div class="card-body p-2">
-            <h6 class="fw-semibold text-truncate mb-1" title="<%= product.name %>"><%= product.name %></h6>
-            <p class="text-success fw-bold mb-2">₹<%= product.price %></p>
-            <a href="/product/<%= product.id %>" class="btn btn-dark btn-sm w-100">View Product</a>
+
+        <!-- 🔥 Entire card clickable -->
+        <a href="/product/<%= prodSlug %>" 
+           class="text-decoration-none text-dark w-100"
+           style="max-width:300px;"
+        >
+
+          <div class="card shadow-sm text-center position-relative"
+               style="width: 100%; border-radius: 10px; height: 420px;">
+
+
+ 
+            <!-- Product Image -->
+            <img 
+              src="<%= product.image || 'placeholder.jpg' %>"  
+              class="card-img-top"
+              alt="<%= prodName %>"
+              loading="lazy"
+              onerror="this.onerror=null;this.src='/images/no-image.png';"
+              style="height:300px; object-fit:contain; padding:10px;"
+            >
+
+            <div class="card-body p-2 d-flex flex-column">
+
+              <!-- Name -->
+              <h6 class="fw-semibold text-truncate mb-1" title="<%= prodName %>">
+                <%= prodName %>
+              </h6>
+
+              <!-- Price -->
+              <p class="text-success fw-bold mb-2">
+                ₹<%= Number(product.price || 0).toFixed(2) %>
+              </p>
+
+              <!-- 🟢 Add to Cart button (does NOT trigger card link) -->
+               <div class="d-flex align-items-center justify-content-end gap-5 mt-2">
+  <!-- ADD BUTTON -->
+  <form action="/cart/add" method="POST" class="d-inline">
+    <input type="hidden" name="productId" value="<%= product.id %>">
+
+    <button type="submit" 
+            class="btn btn-success btn-sm px-3 py-2 d-flex align-items-center">
+      <i class="fas fa-cart-plus me-2"></i>
+      Add
+    </button>
+  </form>
+
+  <!-- WISHLIST BUTTON -->
+  <button class="btn btn-outline-dark btn-sm px-3 py-2 d-flex align-items-center">
+    <i class="fas fa-heart me-2" style="font-size:14px;"></i>
+    Wishlist
+  </button>
+
+</div>
+
+            </div>
           </div>
-        </div>
+
+        </a>
       </div>
+
     <% }) %>
+
   <% } else { %>
     <div class="col-12 text-center">
       <h5 class="text-muted py-5">No products found in this category</h5>
@@ -204,9 +266,7 @@
 </div>
 
 
-
         <!-- Simple pagination placeholder if you want to implement server-side pages -->
-        <!-- Replace with actual pagination logic from your server -->
         <% if (products && products.length > 15) { %>
           <nav class="mt-4" aria-label="Products pagination">
             <ul class="pagination justify-content-center">
@@ -222,15 +282,15 @@
   </div>
 
   <!-- OFFCANVAS: categories for mobile -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="categoriesOffcanvas">
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="categoriesOffcanvas" aria-labelledby="categoriesOffcanvasLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title">Categories</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+      <h5 class="offcanvas-title" id="categoriesOffcanvasLabel">Categories</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <ul class="list-unstyled">
         <li><a href="/" class="d-block py-2 text-dark"><i class="fas fa-home me-2"></i> Home</a></li>
-        <li class="py-2"><strong><i class="fas fa-angle-right me-2"></i><%= category.name %></strong></li>
+        <li class="py-2"><strong><i class="fas fa-angle-right me-2"></i><%= category && category.name ? category.name : 'Category' %></strong></li>
         <% if (typeof categories !== 'undefined') { %>
           <% categories.forEach(cat => { %>
             <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
@@ -241,10 +301,10 @@
   </div>
 
   <!-- Offcanvas mobile menu (existing) -->
-  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title">Menu</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+      <h5 class="offcanvas-title" id="mobileMenuLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <ul class="list-unstyled">
@@ -265,5 +325,29 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Set cart count from server-provided local (if available) or fallback to localStorage
+    (function() {
+      // server can set: res.locals.cartCount = <number>
+      var serverCartCount = <%= typeof cartCount !== 'undefined' ? Number(cartCount) : 'null'%>;
+      var badge = document.getElementById('cart-count');
+
+      if (serverCartCount !== null) {
+        badge.textContent = serverCartCount;
+      } else {
+        try {
+          var stored = localStorage.getItem('cart');
+          if (stored) {
+            var cart = JSON.parse(stored);
+            var total = Array.isArray(cart) ? cart.reduce(function(s, it){ return s + (Number(it.quantity || 0)); }, 0) : 0;
+            badge.textContent = total;
+          }
+        } catch (e) {
+          // ignore JSON errors
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
