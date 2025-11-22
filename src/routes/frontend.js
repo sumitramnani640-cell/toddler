@@ -11,6 +11,8 @@ const productController = require('../controllers/frontend/productController');
 const cartController = require('../controllers/frontend/cartController');
 const authController = require('../controllers/frontend/authController');
 const frontOrderController = require('../controllers/frontend/orderController');
+const orderController = require('../controllers/frontend/orderController');
+
 
 // Service to create order (shared logic)
 const { createOrder } = require('../services/orderService');
@@ -66,6 +68,32 @@ router.post('/subscribe', newsletterController.subscribe);
 router.get('/shop/:slug', categoryController.show);
 router.get('/category/:slug', categoryController.show); // alternative path
 router.get('/product/:slug', productController.show);
+
+
+// ===============================
+// ORDER HISTORY (uses orders.ejs)
+// ===============================
+router.get('/order-history', authController.isAuthenticated, orderController.orderHistory);
+
+// ===============================
+// ORDER DETAILS
+// ===============================
+router.get('/order/:id', authController.isAuthenticated, orderController.orderDetails);
+
+// ===============================
+// CHECKOUT
+// ===============================
+router.get('/checkout', authController.isAuthenticated, orderController.showCheckout);
+
+// ===============================
+// PLACE ORDER
+// ===============================
+router.post('/place-order', authController.isAuthenticated, orderController.placeOrder);
+
+// ===============================
+// ORDER CONFIRMATION
+// ===============================
+router.get('/order/confirmation/:id', authController.isAuthenticated, orderController.orderDetails);
 
 /* ---------------------
    CART ROUTES

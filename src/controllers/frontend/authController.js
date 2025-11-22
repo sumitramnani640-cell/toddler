@@ -250,6 +250,19 @@ login: async (req, res) => {
     return res.redirect('/login');
   },
 
+  // authController.isAuthenticated — replace existing implementation with this
+isAuthenticated: (req, res, next) => {
+  if (req.session && req.session.user) {
+    // expose user both on req and res.locals (useful for views)
+    req.user = req.session.user;
+    res.locals.user = req.session.user;
+    return next();
+  }
+  req.flash('error_msg', 'Please login to access that page.');
+  return res.redirect('/login');
+},
+
+
   // Render My Account dashboard
   showMyAccount: async (req, res) => {
     try {

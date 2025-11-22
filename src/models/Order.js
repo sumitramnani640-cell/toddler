@@ -1,4 +1,3 @@
-// src/models/Order.js
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
@@ -21,6 +20,20 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0
     },
 
+    // NEW: subtotal (before delivery)
+    subtotalAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+
+    // NEW: delivery charge
+    deliveryCharge: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0
+    },
+
     status: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -29,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
 
     // store the ordered items as JSON
     items: {
-      type: DataTypes.JSON,     // MySQL 5.7+ supports JSON; if you use older MySQL use TEXT instead
+      type: DataTypes.JSON,
       allowNull: false,
       defaultValue: []
     },
@@ -56,7 +69,10 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE'
     });
 
-    // No OrderItem association — items stored in JSON column
+    // If you use an OrderItem model also, add association:
+    if (models.OrderItem) {
+      Order.hasMany(models.OrderItem, { foreignKey: 'order_id', as: 'orderItems' });
+    }
   };
 
   return Order;
