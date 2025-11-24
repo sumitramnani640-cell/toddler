@@ -40,7 +40,6 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'pending'
     },
 
-    // store the ordered items as JSON
     items: {
       type: DataTypes.JSON,
       allowNull: false,

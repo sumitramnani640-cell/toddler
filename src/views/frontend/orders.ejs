@@ -18,6 +18,18 @@
       background: #fff;
       transition: 0.2s;
     }
+     /* ---------- Top thin nav ---------- */
+    .nav-bottom { background: linear-gradient(135deg,#087030 0%,#0e6424 100%); color:#fff; }
+    .nav-bottom a{ color:rgba(255,255,255,0.95); text-decoration:none; font-size:0.95rem; }
+
+    /* ---------- Header / search ---------- */
+    header.site-header{ background:#fff; padding:12px 0; border-bottom:1px solid #eee; }
+    .site-logo { font-weight:700; color:#0b662e; font-size:1.25rem; display:flex; align-items:center; gap:.5rem }
+    .site-logo i{ color:#0b662e }
+
+    form.search-form .form-select,
+    form.search-form .form-control { height:40px; border-radius:6px; }
+
     .dashboard-card:hover { background: #f9f9f9; }
     .sidebar-card { border-radius: 8px; border: 1px solid #eee; }
     .badge-cart { position: absolute; top: 0; right: -6px; }
@@ -27,45 +39,128 @@
 </head>
 <body>
 
-<!-- HEADER -->
+ <!-- thin topbar -->
+  <div class="nav-bottom text-white small py-2">
+    <div class="container d-flex justify-content-between">
+      <div class="d-flex gap-4">
+        <div><i class="fas fa-truck me-2"></i>Fast &amp; Free Delivery</div>
+        <div><i class="fas fa-shopping-basket me-2"></i>Thousands of products</div>
+      </div>
+      <div><i class="fas fa-phone me-2"></i><a href="tel:+971542526215" class="text-white text-decoration-none">+971-542526215</a></div>
+    </div>
+  </div>
 
+  <!-- header -->
   <header class="site-header">
     <div class="container d-flex align-items-center gap-3">
       <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
 
-   <form class="search-form d-flex flex-grow-1" action="/search" method="GET" style="max-width:900px;">
-  <div class="bg-dark text-white py-1 small text-center">
-    Fast & Free Delivery | Shop from thousand products
-  </div>
+  
 
-  <div class="container py-3 d-flex align-items-center justify-content-between">
-    <a href="/">
-      <img src="/" alt="SAVERS GROCERY" height="50">
+
+
+
+
+  <!-- Search Button -->
+ <div class="flex-fill px-3 d-none d-md-block">
+          <form action="/search" method="GET" class="d-flex">
+            <input name="q" class="form-control me-2" type="search" placeholder="Search Products">
+            <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
+          </form>
+        </div>
+
+
+<div class="dropdown position-relative">
+
+  <% if (!user) { %>
+    <!-- 🚫 NOT LOGGED IN -->
+    <a class="d-flex align-items-center text-decoration-none login-btn"
+       style="color:#0b662e; cursor:pointer;"
+       id="loginDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+      <i class="fas fa-user me-1"></i> Login & Register
     </a>
 
-    <div class="flex-grow-1 mx-4">
-      <form action="/search" method="GET" class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Search Products" value="<%= typeof q !== 'undefined' ? q : '' %>">
-        <button class="btn btn-success" type="submit"><i class="fa fa-search"></i></button>
-      </form>
+    <div class="dropdown-menu dropdown-menu-end p-3 shadow"
+         aria-labelledby="loginDropdown"
+         style="min-width:230px; border-radius:10px;">
+
+      <h6 class="mb-1">Your Account</h6>
+      <p class="small text-muted mb-2">Access account and manage orders</p>
+
+      <div class="d-flex flex-column gap-2">
+        <a href="/register" class="btn btn-sm btn-outline-dark w-100">
+          <i class="fa fa-user-plus me-1"></i> Register
+        </a>
+        <a href="/login" class="btn btn-sm btn-success w-100">
+          <i class="fa fa-sign-in-alt me-1"></i> Login
+        </a>
+      </div>
+
     </div>
 
-    <div class="d-flex align-items-center gap-3">
-      <a href="/account" class="text-dark text-decoration-none">
-        <i class="fa fa-user"></i> <%= user ? user.name : 'Account' %>
-      </a>
+  <% } else { %>
+    <!-- ✅ LOGGED IN USER -->
+    <a class="d-flex align-items-center text-decoration-none login-btn"
+       style="color:#0b662e; cursor:pointer;"
+       id="accountDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+      <i class="fas fa-user-circle me-1"></i> <%= user.name %>
+    </a>
 
-      <div class="position-relative">
-        <a href="/cart" class="text-dark text-decoration-none">
-          <i class="fa fa-shopping-cart"></i>
+    <div class="dropdown-menu dropdown-menu-end p-3 shadow"
+         aria-labelledby="accountDropdown"
+         style="min-width:230px; border-radius:10px;">
+
+      <h6 class="mb-1">Hello, <%= user.name %></h6>
+      <p class="small text-muted mb-2">Manage your account</p>
+
+      <div class="d-flex flex-column gap-2">
+        <a href="/account" class="btn btn-sm btn-outline-dark w-100">
+          <i class="fa fa-user me-1"></i> My Account
         </a>
-        <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
-          <span class="badge bg-success badge-cart"><%= cartCount %></span>
-        <% } %>
       </div>
+
+    </div>
+  <% } %>
+
+</div>
+
+
+       <a href="/cart" class="position-relative" style="color:#0b662e;">
+        <i class="fas fa-shopping-cart fa-lg"></i>
+        <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
+          <%= cartCount || 0 %>
+        </span>
+      </a>
+</div>
+</div>
+
     </div>
   </div>
 </header>
+
+
+<div class="nav-bottom text-white small py-2" style="background:#1b683f;">
+  <div class="container d-flex justify-content-between align-items-center">
+
+    <!-- LEFT SIDE -->
+    <div class="d-flex align-items-center gap-3">
+      <i class="fas fa-truck"></i>
+      Next Standard Delivery Today 6:00 PM-10:00 PM
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="d-flex align-items-center gap-2">
+      <i class="fas fa-map-marker-alt"></i>
+      <span>Deliver to: Dubai Festival City - Dubai</span>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- MAIN CONTENT -->
 <div class="container my-5">
@@ -74,7 +169,10 @@
   <div class="mb-3">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/account">Account</a></li>
+       <li class="breadcrumb-item">
+  <i class="fa fa-user-pen"></i><a href="/account" style="color:#000000;border-radius:5px;text-decoration:none;margin-left:5px;">Account</a>
+</li>
+
         <li class="breadcrumb-item active" aria-current="page">Order History</li>
       </ol>
     </nav>
@@ -91,8 +189,7 @@
           <thead class="table-light">
             <tr>
               <th>Order ID</th>
-              <th>Customer</th>
-              <th>No. of Products</th>
+              <th>No Of Ordered Products</th>
               <th>Status</th>
               <th>Total</th>
               <th>Date Added</th>
@@ -105,13 +202,13 @@
               <% orders.forEach(function(order){ %>
                 <tr>
                   <td>#<%= order.id %></td>
-                  <td><%= (user && user.name) ? user.name : (order.customerName || 'Customer') %></td>
+                 
                   <td><%= (typeof order.itemsCount !== 'undefined') ? order.itemsCount : '-' %></td>
                   <td><%= order.status || '-' %></td>
                   <td><%= order.totalFormatted || '-' %></td>
                   <td><%= order.dateFormatted || '' %></td>
                   <td>
-                    <a href="/order/<%= order.id %>" class="btn btn-success btn-sm" title="View order">
+                    <a href="/order-details" class="btn btn-success btn-sm" title="View order">
                       <i class="fa fa-eye"></i>
                     </a>
                   </td>
@@ -153,14 +250,7 @@
           <li><a href="/account/address" class="d-block py-1">Address Book</a></li>
         </ul>
 
-        <h6 class="fw-bold mt-4 mb-3">
-          <i class="fa fa-shopping-bag text-success me-2"></i> MY ORDERS
-        </h6>
-        <ul class="list-unstyled mb-3">
-          <li><a href="/order-history" class="d-block py-1">Order History</a></li>
-          <li><a href="/returns" class="d-block py-1">Returns</a></li>
-          <li><a href="/transactions" class="d-block py-1">Transactions</a></li>
-        </ul>
+
 
         <h6 class="fw-bold mt-4 mb-3">
           <i class="fa fa-folder text-success me-2"></i> MY STUFF
@@ -170,7 +260,44 @@
           <li><a href="/newsletter" class="d-block py-1">Newsletter</a></li>
         </ul>
 
-        <a href="/logout" class="btn btn-outline-danger w-100 mt-3">Logout</a>
+
+   <button id="logoutBtn" class="btn btn-danger btn-sm w-100">
+    <i class="fa fa-sign-out-alt me-1"></i> Logout
+</button>
+
+<!-- Hidden form -->
+<form id="logoutForm" action="/logout" method="POST" class="d-none"></form>
+
+</form>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.getElementById("logoutBtn")?.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title: 'Logout?',
+        text: 'Do you want to log out from your account?',
+        icon: 'warning',
+        width: '320px',
+        padding: '0.8rem',
+        showCancelButton: true,
+        confirmButtonText: 'Logout',
+        cancelButtonText: 'Cancel',
+        buttonsStyling: false,
+        customClass: {
+            popup: 'rounded-3',
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById("logoutForm").submit();
+        }
+    });
+});
+</script>
       </div>
     </div>
 
@@ -178,53 +305,61 @@
 </div>
 
 <!-- FOOTER -->
-<footer class="bg-light mt-5 pt-5 pb-3">
-  <div class="container">
-    <div class="row">
-
-      <div class="col-md-4 mb-4">
-        <img src="<%= (site && site.logo) ? site.logo : '/assets/img/logo.png' %>" alt="<%= (site && site.name) ? site.name : 'SAVER GROCERY' %>" height="55" class="mb-3">
-        <p class="small text-muted">
-          Saver Grocery is the first food grocery in the region operating on a discount model, offering the best quality products to its customers at the best price.
-        </p>
+<footer class="mt-5">
+    <div class="container"> <style>
+      footer { background: #087030; padding: 40px 0; border-top: 1px solid #e0e0e0; }
+      footer a { color: #ffffff; text-decoration: none; font-weight: bold; }
+      footer a:hover { text-decoration: underline; }
+    </style>
+      <div class="row"><style>
+      footer { background: #087030; padding: 40px 0; border-top: 1px solid #e0e0e0; }
+      footer a { color: #ffffff; text-decoration: none; font-weight: bold; }
+      footer a:hover { text-decoration: underline; }
+    </style>
+        <div class="col-sm-3"><h6 class="fw-bold">Get to Know Us</h6><a href="#">About</a></div>
+        <div class="col-sm-3"><h6 class="fw-bold">Connect</h6><a href="#">Facebook</a></div>
+        <div class="col-sm-3"><h6 class="fw-bold">Sell with us</h6><a href="#">Sell</a></div>
+        <div class="col-sm-3"><h6 class="fw-bold">Help</h6><a href="#">Support</a></div>
       </div>
 
-      <div class="col-md-2 mb-4">
-        <h6 class="fw-bold mb-3">INFORMATION</h6>
-        <ul class="list-unstyled small">
-          <li><a href="/about" class="text-dark d-block py-1">About Us</a></li>
-          <li><a href="/delivery" class="text-dark d-block py-1">Delivery Information</a></li>
-          <li><a href="/privacy" class="text-dark d-block py-1">Privacy Policy</a></li>
-          <li><a href="/terms" class="text-dark d-block py-1">Terms & Conditions</a></li>
-        </ul>
-      </div>
 
-      <div class="col-md-2 mb-4">
-        <h6 class="fw-bold mb-3">MY ACCOUNT</h6>
-        <ul class="list-unstyled small">
-          <li><a href="/account" class="text-dark d-block py-1">My Account</a></li>
-          <li><a href="/order-history" class="text-dark d-block py-1">Order History</a></li>
-          <li><a href="/wishlist" class="text-dark d-block py-1">Wishlist</a></li>
-          <li><a href="/contact" class="text-dark d-block py-1">Contact Us</a></li>
-        </ul>
-      </div>
 
-      <div class="col-md-4 mb-4">
-        <h6 class="fw-bold mb-3">SIGN UP FOR NEWSLETTER</h6>
-        <p class="small text-muted">No spam, ever.</p>
-        <form action="/subscribe" method="POST" class="input-group">
-          <input type="email" name="email" class="form-control" placeholder="Email">
-          <button class="btn btn-success">Subscribe</button>
-        </form>
-      </div>
+<br>
+      
+  <div class="col-md-4"><style>
+      footer { background: #087030; padding: 40px 0; border-top: 1px solid #e0e0e0; }
+      footer a { color: #ffffff; text-decoration: none; font-weight: bold; }
+      footer a:hover { text-decoration: underline; }
+    </style>
+          <h6>SIGN UP FOR NEWSLETTER</h6>
+<p class="small text-muted">Make sure that you never miss our interesting news and exclusive promotion.</p>
 
+<!-- Alert Messages -->
+<% if (typeof success !== "undefined") { %>
+  <div class="alert alert-success"><%= success %></div>
+<% } %>
+
+<% if (typeof error !== "undefined") { %>
+  <div class="alert alert-danger"><%= error %></div>
+<% } %>
+
+<form class="d-flex" action="/subscribe" method="POST">
+  <input class="form-control me-2" name="email" placeholder="Your email address" required>
+  <button class="btn btn-success" type="submit">Subscribe</button>
+</form>
+
+
+
+
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="text-center small text-muted mt-3">
-    © <%= new Date().getFullYear() %> <%= (site && site.name) ? site.name : 'Saver Grocery' %> — All Rights Reserved.
-  </div>
-</footer>
+
+
+      <div class="text-center small mt-4">© <%= new Date().getFullYear() %> Savers Grocery — All Rights Reserved</div>
+    </div>
+  </footer>
 
 </body>
 </html>
