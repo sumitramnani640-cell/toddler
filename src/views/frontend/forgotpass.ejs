@@ -9,85 +9,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
-  <style>
-    /* Basic look to match screenshot */
-    body { font-family: "Segoe UI", Roboto, Arial; color:#222; background:#fff; }
-    .topbar { background:#225f40; color:#fff; font-size:.9rem; padding:.35rem 0; }
-    .brand-bar { background:#fff; border-bottom:4px solid #1b683f; padding:12px 0; }
-    .nav-bottom { background:#1b683f; color:#fff; padding:.45rem 0; font-size:.95rem; }
-    .breadcrumb-area { padding:10px 0; }
-    .card-box { border-radius:6px; border:1px solid #e6e6e6; padding:18px; background:#fff; }
-    .account-sidebar { border-radius:8px; box-shadow:0 1px 4px rgba(0,0,0,.05); }
-    .btn-success { background:#1b683f; border-color:#1b683f; }
-    .category-dropdown .dropdown-menu { min-width: 220px; max-height: 300px; overflow:auto; border-radius:8px; }
-    .category-btn { background:transparent; color:#333; border:0; padding:6px 12px; }
-    .tin-field { background:#f7fbfe; }
-    .footer { padding:40px 0; border-top:1px solid #eee; }
-    .logo-small { height:58px; }
-  </style>
-</head>
-<body>
-
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="container d-flex justify-content-between">
-      <div><i class="fas fa-truck"></i> Fast & Free Delivery</div>
-      <div><i class="fas fa-phone"></i> +971-542526215</div>
-    </div>
-  </div>
-
-  <!-- Brand & Search -->
-  <div class="brand-bar">
-    <div class="container d-flex align-items-center justify-content-between">
-      <div class="d-flex align-items-center gap-3">
-        <img src="https://via.placeholder.com/160x50?text=Saver+Logo" alt="Saver Grocery" style="height:50px;">
-      </div>
-
-      <div class="flex-grow-1 mx-4">
-        <form class="d-flex" role="search">
-          <div class="input-group">
-            <button class="btn btn-outline-secondary dropdown-toggle category-btn" type="button" id="categoryToggle" data-bs-toggle="dropdown" aria-expanded="false">
-              All Category
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="categoryToggle">
-              <li><a class="dropdown-item" href="#">Fresh Food</a></li>
-              <li><a class="dropdown-item" href="#">Beverages</a></li>
-              <li><a class="dropdown-item" href="#">Bakery</a></li>
-              <li><a class="dropdown-item" href="#">Frozen Food</a></li>
-              <li><a class="dropdown-item" href="#">Pet Supplies</a></li>
-              <li><a class="dropdown-item" href="#">Fruits And Vegetables</a></li>
-              <li><a class="dropdown-item" href="#">Food Cupboard</a></li>
-              <li><a class="dropdown-item" href="#">Bio And Organic Food</a></li>
-              <li><a class="dropdown-item" href="#">Health And Fitness</a></li>
-              <li><a class="dropdown-item" href="#">Cleaning And Household</a></li>
-              <li><a class="dropdown-item" href="#">Beauty And Personal Care</a></li>
-              <li><a class="dropdown-item" href="#">Gourmet</a></li>
-              <li><a class="dropdown-item" href="#">Easter</a></li>
-            </ul>
-
-            <input class="form-control" type="search" placeholder="Search Products" aria-label="Search">
-            <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
-          </div>
-        </form>
-      </div>
-
-      <div class="d-flex gap-2 align-items-center">
-        <button class="btn btn-outline-success">Horeca</button>
-        <a class="btn btn-link" href="#"><i class="fa fa-user"></i> Login & Register</a>
-        <a class="btn btn-link" href="#"><i class="fa fa-shopping-cart"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <!-- thin green band with delivery -->
-  <div class="nav-bottom">
-    <div class="container d-flex align-items-center">
-      <div class="me-3"><i class="fas fa-clock"></i> Next Standard Delivery Today 6:00 PM-10:00 PM</div>
-      <div class="ms-auto"><i class="fas fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
-    </div>
-  </div>
-
+  <%- include("layouts/header") %>
   <!-- Breadcrumb -->
   <div class="container breadcrumb-area">
     <nav aria-label="breadcrumb">
@@ -147,50 +69,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="row gy-4">
-        <div class="col-md-4">
-          <img src="https://via.placeholder.com/160x48?text=Saver+Logo" alt="Saver Grocery" class="mb-3 logo-small">
-          <p class="small text-muted">Saver Grocery is the first food grocery in the region operating on a discount model, offering the best quality products to its customers at the best price.</p>
-        </div>
-
-        <div class="col-md-2">
-          <h6>INFORMATION</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Delivery Information</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-2">
-          <h6>MY ACCOUNT</h6>
-          <ul class="list-unstyled small">
-            <li><a href="#">My Account</a></li>
-            <li><a href="#">Order History</a></li>
-            <li><a href="#">Wishlist</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-4">
-          <h6>SIGN UP FOR NEWSLETTER</h6>
-          <p class="small text-muted">Make sure that you never miss our interesting news and exclusive promotion. No spam, ever</p>
-          <form class="d-flex">
-            <input class="form-control me-2" placeholder="Your email address">
-            <button class="btn btn-success" type="button">Subscribe</button>
-          </form>
-
-          <div class="mt-3">
-            <a href="#" class="me-2"><img src="https://via.placeholder.com/120x40?text=Google+Play" alt="Play"></a>
-            <a href="#"><img src="https://via.placeholder.com/120x40?text=App+Store" alt="AppStore"></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
+   <%- include("layouts/footer") %>
   <!-- Floating chat/help bubble (like screenshot) -->
   <div style="position:fixed; right:20px; bottom:90px; z-index:1050;">
     <div class="card p-2" style="width:220px; box-shadow:0 6px 18px rgba(0,0,0,.12);">

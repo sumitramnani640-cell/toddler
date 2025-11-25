@@ -1,0 +1,239 @@
+<style>
+/* ===== FOOTER MAIN WRAPPER ===== */
+footer {
+  background: #fff;
+  padding: 40px 0 0 0;
+  border-top: 1px solid #e5e5e5;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: #333;
+}
+
+/* ===== TOP BAR ICON STRIP ===== */
+.footer-icons-strip {
+  background: #f8f8f8;
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.footer-icons-strip .icon-box {
+  text-align: center;
+  flex: 1;
+}
+
+.footer-icons-strip i {
+  font-size: 30px;
+  color: #0b662e;
+  margin-bottom: 8px;
+}
+
+.footer-icons-strip p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.footer-icons-strip span {
+  font-size: 13px;
+  color: #777;
+}
+
+/* ===== MAIN FOOTER CONTENT ===== */
+.footer-main {
+  padding: 40px 0;
+}
+
+.footer-logo {
+  width: 180px;
+  margin-bottom: 15px;
+}
+
+.footer-about {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Contact icons */
+.footer-contact i {
+  color: #0b662e;
+  margin-right: 8px;
+}
+
+/* Links */
+.footer-links a {
+  display: block;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: #0b662e;
+  text-decoration: underline;
+}
+
+/* Newsletter */
+.newsletter-box input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.newsletter-box button {
+  background: #0b662e;
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+
+.app-btn-img {
+  height: 38px;
+  margin-right: 6px;
+}
+
+/* ===== COPYRIGHT BAR ===== */
+.footer-bottom {
+  background: #087030;
+  color: #fff;
+  text-align: center;
+  padding: 15px 0;
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+.footer-social i {
+  color: #fff;
+  margin: 0 6px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.footer-social i:hover {
+  opacity: .8;
+}
+</style>
+
+<footer>
+
+  <!-- ================= ICON STRIP ================== -->
+  <div class="footer-icons-strip">
+    <div class="container d-flex justify-content-between flex-wrap">
+
+      <div class="icon-box">
+        <i class="fas fa-headset"></i>
+        <p>24/7 Support</p>
+        <span>We’re Always Here To Help</span>
+      </div>
+
+      <div class="icon-box">
+        <i class="fas fa-shield-alt"></i>
+        <p>Secure Payments</p>
+        <span>Online & Offline Payments</span>
+      </div>
+
+      <div class="icon-box">
+        <i class="fas fa-shipping-fast"></i>
+        <p>Same Day Delivery</p>
+        <span>All Over Dubai</span>
+      </div>
+
+      <div class="icon-box">
+        <i class="fas fa-truck"></i>
+        <p>Free Delivery</p>
+        <span>For Orders Above AED 200</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ================= MAIN FOOTER ================== -->
+  <div class="container footer-main">
+    <div class="row">
+
+      <!-- Left Column -->
+      <div class="col-md-4">
+        <img src="/assets/logo.png" class="footer-logo" alt="Saver Grocery">
+
+        <p class="footer-about">
+          Saver Grocery is the finest food grocery in the region operating
+          on a discount model, offering the best quality products to its
+          customers at the best price.
+        </p>
+
+        <p class="footer-contact"><i class="fa fa-map-marker-alt"></i>
+          DSP Warehouse Complex, Block-C19,<br>
+          Al Barsha South, P.O.Box 231722,<br>
+          Dubai, United Arab Emirates
+        </p>
+
+        <p class="footer-contact"><i class="fa fa-phone"></i> +971-542526215</p>
+        <p class="footer-contact"><i class="fa fa-envelope"></i> info@savergrocery.com</p>
+      </div>
+
+      <!-- Info Column -->
+      <div class="col-md-3 footer-links">
+        <h6 class="fw-bold mb-3">INFORMATION</h6>
+
+        <a href="#">About Us</a>
+        <a href="#">Delivery Information</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Refund Policy</a>
+        <a href="#">Contact Us</a>
+      </div>
+
+      <!-- My Account -->
+      <div class="col-md-2 footer-links">
+        <h6 class="fw-bold mb-3">MY ACCOUNT</h6>
+
+        <a href="/account">My Account</a>
+        <a href="/order-history">Order History</a>
+        <a href="/wishlist">Wishlist</a>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">SIGN UP FOR NEWSLETTER</h6>
+
+        <p class="small text-muted">Make sure that you never miss our interesting news and exclusive promotions. No spam, ever.</p>
+
+        <!-- Alert Messages -->
+        <% if (typeof success !== "undefined") { %>
+       <div class="alert alert-success"><%= success %></div>
+        <% } %>
+
+        <% if (typeof error !== "undefined") { %>
+        <div class="alert alert-danger"><%= error %></div>
+         <% } %>
+        <form class="newsletter-box d-flex mb-3" action="/subscribe" method="POST">
+          <input class="form-control me-2" name="email" placeholder="Your email address" required>
+          <button type="submit">Subscribe</button>
+        </form>
+
+        <div class="d-flex">
+          <img src="/assets/android.png" class="app-btn-img">
+          <img src="/assets/iphone.png" class="app-btn-img">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+ 
+
+  <!-- ================= COPYRIGHT BAR ================== -->
+  <div class="footer-bottom">
+
+    <div class="footer-social mb-2">
+      <i class="fab fa-facebook-f"></i>
+      <i class="fab fa-instagram"></i>
+      <i class="fab fa-youtube"></i>
+      <i class="fab fa-twitter"></i>
+    </div>
+
+    Copyright © 2025 SAVER GROCERY FOOD STUFF TRADING L.L.C.
+    All rights reserved.
+    
+  </div>
+
+</footer>

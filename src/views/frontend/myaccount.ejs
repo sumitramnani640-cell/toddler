@@ -11,11 +11,11 @@
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  <style>
+   <style>
     body { font-family: "Segoe UI", Roboto, Arial; color:#222; background:#fff; }
     .topbar { background:#225f40; color:#fff; font-size:.9rem; padding:.35rem 0; }
     .brand-bar { background:#fff; border-bottom:4px solid #1b683f; padding:12px 0; }
-     header.site-header{ background:#fff; padding:12px 0; border-bottom:1px solid #eee; }
+    header.site-header{ background:#fff; padding:12px 0; border-bottom:1px solid #eee; }
     .site-logo { font-weight:700; color:#0b662e; font-size:1.25rem; display:flex; align-items:center; gap:.5rem }   
     .site-logo i{ color:#0b662e }
     .nav-bottom { background:#1b683f; color:#fff; padding:.45rem 0; font-size:.95rem; }
@@ -23,58 +23,41 @@
     .dashboard-card { border:1px solid #e6e6e6; padding:20px; border-radius:8px; transition:.2s; background:#fff; }
     .dashboard-card:hover { border-color:#1b683f; }
     .dashboard-card i { font-size:35px; color:#1b683f; margin-bottom:10px; }
-    .sidebar-box { border-radius:8px; border:1px solid #e6e6e6; background:#fff; padding:15px; }
+
+    /* NEW SIDEBAR STYLES */
+    .sidebar-card {
+      border-radius:8px;
+      border:1px solid #e6e6e6;
+      background:#fff;
+    }
+    .sidebar-card h6 {
+      font-size:13px;
+      letter-spacing:.4px;
+      margin-bottom:8px;
+    }
+    .sidebar-card ul li a {
+      display:block;
+      padding:3px 0;
+      font-size:14px;
+      color:#444;
+      text-decoration:none;
+      transition:.2s;
+    }
+    .sidebar-card ul li a:hover {
+      color:#0b662e;
+      padding-left:3px;
+    }
+
     .footer { padding:40px 0; border-top:1px solid #eee; }
     .flash { margin-bottom:1rem; }
   </style>
+
 </head>
 
 <body>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="container d-flex justify-content-between">
-      <div><i class="fas fa-truck"></i> Fast & Free Delivery</div>
-      <div><i class="fas fa-phone"></i> +971-542526215</div>
-    </div>
-  </div>
-
-  <!-- Brand + search -->
-  <div class="brand-bar">
-   <div class="container d-flex align-items-center gap-3">
-      <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
-
-      <div class="flex-grow-1 mx-4">
-        <form action="/search" method="GET" class="d-flex">
-          <input name="q" class="form-control" placeholder="Search Products">
-          <button class="btn btn-success ms-2"><i class="fas fa-search"></i></button>
-        </form>
-      </div>
-
-      <div class="d-flex gap-3 align-items-center">
-      
-
-        <% if (user) { %>
-          <a class="btn btn-link"><i class="fa fa-user"></i> <%= user.name || user.email %></a>
-          <button id="logoutTriggerTop" class="btn btn-sm btn-danger">Logout</button>
-        <% } else { %>
-          <a href="/login" class="btn btn-link"><i class="fa fa-user"></i> Login</a>
-          <a href="/register" class="btn btn-link">Register</a>
-        <% } %>
-
-        <a class="btn btn-link"><i class="fa fa-shopping-cart"></i></a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Delivery band -->
-  <div class="nav-bottom">
-    <div class="container d-flex justify-content-between">
-      <div><i class="fa fa-clock"></i> Next Standard Delivery Today 6:00 PM - 10:00 PM</div>
-      <div><i class="fa fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
-    </div>
-  </div>
-
+  <%- include("layouts/header") %>
+      <br>
   <!-- Breadcrumb -->
   <div class="container breadcrumb-area">
     <nav>
@@ -86,10 +69,58 @@
   </div>
 
   <!-- MAIN CONTENT -->
-  <main class="container my-4">
+    <main class="container my-4">
     <div class="row g-4">
 
-      <!-- LEFT Main Cards -->
+
+      <!-- LEFT SIDEBAR -->
+      <div class="col-lg-3">
+        <div class="card p-3 sidebar-card">
+
+          <h6 class="fw-bold mb-2">
+            <i class="fa fa-user text-success me-2"></i> ACCOUNT SETTINGS
+          </h6>
+          <ul class="list-unstyled mb-3">
+            <li><a href="/account">My Account</a></li>
+            <li><a href="/account/edit">Edit Account</a></li>
+            <li><a href="/account/password">Password</a></li>
+            <li><a href="/account/addresses">Address Book</a></li>
+          </ul>
+
+          <hr class="my-2">
+
+          <h6 class="fw-bold mb-2">
+            <i class="fa fa-folder text-success me-2"></i> MY ORDERS
+          </h6>
+          <ul class="list-unstyled mb-3">
+            <li><a href="/orders">Order History</a></li>
+            <li><a href="/wishlist">Wishlist</a></li>
+          </ul>
+
+          <hr class="my-2">
+
+          <h6 class="fw-bold mb-2">
+            <i class="fa fa-heart text-success me-2"></i> MY STUFF
+          </h6>
+          <ul class="list-unstyled mb-3">
+            <li><a href="/cart">Cart</a></li>
+            <li><a href="/newsletter">Newsletter</a></li>
+          </ul>
+
+          <hr class="my-2">
+
+          <% if (user) { %>
+            <button id="logoutBtn" class="btn btn-danger w-100">
+              <i class="fa fa-sign-out-alt me-1"></i> Logout
+            </button>
+          <% } else { %>
+            <a href="/login" class="btn btn-outline-primary w-100">Login</a>
+          <% } %>
+
+        </div>
+      </div>
+
+      <!-- RIGHT MAIN CONTENT -->
       <div class="col-lg-9">
 
         <!-- Flash messages -->
@@ -107,20 +138,18 @@
 
         <% if (user) { %>
           <!-- LOGGED IN -->
-          <h4 class="mb-3">My Account</h4>
+          <h4 class="mt-3 mb-3">My Account</h4>
 
           <div class="row g-4">
-  <div class="col-md-6">
-    <a href="/edit" class="dashboard-link">
-      <div class="dashboard-card">
-        <i class="fa fa-user-pen"></i>
-        <h6>Edit your account information</h6>
-        <span class="text-muted small">Edit Your Account</span>
-      </div>
-    </a>
-  </div>
-
-
+            <div class="col-md-6">
+              <a href="/edit" class="dashboard-link text-decoration-none">
+                <div class="dashboard-card">
+                  <i class="fa fa-user-pen"></i>
+                  <h6>Edit your account information</h6>
+                  <span class="text-muted small">Edit Your Account</span>
+                </div>
+              </a>
+            </div>
 
             <div class="col-md-6">
               <div class="dashboard-card">
@@ -146,33 +175,17 @@
               </div>
             </div>
           </div>
-</div>
+
           <h4 class="mt-5 mb-3">My Orders</h4>
 
           <div class="row g-4">
             <div class="col-md-6">
               <div class="dashboard-card">
-                 <a href="/order-history" class="text-decoration-none">
-                <i class="fa fa-list"></i>
-                <h6>View your order history</h6>
-                <span class="text-muted small">See Your Order History</span>
+                <a href="/order-history" class="text-decoration-none">
+                  <i class="fa fa-list"></i>
+                  <h6>View your order history</h6>
+                  <span class="text-muted small">See Your Order History</span>
                 </a>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="dashboard-card">
-                <i class="fa fa-rotate-left"></i>
-                <h6>View your return requests</h6>
-                <span class="text-muted small">See Your Return</span>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="dashboard-card">
-                <i class="fa fa-receipt"></i>
-                <h6>Your Transactions</h6>
-                <span class="text-muted small">See Your Transactions</span>
               </div>
             </div>
 
@@ -184,25 +197,9 @@
               </div>
             </div>
 
-            <div class="col-md-6">
-              <div class="dashboard-card">
-                <i class="fa fa-clipboard-check"></i>
-                <h6>Pre-Order List</h6>
-                <span class="text-muted small">See Your Pre-Order List</span>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="dashboard-card">
-                <i class="fa fa-question-circle"></i>
-                <h6>Enquiry List</h6>
-                <span class="text-muted small">See Your Enquiry List</span>
-              </div>
-            </div>
-          </div>
 
         <% } else { %>
-          <!-- NOT LOGGED IN: inline login form -->
+          <!-- NOT LOGGED IN -->
           <div class="card p-4">
             <h4 class="mb-3">Login to your account</h4>
             <form action="/login" method="POST" class="mx-auto" style="max-width:420px;">
@@ -225,99 +222,14 @@
           </div>
         <% } %>
 
-      </div>
+      </div><!-- /col-lg-9 -->
 
-      <!-- RIGHT SIDEBAR -->
-      <div class="col-lg-3">
-        <div class="sidebar-box mb-4">
-          <h6><i class="fa fa-user-circle"></i> ACCOUNT SETTINGS</h6>
-          <ul class="list-unstyled mt-3">
-            <li><a href="/account">My Account</a></li>
-            <li><a href="/account/edit">Edit Account</a></li>
-            <li><a href="/account/password">Password</a></li>
-            <li><a href="/account/addresses">Address Book</a></li>
-          </ul>
-        </div>
-
-        <div class="sidebar-box mb-4">
-          <h6><i class="fa fa-boxes-stacked"></i> MY ORDERS</h6>
-          <ul class="list-unstyled mt-3">
-            <li><a href="/orders">Order History</a></li>
-            <li><a href="/orders/returns">Returns</a></li>
-            <li><a href="/orders/transactions">Transactions</a></li>
-          </ul>
-        </div>
-
-        <div class="sidebar-box">
-          <h6><i class="fa fa-heart"></i> MY STUFF</h6>
-          <ul class="list-unstyled mt-3">
-            <li><a href="/wishlist">Wishlist</a></li>
-            <li><a href="/newsletter">Newsletter</a></li>
-          </ul>
-          <hr>
-          <% if (user) { %>
-            <button id="logoutBtn" class="btn btn-danger w-100">
-              <i class="fa fa-sign-out-alt me-1"></i> Logout
-            </button>
-          <% } else { %>
-            <a href="/login" class="btn btn-outline-primary w-100">Login</a>
-          <% } %>
-        </div>
-      </div>
-
-    </div>
+    </div><!-- /row -->
   </main>
 
+
   <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <div class="row gy-4">
-
-        <div class="col-md-4">
-          <img src="https://via.placeholder.com/160x48?text=Saver+Logo" class="mb-3">
-          <p class="small text-muted">
-            Saver Grocery is the first food grocery in the region operating on a discount model...
-          </p>
-          <p class="small m-0"><i class="fa fa-map-marker-alt"></i> DSP Warehouse Complex, Al Barsha South, Dubai</p>
-          <p class="small m-0"><i class="fa fa-phone"></i> +971-542526215</p>
-          <p class="small m-0"><i class="fa fa-envelope"></i> info@savergrocery.com</p>
-        </div>
-
-        <div class="col-md-2">
-          <h6>INFORMATION</h6>
-          <ul class="list-unstyled small">
-            <li><a>About Us</a></li>
-            <li><a>Delivery Information</a></li>
-            <li><a>Privacy Policy</a></li>
-            <li><a>Terms & Conditions</a></li>
-            <li><a>Refund Policy</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-2">
-          <h6>MY ACCOUNT</h6>
-          <ul class="list-unstyled small">
-            <li><a href="/account">My Account</a></li>
-            <li><a href="/orders">Order History</a></li>
-            <li><a href="/wishlist">Wishlist</a></li>
-            <li><a href="/sitemap">Sitemap</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-4">
-          <h6>SIGN UP FOR NEWSLETTER</h6>
-          <form action="/subscribe" method="POST" class="d-flex mb-2">
-            <input name="email" class="form-control me-2" placeholder="Your email">
-            <button class="btn btn-success">Subscribe</button>
-          </form>
-          <img src="https://via.placeholder.com/120x40?text=Google+Play">
-          <img src="https://via.placeholder.com/120x40?text=App+Store">
-        </div>
-
-      </div>
-    </div>
-  </footer>
-
+   <%- include("layouts/footer") %>
   <!-- Hidden logout POST form -->
   <form id="logoutForm" action="/logout" method="POST" class="d-none"></form>
 

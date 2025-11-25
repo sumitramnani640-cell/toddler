@@ -83,48 +83,7 @@
 </head>
 <body>
 
-  <!-- top strip -->
-  <div class="top-strip">
-    <div class="container inner">
-      <div>Next Standard Delivery Today 6:00 PM - 10:00 PM</div>
-      <div>Call: +971-542526215</div>
-    </div>
-  </div>
-
-  <!-- header -->
-  <header>
-    <div class="container header-inner">
-      <div class="logo">
-        <!-- uploaded logo-like image from conversation path -->
-        <img src="/mnt/data/7d90beaf-112a-4ef2-bfbe-8527ebd4893a.png" alt="Saver Grocery">
-        <div style="font-weight:700; font-size:18px; color:var(--green)">SAVER GROCERY</div>
-      </div>
-
-      <div class="search">
-        <input placeholder="Search Products..." aria-label="Search">
-      </div>
-
-      <div class="account-cart">
-        <div style="font-size:14px"><a href="/account">Account</a></div>
-        <div style="position:relative">
-          <a href="/cart" style="font-size:18px; color:var(--green)">🛒</a>
-          <span style="position:absolute; top:-8px; right:-8px; background:#ffd24d; color:#111; font-weight:700; font-size:12px; padding:2px 6px; border-radius:12px">3</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- categories bar -->
-    <div class="cats">
-      <div class="container" style="display:flex; gap:14px; flex-wrap:wrap">
-        <div><strong>All Category ▾</strong></div>
-        <div class="muted">Fresh Food</div>
-        <div class="muted">Beverages</div>
-        <div class="muted">Bakery</div>
-        <div class="muted">Frozen Food</div>
-        <div class="muted">Pet Supplies</div>
-      </div>
-    </div>
-  </header>
+   <%- include("layouts/header") %>
 
   <!-- breadcrumb -->
   <div class="container breadcrumb">
@@ -307,39 +266,7 @@ United Arab Emirates</div>
   </div>
 
   <!-- footer -->
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div style="flex:1; min-width:220px">
-          <div style="font-weight:700; color:var(--green)">SAVER GROCERY</div>
-          <p class="muted" style="max-width:360px">Saver Grocery is the first food grocery in the region operating on a discount model, offering the best quality products to its customers at the best price.</p>
-          <p class="muted">DSP Warehouse Complex, Al Barsha South, Dubai</p>
-          <p class="muted">+971-542526215 • info@savergrocery.com</p>
-        </div>
-
-        <div style="min-width:140px">
-          <div style="font-weight:700; margin-bottom:8px">INFORMATION</div>
-          <div class="muted">About Us<br>Delivery Information<br>Privacy Policy</div>
-        </div>
-
-        <div style="min-width:140px">
-          <div style="font-weight:700; margin-bottom:8px">MY ACCOUNT</div>
-          <div class="muted">My Account<br>Order History<br>Wishlist</div>
-        </div>
-
-        <div style="flex:1; min-width:200px">
-          <div style="font-weight:700; margin-bottom:8px">SIGN UP FOR NEWSLETTER</div>
-          <div class="muted" style="margin-bottom:8px">Make sure that you never miss our interesting news and exclusive promotion.</div>
-          <form style="display:flex; gap:8px; max-width:360px">
-            <input placeholder="you@example.com" style="flex:1; padding:8px; border:1px solid var(--border); border-radius:6px">
-            <button style="background:var(--green); color:#fff; border:none; padding:8px 12px; border-radius:6px">Subscribe</button>
-          </form>
-        </div>
-      </div>
-
-      <div style="text-align:center; margin-top:18px; color:var(--muted)">© 2025 SAVER GROCERY FOODSTUFF TRADING L.L.C. All rights reserved</div>
-    </div>
-  </footer>
+  <%- include("layouts/footer") %>
 
 </body>
 </html>

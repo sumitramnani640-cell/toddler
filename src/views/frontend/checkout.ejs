@@ -44,62 +44,7 @@
 </head>
 <body>
 
-  <!-- TOP BAR -->
-  <div class="nav-bottom text-white small py-2">
-    <div class="container d-flex justify-content-between">
-      <div class="d-flex gap-4">
-        <div><i class="fas fa-truck me-2"></i>Fast &amp; Free Delivery</div>
-        <div><i class="fas fa-shopping-basket me-2"></i>Thousands of products</div>
-      </div>
-      <div><i class="fas fa-phone me-2"></i>+971-542526215</div>
-    </div>
-  </div>
-
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="container d-flex align-items-center gap-3 py-3">
-      <a href="/" class="site-logo"><i class="fas fa-shopping-cart"></i> Savers Grocery</a>
-<% 
-  // defensive: ensure categories is always an array so the template cannot crash
-  const cats = (typeof categories !== 'undefined' && Array.isArray(categories)) ? categories : [];
-  const currentCategory = typeof category !== 'undefined' ? category : '';
-%>
-      <form class="search-form d-flex flex-grow-1" action="/search" method="GET">
-        <select name="category" class="form-select w-auto me-2" style="min-width:130px;">
-          <option value="">All Categories</option>
-          <% if (Array.isArray(categories)) { %>
-            <% categories.forEach(cat => { %>
-              <option value="<%= cat.slug %>" <%= (category === cat.slug) ? 'selected' : '' %>><%= cat.name %></option>
-            <% }) %>
-          <% } %>
-        </select>
-
-        <input type="text" name="q" class="form-control" placeholder="Search products..." value="<%= q || '' %>">
-        <button class="btn ms-2" style="background:#0b662e;color:#fff;">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-
-      <% if (user) { %>
-        <div class="text-success small-muted">Welcome, <strong><%= user.name || user.email %></strong></div>
-      <% } else { %>
-        <a href="/login" class="text-decoration-none" style="color:#0b662e;">Login &amp; Register</a>
-      <% } %>
-      <a href="/cart" class="position-relative ms-3" style="color:#0b662e;">
-        <i class="fas fa-shopping-cart fa-lg"></i>
-        <span id="cartBadge" class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle"><%= cartCount || 0 %></span>
-      </a>
-    </div>
-  </header>
-
-  <!-- DELIVERY BAR -->
-  <div class="nav-bottom text-white small py-2" style="background:#1b683f;">
-    <div class="container d-flex justify-content-between align-items-center">
-      <div id="nextDelivery"> <i class="fas fa-truck"></i> Next Standard Delivery Today 6:00 PM-10:00 PM</div>
-      <div><i class="fas fa-map-marker-alt"></i> Deliver to: <span id="deliverAddr"><%= (cart && cart.shippingAddress && cart.shippingAddress.city) ? cart.shippingAddress.city + ' - ' + (cart.shippingAddress.area || '') : 'Dubai Festival City - Dubai' %></span></div>
-    </div>
-  </div>
-
+  <%- include("layouts/header") %>
   <!-- MAIN CONTENT -->
   <div class="container py-4">
     <nav class="mb-3 small-muted">
@@ -343,21 +288,8 @@
     </div>
 
   </div>
-
-  <!-- FOOTER -->
-  <footer class="mt-5">
-    <div class="container py-4">
-      <div class="row">
-        <div class="col-sm-3"><h6>Get to Know Us</h6><a href="#">About</a></div>
-        <div class="col-sm-3"><h6>Connect</h6><a href="#">Facebook</a></div>
-        <div class="col-sm-3"><h6>Sell with us</h6><a href="#">Sell</a></div>
-        <div class="col-sm-3"><h6>Help</h6><a href="#">Support</a></div>
-      </div>
-      <div class="text-center small mt-4">
-        © <%= new Date().getFullYear() %> Savers Grocery — All Rights Reserved
-      </div>
-    </div>
-  </footer>
+  <!-- footer -->
+  <%- include("layouts/footer") %>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 

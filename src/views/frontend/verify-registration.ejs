@@ -26,47 +26,7 @@
 </head>
 <body>
 
-  <!-- ===================== TOPBAR ===================== -->
-  <div class="topbar">
-    <div class="container d-flex justify-content-between">
-      <div><i class="fas fa-truck"></i> Fast & Free Delivery</div>
-      <div><i class="fas fa-phone"></i> +971-542526215</div>
-    </div>
-  </div>
-
-  <!-- ===================== BRAND BAR ===================== -->
-  <div class="brand-bar">
-    <div class="container d-flex align-items-center justify-content-between">
-      <a href="/" class="d-flex align-items-center gap-3">
-        <img src="/images/logo.png" alt="Saver Grocery" style="height:50px;"
-             onerror="this.src='https://via.placeholder.com/160x50?text=Saver+Logo'">
-      </a>
-
-      <div class="flex-grow-1 mx-4">
-        <form class="d-flex" method="GET" action="/search">
-          <input class="form-control me-2" type="search" name="q" placeholder="Search Products">
-          <button class="btn btn-success" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-      </div>
-
-      <div class="d-flex gap-3 align-items-center">
-
-
-    </div>
-  </div>
-
-  <!-- ===================== CATEGORY NAV ===================== -->
-  <div class="nav-bottom">
-    <div class="container d-flex align-items-center">
-      <div class="me-3"><i class="fas fa-map-marker-alt"></i> Deliver to: Dubai Festival City - Dubai</div>
-      <ul class="list-inline mb-0 ms-auto">
-        <!-- <li class="list-inline-item text-white me-3">All Category</li>
-        <li class="list-inline-item text-white me-3">Fresh Food</li>
-        <li class="list-inline-item text-white me-3">Beverages</li>
-        <li class="list-inline-item text-white me-3">Bakery</li> -->
-      </ul>
-    </div>
-  </div>
+  <%- include("layouts/header") %>
 
   <!-- ===================== MAIN ===================== -->
   <main class="container my-5">
@@ -132,51 +92,7 @@
   </main>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="row gy-4">
-
-        <div class="col-md-4">
-          <img src="/images/logo.png" alt="Saver Grocery"
-               class="logo-small mb-3"
-               onerror="this.src='https://via.placeholder.com/160x48?text=Saver+Logo'">
-          <p class="small text-muted">
-            Saver Grocery is the first food grocery in the region operating on a discount model.
-          </p>
-        </div>
-
-        <div class="col-md-2">
-          <h6>INFORMATION</h6>
-          <ul class="list-unstyled small">
-            <li><a href="/about">About Us</a></li>
-            <li><a href="/delivery-info">Delivery Information</a></li>
-            <li><a href="/privacy">Privacy Policy</a></li>
-            <li><a href="/terms">Terms & Conditions</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-2">
-          <h6>MY ACCOUNT</h6>
-          <ul class="list-unstyled small">
-            <li><a href="/my-account">My Account</a></li>
-            <li><a href="/orders">Order History</a></li>
-            <li><a href="/wishlist">Wishlist</a></li>
-            <li><a href="/sitemap">Sitemap</a></li>
-          </ul>
-        </div>
-
-        <div class="col-md-4">
-          <h6>SIGN UP FOR NEWSLETTER</h6>
-          <p class="small text-muted">Never miss promotions and offers.</p>
-          <form class="d-flex" method="POST" action="/subscribe">
-            <input class="form-control me-2" placeholder="Your email" name="email" required>
-            <button class="btn btn-success">Subscribe</button>
-          </form>
-        </div>
-
-      </div>
-    </div>
-  </footer>
+   <%- include("layouts/footer") %>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
