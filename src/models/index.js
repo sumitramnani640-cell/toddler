@@ -25,8 +25,7 @@ const BannerModel = require('./Banner');
 const UserModel = require('./User');
 const OrderModel = require('./Order');
 const NewsletterModel = require('./Newsletter');
-const CategoryFeatureModel = require('./CategoryFeature');
-const ProductFeatureModel = require('./ProductFeature');
+const CmsPageModel = require('./CmsPage');
 
 // initialize models (pass sequelize, DataTypes)
 const Admin = AdminModel(sequelize, DataTypes);
@@ -36,8 +35,7 @@ const Banner = BannerModel(sequelize, DataTypes);
 const User = UserModel(sequelize, DataTypes);
 const Order = OrderModel(sequelize, DataTypes);
 const Newsletter = NewsletterModel(sequelize, DataTypes);
-const CategoryFeature = CategoryFeatureModel(sequelize, DataTypes);
-const ProductFeature = ProductFeatureModel(sequelize, DataTypes);
+const CmsPage = CmsPageModel(sequelize, DataTypes);
 
 // Gather all models in one object so model.associate(models) works
 const models = {
@@ -48,8 +46,7 @@ const models = {
   User,
   Order,
   Newsletter,
-  CategoryFeature,
-  ProductFeature
+  CmsPage
 };
 
 // Diagnostic logs (useful while debugging)

@@ -1,11 +1,23 @@
 // src/controllers/admin/dashboardController.js
-const { Product, Category, Banner, User, Order, Newsletter, CategoryFeature, ProductFeature } = require('../../models');
+const {
+  Product,
+  Category,
+  Banner,
+  User,
+  Order,
+  Newsletter,
+  CmsPage
+} = require('../../models');
 
 const dashboardController = {
   index: async (req, res) => {
     try {
       // Accept either admin or adminUser (backwards compatible)
-      const hasAdmin = req.session && ((req.session.admin && req.session.admin.id) || (req.session.adminUser && req.session.adminUser.id));
+      const hasAdmin =
+        req.session &&
+        ((req.session.admin && req.session.admin.id) ||
+          (req.session.adminUser && req.session.adminUser.id));
+
       console.log('dashboardController.index: session keys=', Object.keys(req.session || {}));
       console.log('dashboardController.index: hasAdmin=', !!hasAdmin);
 
@@ -21,8 +33,7 @@ const dashboardController = {
         totalBanners,
         totalOrder,
         totalNewsletter,
-        totalCategoryFeatures,
-        totalProductFeatures
+        totalCmsPages
       ] = await Promise.all([
         Product.count(),
         Category.count(),
@@ -30,16 +41,17 @@ const dashboardController = {
         Banner.count(),
         Order.count(),
         Newsletter.count(),
-        CategoryFeature.count(),
-        ProductFeature.count()
+        CmsPage.count()          // NEW: count CMS pages
       ]);
 
       const recentProducts = await Product.findAll({
-        include: [{
-          model: Category,
-          as: 'category',
-          attributes: ['name']
-        }],
+        include: [
+          {
+            model: Category,
+            as: 'category',
+            attributes: ['name']
+          }
+        ],
         order: [['createdAt', 'DESC']],
         limit: 5
       });
@@ -58,18 +70,19 @@ const dashboardController = {
         totalBanners,
         totalOrder,
         totalNewsletter,
+        totalCmsPages,
+
+        // Backwards compatibility: if your EJS still uses totalCategoryFeatures,
+        // this will keep it working until you rename it in the view.
+        totalCategoryFeatures: totalCmsPages,
+
         recentProducts,
         recentCustomers,
-        totalCategoryFeatures,
-        totalProductFeatures,
         layout: 'admin/layouts/admin'
       });
-
     } catch (error) {
       console.error('Dashboard error:', error);
 
-      // Render an error page inside admin area instead of redirecting to login.
-      // This prevents potential redirect loops and gives the admin useful feedback.
       res.status(500).render('admin/error', {
         title: 'Admin - Error',
         message: 'Failed to load dashboard. Please try again later.',

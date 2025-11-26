@@ -15,7 +15,8 @@ const adminRoutes = require('./routes/admin');
 const frontendRoutes = require('./routes/frontend');
 
 // Initialize DB/models
-require('./models/index');
+const db = require('./models');         // loads models/index.js
+const { CmsPage } = db;                 // make sure CmsPage is defined in models/index.js
 
 // -----------------------------
 // Parsers + Static
@@ -44,8 +45,14 @@ app.use((req, res, next) => {
   console.log(
     '[SESSION DEBUG] url=', req.originalUrl,
     ' cookies=', !!req.headers.cookie,
-    ' sessionUser=', req.session && req.session.user ? JSON.stringify({ id: req.session.user.id, name: req.session.user.name }) : null,
-    ' cart=', req.session && req.session.cart ? `items:${(req.session.cart.items || []).length}` : 'none'
+    ' sessionUser=',
+    req.session && req.session.user
+      ? JSON.stringify({ id: req.session.user.id, name: req.session.user.name })
+      : null,
+    ' cart=',
+    req.session && req.session.cart
+      ? `items:${(req.session.cart.items || []).length}`
+      : 'none'
   );
   next();
 });
@@ -93,6 +100,23 @@ app.use((req, res, next) => {
   res.locals.vat = vat;
   res.locals.total = total;
 
+  next();
+});
+
+// -----------------------------
+// Load CMS "Information" pages for footer
+// -----------------------------
+app.use(async (req, res, next) => {
+  try {
+    const informationPages = await CmsPage.findAll({
+      where: { status: true },
+      order: [['position', 'ASC']]
+    });
+    res.locals.informationPages = informationPages;
+  } catch (err) {
+    console.error('Error loading CMS pages:', err);
+    res.locals.informationPages = [];
+  }
   next();
 });
 

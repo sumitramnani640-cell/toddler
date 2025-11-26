@@ -1,0 +1,147 @@
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-file-alt mr-2"></i>
+          <%= action === 'edit' ? 'Edit CMS Page' : 'Add New CMS Page' %>
+        </h3>
+      </div>
+
+      <form
+        action="<%= action === 'edit' ? '/admin/cms/' + page.id : '/admin/cms' %>"
+        method="POST"
+      >
+        <div class="card-body">
+
+          <!-- Page Title -->
+          <div class="form-group">
+            <label for="title">Page Title <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              value="<%= page.title || '' %>"
+              placeholder="Enter page title"
+              required
+            />
+            <small class="form-text text-muted">Example: About Us, Privacy Policy, Contact Us</small>
+          </div>
+
+          <!-- Slug -->
+          <div class="form-group">
+            <label for="slug">Slug <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              id="slug"
+              name="slug"
+              value="<%= page.slug || '' %>"
+              placeholder="URL slug (example: about-us)"
+              required
+            />
+            <small class="form-text text-muted">This will appear in URL: /page/your-slug</small>
+          </div>
+
+          <!-- Content -->
+          <div class="form-group">
+            <label for="content">Content</label>
+            <textarea
+              class="form-control"
+              id="content"
+              name="content"
+              rows="8"
+              placeholder="Write page content here..."
+            ><%= page.content || '' %></textarea>
+            <small class="form-text text-muted">Supports HTML. You can enable a WYSIWYG editor like CKEditor.</small>
+          </div>
+
+          <!-- Status -->
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+              <option value="1" <%= page.status === true ? 'selected' : '' %>>Active</option>
+              <option value="0" <%= page.status === false ? 'selected' : '' %>>Inactive</option>
+            </select>
+          </div>
+
+          <!-- Position -->
+          <div class="form-group">
+            <label for="position">Position</label>
+            <input
+              type="number"
+              class="form-control"
+              id="position"
+              name="position"
+              value="<%= page.position || 0 %>"
+              placeholder="Order in footer (example: 1)"
+              min="0"
+            />
+            <small class="form-text text-muted">Lower numbers appear first in footer.</small>
+          </div>
+
+        </div>
+
+        <div class="card-footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save mr-1"></i>
+            <%= action === 'edit' ? 'Update Page' : 'Create Page' %>
+          </button>
+
+          <a href="/admin/cms" class="btn btn-secondary ml-2">
+            <i class="fas fa-times mr-1"></i> Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar (Guidelines / Info) -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-info-circle mr-2"></i> CMS Guidelines
+        </h3>
+      </div>
+
+      <div class="card-body">
+        <h5>Page Content Tips</h5>
+        <ul class="list-unstyled">
+          <li>
+            <i class="fas fa-check text-success mr-2"></i>
+            Write clear, structured content
+          </li>
+          <li>
+            <i class="fas fa-check text-success mr-2"></i>
+            Use short and simple sentences
+          </li>
+          <li>
+            <i class="fas fa-check text-success mr-2"></i>
+            Keep consistent formatting
+          </li>
+          <li>
+            <i class="fas fa-check text-success mr-2"></i>
+            Avoid very long paragraphs
+          </li>
+        </ul>
+
+        <h5>Slug Tips</h5>
+        <ul class="list-unstyled">
+          <li><i class="fas fa-link mr-2"></i>Use lowercase letters</li>
+          <li><i class="fas fa-link mr-2"></i>Use hyphens for spaces</li>
+          <li><i class="fas fa-link mr-2"></i>No special characters</li>
+        </ul>
+
+        <h5>Examples</h5>
+        <ul class="list-unstyled">
+          <li><strong>Title:</strong> Privacy Policy</li>
+          <li><strong>Slug:</strong> privacy-policy</li>
+          <li><strong>Title:</strong> Terms & Conditions</li>
+          <li><strong>Slug:</strong> terms-and-conditions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

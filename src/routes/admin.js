@@ -11,8 +11,8 @@ const bannerController = require('../controllers/admin/bannerController');
 const customerController = require('../controllers/admin/customerController');
 const orderController = require('../controllers/admin/orderController');
 const NewsletterController = require('../controllers/admin/NewsletterController');
-const categoryFeatureController = require('../controllers/admin/categoryFeatureController');
-const productFeatureController = require('../controllers/admin/productFeatureController');
+const cmsController = require('../controllers/admin/cmsController');
+
 
 // -------------------------------
 // DEBUG LOGGER (optional - remove in production)
@@ -138,26 +138,15 @@ router.post('/orders/:id/delete', orderController.destroy);
 router.get('/newsletter', NewsletterController.index);
 router.post('/newsletter/:id/delete', NewsletterController.destroy);
 
-// -------------------------------
-// CATEGORY FEATURES
-// -------------------------------
-router.get('/category-features', categoryFeatureController.index);
-router.get('/category-features/create', categoryFeatureController.create);
-router.post('/category-features', categoryFeatureController.store);
-router.get('/category-features/:id', categoryFeatureController.show);
-router.get('/category-features/:id/edit', categoryFeatureController.edit);
-router.post('/category-features/:id', categoryFeatureController.update);
-router.post('/category-features/:id/delete', categoryFeatureController.destroy);
 
-// -------------------------------
-// PRODUCT FEATURES
-// -------------------------------
-router.get('/product-features', productFeatureController.index);
-router.get('/product-features/create', productFeatureController.create);
-router.post('/product-features', productFeatureController.store);
-router.get('/product-features/:id', productFeatureController.show);
-router.get('/product-features/:id/edit', productFeatureController.edit);
-router.post('/product-features/:id', productFeatureController.update);
-router.post('/product-features/:id/delete', productFeatureController.destroy);
+// 
+router.get('/cms', cmsController.index);
+router.get('/cms/create', cmsController.create);
+router.post('/cms', cmsController.store);
+router.get('/cms/:id', cmsController.show);
+router.get('/cms/:id/edit', cmsController.edit);
+router.post('/cms/:id', cmsController.update);
+router.post('/cms/:id/delete', cmsController.destroy);
+
 
 module.exports = router;

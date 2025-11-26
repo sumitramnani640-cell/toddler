@@ -48,31 +48,23 @@
       </div>
     </div>
 
-    <!-- Category Features (NEW) -->
-    <div class="col-lg-3 col-6">
-      <div class="small-box" style="background-color:#20c997; color:#fff;">
-        <div class="inner">
-          <h3><%= typeof totalCategoryFeatures !== 'undefined' ? totalCategoryFeatures : 0 %></h3>
-          <p>Category Features</p>
-        </div>
-        <div class="icon"><i class="fas fa-layer-group"></i></div>
-        <a href="/admin/category-features" class="small-box-footer" style="color:#fff;">More info <i class="fas fa-arrow-circle-right"></i></a>
-      </div>
-    </div>
-
-    <!-- Product Features (NEW) -->
- <div class="col-lg-3 col-6">
-  <div class="small-box bg-purple">
+<!-- CMS (NEW) -->
+<div class="col-lg-3 col-6">
+  <div class="small-box" style="background-color:#20c997; color:#fff;">
     <div class="inner">
-      <h3><%= totalProductFeatures || 0 %></h3>
-      <p>Product Features</p>
+      <h3><%= typeof totalCmsPages !== 'undefined' ? totalCmsPages : 0 %></h3>
+      <p>Content Management Services</p>
     </div>
-    <div class="icon"><i class="fas fa-gift"></i></div>
-    <a href="/admin/product-features" class="small-box-footer">
+    <div class="icon">
+      <i class="fas fa-folder-tree"></i>
+    </div>
+    <a href="/admin/cms" class="small-box-footer" style="color:#fff;">
       More info <i class="fas fa-arrow-circle-right"></i>
     </a>
   </div>
 </div>
+
+
 
 
     <div class="col-lg-3 col-6">
@@ -126,7 +118,7 @@
                       <td>
                         <div class="d-flex align-items-center">
                           <% if (product.image) { %>
-                            <img src="/uploads/<%= product.image %>" alt="<%= product.name %>" class="product-image mr-2" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">
+                            <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image mr-2" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">
                           <% } else { %>
                             <div class="product-image mr-2 bg-light d-flex align-items-center justify-content-center" style="width:48px;height:48px;border-radius:4px;">
                               <i class="fas fa-image text-muted"></i>
