@@ -174,12 +174,14 @@ footer {
       <div class="col-md-3 footer-links">
         <h6 class="fw-bold mb-3">INFORMATION</h6>
 
-        <a href="#">About Us</a>
-        <a href="#">Delivery Information</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms & Conditions</a>
-        <a href="#">Refund Policy</a>
-        <a href="#">Contact Us</a>
+<% if (cmsPages && cmsPages.length > 0) { %>
+  <% cmsPages.forEach(page => { %>
+    <a href="/page/<%= page.slug %>"><%= page.title %></a>
+  <% }) %>
+<% } else { %>
+  <p>No pages available</p>
+<% } %>
+
       </div>
 
       <!-- My Account -->

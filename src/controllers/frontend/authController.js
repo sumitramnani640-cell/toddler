@@ -20,8 +20,7 @@ const authController = {
         req.flash('error_msg', 'Please fill all fields and ensure passwords match');
         req.flash('prefillEmail', email || '');
         return res.redirect('/register');
-      }
-
+      }                                                                                       
       const emailLower = email.toLowerCase();
       const existing = await User.findOne({ where: { email: emailLower }});
       if (existing) {

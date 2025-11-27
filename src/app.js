@@ -103,22 +103,27 @@ app.use((req, res, next) => {
   next();
 });
 
+/// -----------------------------
+// Load CMS pages for footer (cmsPages)
 // -----------------------------
-// Load CMS "Information" pages for footer
-// -----------------------------
+app.locals.cmsPages = []; // default so views never break
+
 app.use(async (req, res, next) => {
   try {
-    const informationPages = await CmsPage.findAll({
-      where: { status: true },
-      order: [['position', 'ASC']]
+    const cmsPages = await CmsPage.findAll({
+      where: { status: 1 },          // if status is INT (1 = active)
+      attributes: ['title', 'slug'], // only what footer needs
+      order: [['title', 'ASC']]
     });
-    res.locals.informationPages = informationPages;
+    res.locals.cmsPages = cmsPages;
   } catch (err) {
     console.error('Error loading CMS pages:', err);
-    res.locals.informationPages = [];
+    res.locals.cmsPages = [];
   }
   next();
 });
+
+
 
 // -----------------------------
 // EJS + Layouts

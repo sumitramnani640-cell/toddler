@@ -10,9 +10,9 @@ const categoryController = require('../controllers/frontend/categoryController')
 const productController = require('../controllers/frontend/productController');
 const cartController = require('../controllers/frontend/cartController');
 const authController = require('../controllers/frontend/authController');
-const frontOrderController = require('../controllers/frontend/orderController');
 const orderController = require('../controllers/frontend/orderController');
-
+const frontOrderController = require('../controllers/frontend/orderController'); // alias, same file
+const cmsController = require('../controllers/frontend/CmsController'); // ✅ NOTE: lowercase c
 
 // Service to create order (shared logic)
 const { createOrder } = require('../services/orderService');
@@ -69,33 +69,20 @@ router.get('/shop/:slug', categoryController.show);
 router.get('/category/:slug', categoryController.show); // alternative path
 router.get('/product/:slug', productController.show);
 
-
-// ===============================
+/* ---------------------
+   ORDER HISTORY & DETAILS
+   --------------------- */
 // ORDER HISTORY (uses orders.ejs)
-// ===============================
 router.get('/order-history', authController.isAuthenticated, orderController.orderHistory);
 
-// ===============================
 // ORDER DETAILS
-// ===============================
 router.get('/order/:id', authController.isAuthenticated, orderController.orderDetails);
 
-
-
-// ===============================
-// CHECKOUT
-// ===============================
-router.get('/checkout', authController.isAuthenticated, orderController.showCheckout);
-
-// ===============================
-// PLACE ORDER
-// ===============================
-router.post('/place-order', authController.isAuthenticated, orderController.placeOrder);
-
-// ===============================
-// ORDER CONFIRMATION
-// ===============================
-router.get('/order/confirmation/:id', authController.isAuthenticated, orderController.orderDetails);
+/* ---------------------
+   CMS PAGES
+   --------------------- */
+// /page/about-us, /page/privacy-policy, etc.
+router.get('/page/:slug', cmsController.showPage);
 
 /* ---------------------
    CART ROUTES
@@ -162,14 +149,17 @@ router.post('/checkout/payment', (req, res) => {
   return res.redirect('/checkout');
 });
 
-/* POST /checkout/confirm (place order) */
-/* This route computes totals, validates min order, then uses createOrder service */
+/* POST /checkout/confirm (place order)
+   This route computes totals, validates min order, then uses createOrder service */
 router.post('/checkout/confirm', async (req, res) => {
   console.log('[DEBUG] /checkout/confirm hit');
   const cart = req.session.cart || { items: [] };
   if (!cart.items || !cart.items.length) return res.redirect('/cart');
 
-  const subtotal = (cart.items || []).reduce((s, it) => s + Number(it.price || 0) * Number(it.qty || 0), 0);
+  const subtotal = (cart.items || []).reduce(
+    (s, it) => s + Number(it.price || 0) * Number(it.qty || 0),
+    0
+  );
   const MIN_ORDER = 150;
   if (subtotal < MIN_ORDER) {
     req.flash('error_msg', `A minimum order of AED${MIN_ORDER} is required for groceries.`);
@@ -177,13 +167,23 @@ router.post('/checkout/confirm', async (req, res) => {
   }
 
   const payload = {
-    userId: (req.session.user && req.session.user.id) || (req.user && req.user.id) || null,
+    userId:
+      (req.session.user && req.session.user.id) ||
+      (req.user && req.user.id) ||
+      null,
     items: cart.items,
     subtotal,
     delivery: Number(req.body.shipping || 0),
-    total: Number(req.body.total || (subtotal + (subtotal * 0.05) + Number(req.body.shipping || 0))),
+    total: Number(
+      req.body.total ||
+        (subtotal + subtotal * 0.05 + Number(req.body.shipping || 0))
+    ),
     screenshotUrl: req.body.screenshotUrl || DEFAULT_SCREENSHOT,
-    payment_method: req.session.checkout && req.session.checkout.payment_method ? req.session.checkout.payment_method : (req.body.payment_method || 'cod')
+    payment_method:
+      (req.session.checkout &&
+        req.session.checkout.payment_method) ||
+      req.body.payment_method ||
+      'cod',
   };
 
   try {
@@ -209,13 +209,15 @@ if (frontOrderController && typeof frontOrderController.showCheckout === 'functi
 } else {
   router.get('/checkout', requireLogin, (req, res) => {
     const cart = req.session.cart || { items: [], totals: { quantity: 0, amount: 0 } };
-    const cartCount = Array.isArray(cart.items) ? cart.items.reduce((a,b) => a + (b.qty||0), 0) : 0;
+    const cartCount = Array.isArray(cart.items)
+      ? cart.items.reduce((a, b) => a + (b.qty || 0), 0)
+      : 0;
     return res.render('frontend/checkout', {
       cart,
       title: 'Checkout',
       user: req.user || (req.session && req.session.user),
       categories: res.locals.categories || [],
-      cartCount
+      cartCount,
     });
   });
 }
@@ -228,7 +230,9 @@ if (frontOrderController && typeof frontOrderController.showCheckout === 'functi
 if (frontOrderController && typeof frontOrderController.placeOrder === 'function') {
   router.post('/place-order', frontOrderController.placeOrder);
 } else {
-  router.post('/place-order', (req, res) => res.status(404).json({ error: 'place-order not implemented' }));
+  router.post('/place-order', (req, res) =>
+    res.status(404).json({ error: 'place-order not implemented' })
+  );
 }
 
 // Confirmation page (controller or fallback)
@@ -240,7 +244,7 @@ if (frontOrderController && typeof frontOrderController.confirmation === 'functi
     return res.render('frontend/order-confirmation', {
       orderId: req.query.orderId,
       title: 'Order Confirmation',
-      user: req.user || (req.session && req.session.user)
+      user: req.user || (req.session && req.session.user),
     });
   });
 }
