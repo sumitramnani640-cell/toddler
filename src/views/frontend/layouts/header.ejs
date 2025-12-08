@@ -405,11 +405,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     <!-- CART -->
     <a href="/cart" class="position-relative" style="color:#0b662e;">
-      <i class="fas fa-shopping-cart fa-lg"></i>
-      <span class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle">
-        <%= cartCount || 0 %>
-      </span>
-    </a>
+  <i class="fas fa-shopping-cart fa-lg"></i>
+
+  <!-- IMPORTANT: add id="cartBadge" -->
+  <span id="cartBadge"
+        class="badge bg-warning text-dark position-absolute top-0 start-100 translate-middle"
+        style="min-width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:50%;">
+    <%= cartCount || 0 %>
+  </span>
+</a>
+
 
   </div>
 </header>

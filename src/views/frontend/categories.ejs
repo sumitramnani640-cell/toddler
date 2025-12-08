@@ -148,12 +148,11 @@
 
               <!-- 🟢 Add to Cart button (does NOT trigger card link) -->
                <div class="d-flex align-items-center justify-content-end gap-5 mt-2">
-  <!-- ADD BUTTON -->
-  <form action="/cart/add" method="POST" class="d-inline">
-    <input type="hidden" name="productId" value="<%= product.id %>">
-
-    <button type="submit" 
-            class="btn btn-success btn-sm px-3 py-2 d-flex align-items-center">
+            <!-- ADD BUTTON -->
+            <form action="/cart/add" method="POST" class="d-inline">
+               <input type="hidden" name="productId" value="<%= product.id %>">
+               <button type="submit" 
+             class="btn btn-success btn-sm px-3 py-2 d-flex align-items-center">
       <i class="fas fa-cart-plus me-2"></i>
       Add
     </button>
@@ -164,7 +163,6 @@
     <i class="fas fa-heart me-2" style="font-size:14px;"></i>
     Wishlist
   </button>
-
 </div>
 
             </div>

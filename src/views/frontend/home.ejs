@@ -149,10 +149,14 @@
   </form>
 
   <!-- WISHLIST BUTTON -->
-  <button class="btn btn-outline-dark btn-sm px-3 py-2 d-flex align-items-center">
-    <i class="fas fa-heart me-2" style="font-size:14px;"></i>
-    Wishlist
-  </button>
+ <button 
+  class="btn btn-outline-dark btn-sm px-3 py-2 d-flex align-items-center"
+  onclick="addToWishlist(<%= product.id %>)">
+
+  <i class="fas fa-heart me-2" style="font-size:14px;"></i>
+  Wishlist
+</button>
+
 
 </div>
 

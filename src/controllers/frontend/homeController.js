@@ -6,7 +6,7 @@ const productAttrs = [
   'id',
   'name',
   'description',
-  'price',
+  'price',    
   'stock',
   'image',
   'category_id',

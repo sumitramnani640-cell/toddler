@@ -1,4 +1,5 @@
-// src/app.js
+'use strict';
+
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -15,8 +16,8 @@ const adminRoutes = require('./routes/admin');
 const frontendRoutes = require('./routes/frontend');
 
 // Initialize DB/models
-const db = require('./models');         // loads models/index.js
-const { CmsPage } = db;                 // make sure CmsPage is defined in models/index.js
+const db = require('./models'); // loads src/models/index.js
+const { CmsPage } = db; // ensure CmsPage exists; used for footer pages
 
 // -----------------------------
 // Parsers + Static
@@ -63,67 +64,111 @@ app.use((req, res, next) => {
 app.use(flash());
 
 // -----------------------------
-// Expose flash/session to views (frontend defaults)
-// Adds global cart + totals for all frontend views
+// Expose flash/session + cart to views (DB for logged-in users, session for guests)
+// Place BEFORE mounting frontend routes so every view gets correct locals
 // -----------------------------
-app.use((req, res, next) => {
-  // flash messages
-  res.locals.success_msg = req.flash('success_msg') || [];
-  res.locals.error_msg = req.flash('error_msg') || [];
+app.use(async (req, res, next) => {
+  try {
+    // flash messages
+    res.locals.success_msg = req.flash('success_msg') || [];
+    res.locals.error_msg = req.flash('error_msg') || [];
 
-  // frontend user info stored in frontend session (connect.sid)
-  res.locals.user = req.session && req.session.user ? req.session.user : null;
+    // user (from frontend session)
+    res.locals.user = req.session && req.session.user ? req.session.user : null;
+    res.locals.adminUser = null;
 
-  // adminUser will be set when admin session is active (handled later)
-  res.locals.adminUser = null;
+    // default cart locals
+    res.locals.cart = { items: [] };
+    res.locals.cartCount = 0;
+    res.locals.subtotal = 0;
+    res.locals.vat = 0;
+    res.locals.total = 0;
 
-  // --- cart defaults (always available in views) ---
-  const cart = (req.session && req.session.cart) ? req.session.cart : { items: [] };
+    // determine user id (session-based or passport)
+    const userId = req.session?.user?.id || req.user?.id || null;
 
-  // ensure items is an array
-  cart.items = Array.isArray(cart.items) ? cart.items : [];
+    // If logged in and db.Cart exists -> compute cart from DB
+    if (userId && db && db.Cart) {
+      // Each row in `cart` table is one item (userId + productId + qty)
+      const rows = await db.Cart.findAll({
+        where: { userId },
+        include: [{ model: db.Product, as: 'product', attributes: ['price'] }]
+      });
 
-  // compute subtotal, vat, total
-  const subtotal = cart.items.reduce((sum, it) => {
-    const price = Number(it.price) || 0;
-    const qty = Number(it.qty) || 0;
-    return sum + price * qty;
-  }, 0);
+      const items = (rows || []).map(r => ({
+        productId: r.productId,
+        qty: Number(r.qty || 1),
+        price: r.product ? Number(r.product.price || 0) : 0
+      }));
 
-  const vat = +((subtotal * 0.05).toFixed(2));
-  const total = +((subtotal + vat).toFixed(2));
+      const subtotal = items.reduce((s, it) => s + (it.price * it.qty), 0);
+      const vat = +((subtotal * 0.05).toFixed(2));
+      const total = +(subtotal + vat).toFixed(2);
 
-  // expose to templates
-  res.locals.cart = cart;
-  res.locals.cartCount = cart.items.length;
-  res.locals.subtotal = subtotal;
-  res.locals.vat = vat;
-  res.locals.total = total;
+      res.locals.cart = { items, subtotal, vat, total, totalQty: items.reduce((s,i) => s + (i.qty||0), 0) };
 
-  next();
+      // Show sum of quantities in the header badge
+      res.locals.cartCount = items.reduce((s,i) => s + (Number(i.qty) || 0), 0);
+
+      res.locals.subtotal = subtotal;
+      res.locals.vat = vat;
+      res.locals.total = total;
+
+      return next();
+    }
+
+    // Guest fallback (session cart)
+    const sessionCart = req.session?.cart ?? { items: [] };
+    sessionCart.items = Array.isArray(sessionCart.items) ? sessionCart.items : [];
+
+    const subtotal = sessionCart.items.reduce((s, it) => s + ((Number(it.price) || 0) * (Number(it.qty) || 0)), 0);
+    const vat = +((subtotal * 0.05).toFixed(2));
+    const total = +(subtotal + vat).toFixed(2);
+
+    res.locals.cart = sessionCart;
+    // sum of quantities for header badge
+    res.locals.cartCount = Array.isArray(sessionCart.items) ? sessionCart.items.reduce((s,i)=>s+(Number(i.qty)||0),0) : 0;
+    res.locals.subtotal = subtotal;
+    res.locals.vat = vat;
+    res.locals.total = total;
+
+    return next();
+  } catch (err) {
+    console.error('[CART-MW ERROR]', err);
+    // safe defaults
+    res.locals.cart = { items: [] };
+    res.locals.cartCount = 0;
+    res.locals.subtotal = 0;
+    res.locals.vat = 0;
+    res.locals.total = 0;
+    return next();
+  }
 });
 
-/// -----------------------------
-// Load CMS pages for footer (cmsPages)
 // -----------------------------
-app.locals.cmsPages = []; // default so views never break
+// Load CMS "Information" pages for footer (app.locals to make them available everywhere)
+// -----------------------------
+app.locals.cmsPages = []; // default to avoid view errors
 
 app.use(async (req, res, next) => {
   try {
-    const cmsPages = await CmsPage.findAll({
-      where: { status: 1 },          // if status is INT (1 = active)
-      attributes: ['title', 'slug'], // only what footer needs
-      order: [['title', 'ASC']]
-    });
-    res.locals.cmsPages = cmsPages;
+    if (CmsPage) {
+      const cmsPages = await CmsPage.findAll({
+        where: { status: true }, // adjust to your status type (1 / true)
+        attributes: ['title', 'slug'],
+        order: [['position', 'ASC']]
+      });
+      res.locals.cmsPages = cmsPages;
+      app.locals.cmsPages = cmsPages; // also store globally if you prefer
+    } else {
+      res.locals.cmsPages = app.locals.cmsPages || [];
+    }
   } catch (err) {
     console.error('Error loading CMS pages:', err);
     res.locals.cmsPages = [];
   }
   next();
 });
-
-
 
 // -----------------------------
 // EJS + Layouts
@@ -163,7 +208,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// -----------------------------
 // Method override for form verbs
+// -----------------------------
 app.use(methodOverride('_method'));
 
 // -----------------------------
@@ -180,7 +227,7 @@ const adminSession = session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // set to true in production with HTTPS
+    secure: false,
     sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000
   }
@@ -193,7 +240,7 @@ app.use(
   '/admin',
   adminSession,
   (req, res, next) => {
-    // Expose admin session user to views only for admin routes
+    // Expose admin session user to admin views
     res.locals.adminUser = req.session && req.session.adminUser ? req.session.adminUser : null;
     next();
   },

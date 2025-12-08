@@ -12,7 +12,8 @@ const cartController = require('../controllers/frontend/cartController');
 const authController = require('../controllers/frontend/authController');
 const orderController = require('../controllers/frontend/orderController');
 const frontOrderController = require('../controllers/frontend/orderController'); // alias, same file
-const cmsController = require('../controllers/frontend/CmsController'); // ✅ NOTE: lowercase c
+const cmsController = require('../controllers/frontend/CmsController'); // keep casing that matches your file
+const wishlistController = require('../controllers/frontend/wishlistController'); // wishlist controller
 
 // Service to create order (shared logic)
 const { createOrder } = require('../services/orderService');
@@ -21,15 +22,11 @@ const { createOrder } = require('../services/orderService');
 const DEFAULT_SCREENSHOT = '/mnt/data/4030561d-5fb8-4bb9-ae2c-1bbf13623888.png';
 
 // Simple middleware to require login for routes that must be protected.
-// If you already have authController.isAuthenticated and it redirects,
-// you can replace requireLogin with that.
 function requireLogin(req, res, next) {
   if (req.user || (req.session && req.session.user)) {
-    // attach user from session if not present (optional)
     if (!req.user && req.session && req.session.user) req.user = req.session.user;
     return next();
   }
-  // redirect to login with return URL so user comes back to checkout
   return res.redirect('/login?redirect=/checkout');
 }
 
@@ -67,22 +64,30 @@ router.post('/subscribe', newsletterController.subscribe);
 
 router.get('/shop/:slug', categoryController.show);
 router.get('/category/:slug', categoryController.show); // alternative path
-router.get('/product/:slug', productController.show);
+
+// Product route accepts either slug or numeric id (productController resolves)
+router.get('/product/:identifier', productController.show);
 
 /* ---------------------
    ORDER HISTORY & DETAILS
    --------------------- */
-// ORDER HISTORY (uses orders.ejs)
 router.get('/order-history', authController.isAuthenticated, orderController.orderHistory);
-
-// ORDER DETAILS
 router.get('/order/:id', authController.isAuthenticated, orderController.orderDetails);
 
 /* ---------------------
    CMS PAGES
    --------------------- */
-// /page/about-us, /page/privacy-policy, etc.
 router.get('/page/:slug', cmsController.showPage);
+
+/* ---------------------
+   WISHLIST
+   --------------------- */
+// Route mounting: you can either mount a router (recommended) or direct handlers.
+// If you have a separate routes/wishlist.js use `router.use('/wishlist', require('./wishlist'))`.
+// Here we add simple inline paths that match the wishlistController provided earlier:
+router.get('/wishlist', wishlistController.index);
+router.post('/wishlist/add', wishlistController.add);
+router.post('/wishlist/remove', wishlistController.remove);
 
 /* ---------------------
    CART ROUTES
@@ -95,11 +100,8 @@ router.post('/cart/clear', cartController.clear);
 
 /* ---------------------
    CHECKOUT FLOW (multi-step)
-   - User must be logged in to view the checkout page.
-   - If not logged in, redirect to /login?redirect=/checkout
    --------------------- */
 
-// Step handlers: these just store choices in session and redirect back to GET /checkout
 router.post('/checkout/options', (req, res) => {
   req.session.checkout = req.session.checkout || {};
   req.session.checkout.type = req.body.account_type;
@@ -149,8 +151,7 @@ router.post('/checkout/payment', (req, res) => {
   return res.redirect('/checkout');
 });
 
-/* POST /checkout/confirm (place order)
-   This route computes totals, validates min order, then uses createOrder service */
+/* POST /checkout/confirm (place order) */
 router.post('/checkout/confirm', async (req, res) => {
   console.log('[DEBUG] /checkout/confirm hit');
   const cart = req.session.cart || { items: [] };
@@ -188,9 +189,7 @@ router.post('/checkout/confirm', async (req, res) => {
 
   try {
     const result = await createOrder(payload);
-    // clear cart
     req.session.cart = { items: [] };
-    // redirect to confirmation page (controller or fallback)
     return res.redirect(`/confirmation?orderId=${result.order.id}`);
   } catch (err) {
     console.error('createOrder error', err && (err.stack || err));
@@ -201,8 +200,6 @@ router.post('/checkout/confirm', async (req, res) => {
 
 /* ---------------------
    CHECKOUT PAGE (GET)
-   - Protected: requireLogin middleware will redirect to /login?redirect=/checkout
-   - If frontOrderController exports showCheckout we'll use it; otherwise fallback to inline renderer
    --------------------- */
 if (frontOrderController && typeof frontOrderController.showCheckout === 'function') {
   router.get('/checkout', requireLogin, frontOrderController.showCheckout);
@@ -225,8 +222,6 @@ if (frontOrderController && typeof frontOrderController.showCheckout === 'functi
 /* ---------------------
    PLACE ORDER API + CONFIRMATION
    --------------------- */
-
-// Optional API endpoint (if controller exports placeOrder)
 if (frontOrderController && typeof frontOrderController.placeOrder === 'function') {
   router.post('/place-order', frontOrderController.placeOrder);
 } else {
@@ -235,12 +230,10 @@ if (frontOrderController && typeof frontOrderController.placeOrder === 'function
   );
 }
 
-// Confirmation page (controller or fallback)
 if (frontOrderController && typeof frontOrderController.confirmation === 'function') {
   router.get('/confirmation', frontOrderController.confirmation);
 } else {
   router.get('/confirmation', (req, res) => {
-    // orderId used to show order details — load from DB if you want more info
     return res.render('frontend/order-confirmation', {
       orderId: req.query.orderId,
       title: 'Order Confirmation',
@@ -254,7 +247,6 @@ if (frontOrderController && typeof frontOrderController.confirmation === 'functi
    --------------------- */
 router.post('/checkout', (req, res) => {
   req.session.checkout = req.session.checkout || {};
-  // copy any posted fields into session.checkout as needed
   return res.redirect('/checkout');
 });
 
