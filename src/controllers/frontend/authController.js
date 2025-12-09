@@ -1,9 +1,12 @@
 // src/controllers/frontend/authController.js
 const { User } = require('../../models');
 const bcrypt = require('bcryptjs');
-const otpService = require('../../services/otpService'); // still used for forgot-password flow
+const otpService = require('../../services/otpService'); // for forgot-password
 const emailService = require('../../services/emailService');
 const smsService = require('../../services/smsService');
+
+// helper to migrate guest cart rows into user's cart (see src/helpers/cartMigration.js)
+// const { migrateGuestCartToUser } = require('../../helpers/cartMigration');
 
 const authController = {
   // Render registration page
@@ -20,7 +23,7 @@ const authController = {
         req.flash('error_msg', 'Please fill all fields and ensure passwords match');
         req.flash('prefillEmail', email || '');
         return res.redirect('/register');
-      }                                                                                       
+      }
       const emailLower = email.toLowerCase();
       const existing = await User.findOne({ where: { email: emailLower }});
       if (existing) {
@@ -32,11 +35,11 @@ const authController = {
         name,
         email: emailLower,
         phone,
-        password, // plain -> hashed by model hook
+        password, // model hook should hash
         is_verified: false
       });
 
-      // send OTP for registration verification (keep registration verification)
+      // send OTP for registration verification
       const { otp } = await otpService.generateAndSaveOtp({
         modelInstance: user,
         purpose: 'registration',
@@ -48,7 +51,7 @@ const authController = {
       req.flash('success_msg', 'OTP sent to your email. Enter it to complete registration.');
       return res.redirect(`/verify-registration/${user.id}`);
     } catch (err) {
-      console.error('Register error:', err);
+      console.error('Register error:', err && (err.stack || err));
       req.flash('error_msg', 'Error during registration');
       return res.redirect('/register');
     }
@@ -82,7 +85,7 @@ const authController = {
       req.flash('success_msg', 'Registration verified — you can now login.');
       return res.redirect('/login');
     } catch (err) {
-      console.error('verifyRegistration error:', err);
+      console.error('verifyRegistration error:', err && (err.stack || err));
       req.flash('error_msg', 'Error verifying OTP');
       return res.redirect('/register');
     }
@@ -93,71 +96,80 @@ const authController = {
     const prefillEmail = (req.flash('prefillEmail') || [])[0] || (req.query.email || '');
     return res.render('frontend/login', { title: 'Login - Saver Grocery', prefillEmail });
   },
-// Login handler (password-based only)
-login: async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // 1) basic validation
-    if (!email || !password) {
-      req.flash('error_msg', 'Please enter valid email and password');
+  // Login handler (password-based only)
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // basic validation
+      if (!email || !password) {
+        req.flash('error_msg', 'Please enter valid email and password');
+        return res.redirect('/login');
+      }
+
+      const emailLower = email.toLowerCase();
+
+      // find user
+      const user = await User.findOne({ where: { email: emailLower }});
+      if (!user) {
+        req.flash('prefillEmail', emailLower);
+        req.flash('error_msg', 'Enter a valid email and password');
+        return res.redirect('/login');
+      }
+
+      // account status
+      if (user.status && user.status !== 'active') {
+        req.flash('error_msg', 'Account is deactivated');
+        return res.redirect('/login');
+      }
+
+      // verify password (support model comparePassword or bcrypt)
+      const ok = typeof user.comparePassword === 'function'
+        ? await user.comparePassword(password)
+        : await bcrypt.compare(password, user.password);
+
+      if (!ok) {
+        req.flash('prefillEmail', emailLower);
+        req.flash('error_msg', 'Enter a valid password for this email');
+        return res.redirect('/login');
+      }
+
+      // optional verification flag
+      if (!user.is_verified) {
+        req.flash('error_msg', 'Please verify your account first.');
+        return res.redirect(`/verify-registration/${user.id}`);
+      }
+
+      // success — create session
+      req.session.user = { id: user.id, name: user.name, email: user.email };
+      // also expose to req.user and views
+      req.user = req.session.user;
+      res.locals.user = req.session.user;
+
+      // Migrate any guest cart rows into this user's cart (best-effort).
+      // This will replace rows where cart.userId === guest_cookie_string with the numeric user id.
+      try {
+        await migrateGuestCartToUser(req, res, user.id);
+      } catch (mErr) {
+        // migration is best-effort — don't block login if it fails
+        console.warn('Guest cart migration failed (non-fatal):', mErr && (mErr.stack || mErr));
+      }
+
+      req.flash('success_msg', 'Logged in successfully');
+      // redirect to intended page or homepage
+      return res.redirect(req.session?.redirect || '/');
+    } catch (err) {
+      console.error('Login error:', err && (err.stack || err));
+      req.flash('error_msg', 'Login error');
       return res.redirect('/login');
     }
-
-    const emailLower = email.toLowerCase();
-
-    // 2) try to find user by email
-    const user = await User.findOne({ where: { email: emailLower }});
-
-    // 2a) if user not found -> show message asking to enter valid email+pass
-    if (!user) {
-      // preserve entered email for convenience (optional)
-      req.flash('prefillEmail', emailLower);
-      req.flash('error_msg', 'Enter a valid email and password');
-      return res.redirect('/login');
-    }
-
-    // 3) account status check
-    if (user.status && user.status !== 'active') {
-      req.flash('error_msg', 'Account is deactivated');
-      return res.redirect('/login');
-    }
-
-    // 4) verify password (user.password is hashed in DB)
-    const ok = typeof user.comparePassword === 'function'
-      ? await user.comparePassword(password)
-      : await bcrypt.compare(password, user.password);
-
-    // 4a) if password mismatch -> explicit message to enter valid password
-    if (!ok) {
-      req.flash('prefillEmail', emailLower);
-      req.flash('error_msg', 'Enter a valid password for this email');
-      return res.redirect('/login');
-    }
-
-    // 5) verified flag check (if you require account verification)
-    if (!user.is_verified) {
-      req.flash('error_msg', 'Please verify your account first.');
-      return res.redirect(`/verify-registration/${user.id}`);
-    }
-
-    // 6) success — set minimal session and redirect
-    req.session.user = { id: user.id, name: user.name, email: user.email };
-    req.flash('success_msg', 'Logged in successfully');
-    return res.redirect('/'); // or '/' if you want homepage
-
-  } catch (err) {
-    console.error('Login error:', err);
-    req.flash('error_msg', 'Login error');
-    return res.redirect('/login');
-  }
-},
-
+  },
 
   // Logout
   logout: (req, res) => {
     req.session.destroy(err => {
-      if (err) console.error('Logout error:', err);
+      if (err) console.error('Logout error:', err && err.stack ? err.stack : err);
       return res.redirect('/');
     });
   },
@@ -168,7 +180,7 @@ login: async (req, res) => {
     return res.render('frontend/forgot-password', { title: 'Forgot Password', prefillEmail });
   },
 
-  // Send OTP for forgot-password (retain this flow)
+  // Send OTP for forgot-password
   sendForgotPasswordOtp: async (req, res) => {
     try {
       const { email } = req.body;
@@ -197,7 +209,7 @@ login: async (req, res) => {
       req.flash('success_msg', 'If an account exists, an OTP has been sent.');
       return res.redirect(`/reset-password/${user.id}`);
     } catch (err) {
-      console.error('sendForgotPasswordOtp error:', err);
+      console.error('sendForgotPasswordOtp error:', err && (err.stack || err));
       req.flash('error_msg', 'Error sending OTP');
       return res.redirect('/forgot-password');
     }
@@ -230,13 +242,13 @@ login: async (req, res) => {
         return res.redirect(`/reset-password/${userId}`);
       }
 
-      user.password = password; // model hook will hash
+      user.password = password; // model hook hashes
       await user.save();
 
       req.flash('success_msg', 'Password reset — you can now login.');
       return res.redirect('/login');
     } catch (err) {
-      console.error('resetPassword error:', err);
+      console.error('resetPassword error:', err && (err.stack || err));
       req.flash('error_msg', 'Error resetting password');
       return res.redirect('/forgot-password');
     }
@@ -244,23 +256,14 @@ login: async (req, res) => {
 
   // Middleware to protect routes
   isAuthenticated: (req, res, next) => {
-    if (req.session && req.session.user) return next();
+    if (req.session && req.session.user) {
+      req.user = req.session.user;
+      res.locals.user = req.session.user;
+      return next();
+    }
     req.flash('error_msg', 'Please login to access that page.');
     return res.redirect('/login');
   },
-
-  // authController.isAuthenticated — replace existing implementation with this
-isAuthenticated: (req, res, next) => {
-  if (req.session && req.session.user) {
-    // expose user both on req and res.locals (useful for views)
-    req.user = req.session.user;
-    res.locals.user = req.session.user;
-    return next();
-  }
-  req.flash('error_msg', 'Please login to access that page.');
-  return res.redirect('/login');
-},
-
 
   // Render My Account dashboard
   showMyAccount: async (req, res) => {
@@ -268,7 +271,7 @@ isAuthenticated: (req, res, next) => {
       const userSession = req.session.user || null;
       return res.render('frontend/myaccount', { title: 'My Account - Saver Grocery', user: userSession });
     } catch (err) {
-      console.error('showMyAccount error:', err);
+      console.error('showMyAccount error:', err && (err.stack || err));
       req.flash('error_msg', 'Unable to open account page');
       return res.redirect('/');
     }
