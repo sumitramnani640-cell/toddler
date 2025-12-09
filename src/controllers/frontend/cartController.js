@@ -42,6 +42,8 @@ async function fetchCategoriesPlain() {
    - migrateSessionCartToDbIfNeeded(req)
 ------------------------*/
 async function loadDbCartForUser(userId) {
+  if (!userId || !Cart) return { items: [], subtotal: 0, vat: 0, total: 0, totalQty: 0 };
+
   const rows = await Cart.findAll({
     where: { userId },
     include: [{ model: Product, as: 'product', attributes: productAttrs }]
@@ -51,7 +53,7 @@ async function loadDbCartForUser(userId) {
     const product = r.product || {};
     const np = normalizeProductForCart(product);
     return {
-      productId: r.productId,
+      productId: r.productId ?? r.product_id,
       name: np.name || '',
       price: Number(np.price || 0),
       qty: Number(r.qty || 0),
@@ -74,12 +76,13 @@ async function migrateSessionCartToDbIfNeeded(req) {
     const sessionCart = req.session?.cart;
     if (!sessionCart || !Array.isArray(sessionCart.items) || sessionCart.items.length === 0) return;
 
+    // merge session items into DB cart (best-effort)
     for (const it of sessionCart.items) {
-      const productId = Number(it.productId);
+      const productId = Number(it.productId ?? it.id);
       if (!productId) continue;
       const qty = Math.max(1, Number(it.qty || 1));
 
-      // merge: try find, else create
+      // find existing per-user-per-product entry
       const existing = await Cart.findOne({ where: { userId, productId } });
       if (existing) {
         existing.qty = Number(existing.qty || 0) + qty;
@@ -92,12 +95,12 @@ async function migrateSessionCartToDbIfNeeded(req) {
     // clear session cart after migration
     req.session.cart = { items: [] };
   } catch (err) {
-    console.error('migrateSessionCartToDbIfNeeded error', err);
+    console.error('migrateSessionCartToDbIfNeeded error', err && (err.stack || err));
   }
 }
 
 /* -----------------------
-  Controller methods: same signatures as before
+  Controller methods
 ------------------------*/
 const cartController = {
   index: async (req, res) => {
@@ -108,7 +111,7 @@ const cartController = {
       const userId = req.session?.user?.id || req.user?.id || null;
 
       if (userId) {
-        // migrate if any session cart exists, then load db cart
+        // migrate session cart (if any) then load DB cart
         await migrateSessionCartToDbIfNeeded(req);
         const dbCart = await loadDbCartForUser(userId);
         const safeCart = { items: dbCart.items };
@@ -126,7 +129,7 @@ const cartController = {
         });
       }
 
-      // guest/session flow (unchanged)
+      // guest/session flow
       const cart = req.session?.cart ?? { items: [] };
       cart.items = Array.isArray(cart.items) ? cart.items : [];
       const productIds = cart.items.map(i => i.productId).filter(Boolean);
@@ -172,7 +175,7 @@ const cartController = {
         layout: false
       });
     } catch (error) {
-      console.error('Cart index error:', error);
+      console.error('Cart index error:', error && (error.stack || error));
       let categoriesPlain = [];
       try { categoriesPlain = await fetchCategoriesPlain(); } catch (e) {}
       res.render('frontend/cart', {
@@ -242,7 +245,7 @@ const cartController = {
       req.session.lastAdded = { productId: p.id, name: p.name };
       return res.redirect(req.get('Referrer') || '/cart');
     } catch (error) {
-      console.error('Cart add error:', error);
+      console.error('Cart add error:', error && (error.stack || error));
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) {
         return res.status(500).json({ success:false, message:'Could not add to cart' });
       }
@@ -296,7 +299,7 @@ const cartController = {
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.json({ success:true, cart });
       return res.redirect('/cart');
     } catch (error) {
-      console.error('Cart update error:', error);
+      console.error('Cart update error:', error && (error.stack || error));
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.status(500).json({ success:false, message:'Could not update cart' });
       return res.redirect('back');
     }
@@ -328,7 +331,7 @@ const cartController = {
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.json({ success:true, cart });
       return res.redirect('/cart');
     } catch (error) {
-      console.error('Cart remove error:', error);
+      console.error('Cart remove error:', error && (error.stack || error));
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.status(500).json({ success:false, message:'Could not remove item' });
       return res.redirect('back');
     }
@@ -342,6 +345,9 @@ const cartController = {
       const userId = req.session?.user?.id || req.user?.id || null;
 
       if (userId) {
+        // Ensure any session items are migrated before loading DB cart
+        await migrateSessionCartToDbIfNeeded(req);
+
         const dbCart = await loadDbCartForUser(userId);
         if (!dbCart.items || dbCart.items.length === 0) return res.redirect('/cart');
         const safeCart = { items: dbCart.items };
@@ -385,7 +391,7 @@ const cartController = {
         subtotal, vat, total, layout: false
       });
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('Checkout error:', error && (error.stack || error));
       let categoriesPlain = [];
       try { categoriesPlain = await fetchCategoriesPlain(); } catch (e) {}
       res.render('frontend/checkout', { title:'Checkout - Savers Grocery', cart:{ items:[] }, cartCount:0, categories:categoriesPlain, q:'', category:'', subtotal:0, vat:0, total:0, layout:false });
@@ -404,7 +410,7 @@ const cartController = {
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.json({ success:true, cart: req.session.cart });
       return res.redirect('/cart');
     } catch (error) {
-      console.error('Cart clear error:', error);
+      console.error('Cart clear error:', error && (error.stack || error));
       if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('application/json') !== -1)) return res.status(500).json({ success:false });
       return res.redirect('back');
     }

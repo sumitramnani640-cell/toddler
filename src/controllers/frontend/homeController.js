@@ -1,38 +1,55 @@
 // src/controllers/frontend/homeController.js
-const { Product, Category, Banner } = require('../../models');
+const { Product, Category, Banner, Cart } = require('../../models');
 const { Op } = require('sequelize');
 
 const productAttrs = [
   'id',
   'name',
   'description',
-  'price',    
+  'price',
   'stock',
   'image',
   'category_id',
   'status',
   'createdAt',
   'updatedAt',
-  'slug' // include slug if present in DB
+  'slug'
 ];
 
-// include banner_image here so homepage can use it
 const categoryAttrs = ['id', 'name', 'slug', 'image', 'banner_image', 'updatedAt'];
 
-// helper to compute cartCount from session (supports common shapes)
-function getCartCountFromSession(req) {
+/**
+ * Determine cartCount:
+ *  - If user logged in and Cart model exists, sum qty from DB rows
+ *  - Else fall back to session cart shapes
+ */
+async function getCartCount(req) {
   try {
+    const userId = req.session?.user?.id ?? req.user?.id ?? null;
+    if (userId && typeof Cart !== 'undefined' && Cart) {
+      try {
+        // Sum qty values for rows belonging to user
+        const rows = await Cart.findAll({ where: { userId }, attributes: ['qty'] });
+        if (rows && rows.length) {
+          return rows.reduce((s, r) => s + (Number(r.qty || 0)), 0);
+        }
+        return 0;
+      } catch (e) {
+        console.warn('[getCartCount] DB read failed, falling back to session:', e && e.message ? e.message : e);
+      }
+    }
+
+    // Session fallback
     if (req.session && req.session.cart) {
       const cart = req.session.cart;
       if (Array.isArray(cart.items)) {
-        return cart.items.reduce((sum, it) => sum + (it.qty || 0), 0);
+        return cart.items.reduce((sum, it) => sum + (Number(it.qty || 0)), 0);
       }
-      if (typeof cart.totalQty === 'number') {
-        return cart.totalQty;
-      }
+      if (typeof cart.totalQty === 'number') return cart.totalQty;
+      if (typeof cart.totalQty === 'string' && cart.totalQty.match(/^\d+$/)) return Number(cart.totalQty);
     }
-  } catch (e) {
-    // ignore and return 0 below
+  } catch (err) {
+    console.error('[getCartCount] unexpected', err);
   }
   return 0;
 }
@@ -40,10 +57,12 @@ function getCartCountFromSession(req) {
 const homeController = {
   // Show home page
   index: async (req, res) => {
-    // keep q and category from query so form stays prefilled
     const q = req.query.q || '';
     const category = req.query.category || '';
-    const cartCount = getCartCountFromSession(req);
+
+    // get cart count (DB first)
+    let cartCount = 0;
+    try { cartCount = await getCartCount(req); } catch (e) { cartCount = 0; }
 
     try {
       // Get active banners
@@ -60,7 +79,7 @@ const homeController = {
         attributes: categoryAttrs
       });
 
-      // Optionally fetch featured products (if you still want them on home)
+      // Optionally fetch featured products
       const featuredProducts = await Product.findAll({
         attributes: productAttrs,
         where: { status: 'active' },
@@ -130,13 +149,12 @@ const homeController = {
         return { category: cat, previewProducts: normalized };
       }));
 
-      // render and pass the exact variable name your view expects
       res.render('frontend/home', {
         title: 'Savers Grocery - Fresh Products at Your Doorstep',
         banners,
-        categories: categoriesPlain,          // pass plain categories (with imageUrl/bannerImageUrl)
+        categories: categoriesPlain,
         featuredProducts,
-        categoriesWithPreview, // categoriesWithPreview uses the plain category objects
+        categoriesWithPreview,
         q,
         category,
         cartCount,
@@ -161,7 +179,9 @@ const homeController = {
 
   // Category page (by slug)
   show: async (req, res) => {
-    const cartCount = getCartCountFromSession(req);
+    let cartCount = 0;
+    try { cartCount = await getCartCount(req); } catch (e) { cartCount = 0; }
+
     try {
       const slug = req.params.slug;
 
@@ -171,7 +191,7 @@ const homeController = {
         include: [{
           model: Product,
           as: "products",
-          attributes: productAttrs,      // explicitly ask only existing product columns
+          attributes: productAttrs,
           where: { status: "active" },
           required: false
         }]
@@ -186,7 +206,6 @@ const homeController = {
         });
       }
 
-      // convert to plain object and normalize image urls for category page
       const catObj = (category && typeof category.toJSON === 'function') ? category.toJSON() : category;
       catObj.imageUrl = catObj.image ? (catObj.image.startsWith('/') ? catObj.image : `/uploads/${catObj.image}`) : '/placeholder.jpg';
       catObj.bannerImageUrl = catObj.banner_image ? (catObj.banner_image.startsWith('/') ? catObj.banner_image : `/uploads/${catObj.banner_image}`) : null;

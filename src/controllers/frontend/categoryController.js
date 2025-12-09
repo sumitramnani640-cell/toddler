@@ -1,4 +1,3 @@
-// src/controllers/frontend/categoryController.js
 const path = require('path');
 const fs = require('fs');
 const { Category, Product } = require('../../models');

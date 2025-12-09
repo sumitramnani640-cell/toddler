@@ -11,9 +11,9 @@ const productController = require('../controllers/frontend/productController');
 const cartController = require('../controllers/frontend/cartController');
 const authController = require('../controllers/frontend/authController');
 const orderController = require('../controllers/frontend/orderController');
-const frontOrderController = require('../controllers/frontend/orderController'); // alias, same file
-const cmsController = require('../controllers/frontend/CmsController'); // keep casing that matches your file
-const wishlistController = require('../controllers/frontend/wishlistController'); // wishlist controller
+const frontOrderController = require('../controllers/frontend/orderController'); // alias (same file)
+const cmsController = require('../controllers/frontend/CmsController');
+const wishlistController = require('../controllers/frontend/wishlistController');
 
 // Service to create order (shared logic)
 const { createOrder } = require('../services/orderService');
@@ -64,9 +64,7 @@ router.post('/subscribe', newsletterController.subscribe);
 
 router.get('/shop/:slug', categoryController.show);
 router.get('/category/:slug', categoryController.show); // alternative path
-
-// Product route accepts either slug or numeric id (productController resolves)
-router.get('/product/:identifier', productController.show);
+router.get('/product/:identifier', productController.show); // product by slug or id
 
 /* ---------------------
    ORDER HISTORY & DETAILS
@@ -82,9 +80,6 @@ router.get('/page/:slug', cmsController.showPage);
 /* ---------------------
    WISHLIST
    --------------------- */
-// Route mounting: you can either mount a router (recommended) or direct handlers.
-// If you have a separate routes/wishlist.js use `router.use('/wishlist', require('./wishlist'))`.
-// Here we add simple inline paths that match the wishlistController provided earlier:
 router.get('/wishlist', wishlistController.index);
 router.post('/wishlist/add', wishlistController.add);
 router.post('/wishlist/remove', wishlistController.remove);
@@ -151,49 +146,55 @@ router.post('/checkout/payment', (req, res) => {
   return res.redirect('/checkout');
 });
 
-/* POST /checkout/confirm (place order) */
-router.post('/checkout/confirm', async (req, res) => {
-  console.log('[DEBUG] /checkout/confirm hit');
-  const cart = req.session.cart || { items: [] };
-  if (!cart.items || !cart.items.length) return res.redirect('/cart');
-
-  const subtotal = (cart.items || []).reduce(
-    (s, it) => s + Number(it.price || 0) * Number(it.qty || 0),
-    0
-  );
-  const MIN_ORDER = 150;
-  if (subtotal < MIN_ORDER) {
-    req.flash('error_msg', `A minimum order of AED${MIN_ORDER} is required for groceries.`);
-    return res.redirect('/checkout');
-  }
-
-  const payload = {
-    userId:
-      (req.session.user && req.session.user.id) ||
-      (req.user && req.user.id) ||
-      null,
-    items: cart.items,
-    subtotal,
-    delivery: Number(req.body.shipping || 0),
-    total: Number(
-      req.body.total ||
-        (subtotal + subtotal * 0.05 + Number(req.body.shipping || 0))
-    ),
-    screenshotUrl: req.body.screenshotUrl || DEFAULT_SCREENSHOT,
-    payment_method:
-      (req.session.checkout &&
-        req.session.checkout.payment_method) ||
-      req.body.payment_method ||
-      'cod',
-  };
-
+/* ---------------------
+   POST /checkout/confirm -> delegate to controller that handles DB-first carts
+   --------------------- */
+// NOTE: remove `requireLogin` here if you want guests to be able to place orders.
+router.post('/checkout/confirm', requireLogin, async (req, res, next) => {
   try {
+    if (frontOrderController && typeof frontOrderController.placeOrder === 'function') {
+      // delegate to controller (DB-first logic inside)
+      return frontOrderController.placeOrder(req, res, next);
+    }
+
+    // fallback if controller missing
+    console.warn('[routes] placeOrder controller missing, falling back to basic handler');
+    const cart = req.session.cart || { items: [] };
+    if (!cart.items || !cart.items.length) return res.redirect('/cart');
+
+    const subtotal = (cart.items || []).reduce((s, it) => s + Number(it.price || 0) * Number(it.qty || 0), 0);
+    const MIN_ORDER = 150;
+    if (subtotal < MIN_ORDER) {
+      req.flash('error_msg', `A minimum order of AED${MIN_ORDER} is required for groceries.`);
+      return res.redirect('/checkout');
+    }
+
+    const payload = {
+      userId:
+        (req.session.user && req.session.user.id) ||
+        (req.user && req.user.id) ||
+        null,
+      items: cart.items,
+      subtotal,
+      delivery: Number(req.body.shipping || 0),
+      total: Number(
+        req.body.total ||
+          (subtotal + subtotal * 0.05 + Number(req.body.shipping || 0))
+      ),
+      screenshotUrl: req.body.screenshotUrl || DEFAULT_SCREENSHOT,
+      payment_method:
+        (req.session.checkout &&
+          req.session.checkout.payment_method) ||
+        req.body.payment_method ||
+        'cod',
+    };
+
     const result = await createOrder(payload);
     req.session.cart = { items: [] };
     return res.redirect(`/confirmation?orderId=${result.order.id}`);
   } catch (err) {
-    console.error('createOrder error', err && (err.stack || err));
-    req.flash('error_msg', err.message || 'Could not place order. Please try again.');
+    console.error('[routes /checkout/confirm] fallback handler error', err && err.stack ? err.stack : err);
+    req.flash('error_msg', err.message || 'Could not place order; please try again.');
     return res.redirect('/checkout');
   }
 });
@@ -201,6 +202,7 @@ router.post('/checkout/confirm', async (req, res) => {
 /* ---------------------
    CHECKOUT PAGE (GET)
    --------------------- */
+// Protect checkout page by login (if you want guests, remove requireLogin)
 if (frontOrderController && typeof frontOrderController.showCheckout === 'function') {
   router.get('/checkout', requireLogin, frontOrderController.showCheckout);
 } else {
@@ -230,7 +232,10 @@ if (frontOrderController && typeof frontOrderController.placeOrder === 'function
   );
 }
 
+// friendly confirmation URL
 if (frontOrderController && typeof frontOrderController.confirmation === 'function') {
+  router.get('/order/confirmation/:id', frontOrderController.confirmation);
+  // legacy/alternative
   router.get('/confirmation', frontOrderController.confirmation);
 } else {
   router.get('/confirmation', (req, res) => {

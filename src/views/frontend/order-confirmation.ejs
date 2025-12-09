@@ -6,23 +6,31 @@
   <title><%= title || "Order Confirmation" %></title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     body, html { height:100%; margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#fff; color:#222; }
     .wrap { min-height:100%; display:flex; flex-direction:column; }
     .content { flex:1; display:flex; align-items:center; justify-content:center; padding:60px 20px; }
-    .card-confirm { max-width:760px; width:100%; text-align:center; padding:48px 36px; border-radius:8px; box-shadow:0 6px 30px rgba(0,0,0,0.06); }
-    .check-circle { width:96px; height:96px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:#2f9b66; color:#fff; font-size:44px; margin-bottom:18px; }
-    h2 { font-weight:700; margin-bottom:8px; }
+    .card-confirm { max-width:920px; width:100%; text-align:center; padding:40px 32px; border-radius:8px; box-shadow:0 6px 30px rgba(0,0,0,0.06); background: linear-gradient(180deg,#ffffff, #fbfdff); }
+    .check-circle { width:92px; height:92px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:#2f9b66; color:#fff; font-size:40px; margin-bottom:18px; }
+    h2 { font-weight:700; margin-bottom:6px; }
     .muted { color:#666; margin-bottom:14px; }
-    .order-meta { margin-top:18px; background:#f8faf8; border:1px solid #eee; padding:12px 16px; border-radius:6px; display:inline-block; text-align:left; }
+    .order-meta { margin-top:18px; background:#f8faf8; border:1px solid #eee; padding:12px 16px; border-radius:6px; display:inline-block; text-align:left; min-width:260px; }
+    .order-meta div { margin-bottom:6px; }
     .btn-continue { background:#2f9b66; color:#fff; border:none; padding:10px 20px; border-radius:6px; }
     footer { padding:20px 0; text-align:center; font-size:0.9rem; color:#777; }
+    .items-list { text-align:left; margin-top:14px; }
+    .items-list .item { display:flex; gap:12px; align-items:center; padding:8px 0; border-bottom:1px dashed #eee; }
+    .items-list img { width:56px; height:56px; object-fit:cover; border-radius:6px; }
+    .items-list .title { font-weight:600; }
+    .items-list .meta { color:#666; font-size:0.9rem; }
+    @media (max-width: 768px) { .card-confirm { padding:20px; } }
   </style>
-
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+  <%- include('layouts/header') %>
+
   <div class="wrap">
     <div class="content">
       <div class="card-confirm">
@@ -31,28 +39,55 @@
         </div>
 
         <h2>YOUR ORDER HAS BEEN PLACED!</h2>
-        <p class="muted">Thank you for your purchase. We are preparing your order and will notify you when it is shipped.</p>
+        <p class="muted">Thanks — we received your order and are preparing it now.</p>
 
         <% if (typeof order !== 'undefined' && order) { %>
           <div class="order-meta">
-            <div><strong>Order #:</strong> <%= order.id || order.orderNumber || '—' %></div>
+            <div><strong>Order #</strong>: <%= order.id || order.orderNumber || '—' %></div>
+
+            <% if (order.items && Array.isArray(order.items) && order.items.length) { %>
+              <div><strong>Items:</strong></div>
+              <div class="items-list">
+                <% order.items.forEach(function(it){ %>
+                  <div class="item">
+                    <% if (it.imageUrl || it.image) { %>
+                      <img src="<%= (it.imageUrl || it.image) %>" alt="item">
+                    <% } else { %>
+                      <img src="/images/placeholder.png" alt="item">
+                    <% } %>
+                    <div>
+                      <div class="title"><%= it.name || it.product_name || 'Product' %></div>
+                      <div class="meta">Qty: <%= Number(it.qty || it.quantity || 0) %> &middot; AED <%= Number(it.price || it.unit_price || 0).toFixed(2) %></div>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            <% } %>
+
             <% if (order.totalAmount || order.total) { %>
               <div><strong>Total:</strong> AED <%= (order.totalAmount || order.total).toFixed ? (order.totalAmount || order.total).toFixed(2) : (order.totalAmount || order.total) %></div>
             <% } %>
+
             <% if (order.createdAt) { %>
               <div><strong>Placed on:</strong> <%= new Date(order.createdAt).toLocaleString() %></div>
             <% } %>
-            <% if (order.screenshot_url || order.screenshotUrl) { %>
-              <div style="margin-top:8px;">
-                <a href="<%= order.screenshot_url || order.screenshotUrl %>" target="_blank" class="small">View receipt / screenshot</a>
+
+            <% if (order.screenshotUrl || order.screenshot_url) { %>
+              <div>
+                <!-- <a href="<%= order.screenshotUrl || order.screenshot_url %>" target="_blank" class="small">View receipt / screenshot</a> -->
               </div>
             <% } %>
+          </div>
+        <% } else { %>
+          <div class="order-meta">
+            <div>Your order has been received. You will receive a confirmation email shortly.</div>
           </div>
         <% } %>
 
         <div style="margin-top:22px;">
           <a href="/" class="btn btn-continue">Continue Shopping</a>
           <a href="/order-history" class="btn btn-outline-secondary ms-2">View Orders</a>
+          <a href="/contact" class="btn btn-outline-secondary ms-2">Contact Support</a>
         </div>
       </div>
     </div>
@@ -62,37 +97,18 @@
     </footer>
   </div>
 
-  <!-- Optional icons -->
+  <%- include('layouts/footer') %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
     (function(){
-      // Show SweetAlert success popup on page load.
-      // Server can pass `flashMessage` or `swal` object to customize.
-      const swalData = (typeof swalData !== 'undefined') ? swalData : null;
-
-      // Use server-side values if provided
-      const orderId = "<%= (typeof order !== 'undefined' && order ? (order.id || order.orderNumber || '') : '') %>";
-      const totalStr = "<%= (typeof order !== 'undefined' && order ? (order.totalAmount || order.total || '') : '') %>";
-
-      // Build message
-      let title = 'Your order is placed';
-      let text = 'Thank you — we have received your order.';
-      if(orderId) text = 'Order #' + orderId + ' placed successfully.' + (totalStr ? ' Total: AED ' + totalStr : '');
-
-      // Delay a touch so the page renders before the modal shows
+      // show a small toast or modal if you want; server already renders details
       document.addEventListener('DOMContentLoaded', function(){
-        // Fire the SweetAlert popup
-        Swal.fire({
-          icon: 'success',
-          title: title,
-          text: text,
-          confirmButtonText: 'OK',
-          allowOutsideClick: true
-        }).then((res) => {
-          // optional: if you want to redirect straight to home or orders after click:
-          // window.location = '/';
-        });
+        // optional small toast (uncomment if desired)
+        // Swal.fire({ icon:'success', title:'Order placed', text:'Thanks — your order is confirmed.' });
       });
     })();
   </script>

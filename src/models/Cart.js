@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 1
     }
   }, {
-    tableName: 'cart',
+    tableName: 'carts',
     indexes: [
       { unique: true, fields: ['userId', 'productId'] }
     ]
