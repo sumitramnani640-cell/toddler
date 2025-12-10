@@ -136,32 +136,32 @@
 
           <nav>
             <a href="/account" class="<%= (activePage === 'account') ? 'active' : '' %>">Account</a>
-            <a href="/account/edit" class="<%= (activePage === 'edit') ? 'active' : '' %>">Edit Account</a>
+            <!-- <a href="/account/edit" class="<%= (activePage === 'edit') ? 'active' : '' %>">Edit Account</a>
             <a href="/account/password" class="<%= (activePage === 'password') ? 'active' : '' %>">Password</a>
             <a href="/account/preorder" class="<%= (activePage === 'preorder') ? 'active' : '' %>">Pre-Order</a>
-            <a href="/account/address" class="<%= (activePage === 'address') ? 'active' : '' %>">Address Book</a>
+            <a href="/account/address" class="<%= (activePage === 'address') ? 'active' : '' %>">Address Book</a> -->
+          <!-- </nav> -->
+
+          <!-- <hr> -->
+
+          <!-- <div class="small text-muted mb-2">MY ORDERS</div> -->
+          <!-- <nav> -->
+            <a href="/order-history">Order History</a>
           </nav>
 
-          <hr>
+          <!-- <hr> -->
 
-          <div class="small text-muted mb-2">MY ORDERS</div>
-          <nav>
-            <a href="/account/orders">Order History</a>
-            <a href="/account/returns">Returns</a>
-            <a href="/account/transactions">Transactions</a>
-          </nav>
+          <!-- <div class="small text-muted mb-2">MY STUFF</div>
+          <nav> -->
 
-          <hr>
-
-          <div class="small text-muted mb-2">MY STUFF</div>
-          <nav>
-            <a href="/account/wishlist" class="active">Wishlist</a>
             <a href="/account/newsletter">Newsletter</a>
           </nav>
 
           <hr>
 
-          <a href="/logout" class="text-danger"><i class="fas fa-power-off me-1"></i> Logout</a>
+        <button id="logoutBtn" class="btn btn-danger w-100">
+              <i class="fa fa-sign-out-alt me-1"></i> Logout
+            </button>
         </div>
       </div>
     </div>
@@ -173,3 +173,55 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+
+<form id="logoutForm" action="/logout" method="POST" class="d-none"></form>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    (function() {
+      function showLogoutConfirm() {
+        return Swal.fire({
+          title: 'Logout?',
+          text: 'Do you want to log out from your account?',
+          icon: 'warning',
+          width: '320px',
+          padding: '0.9rem',
+          showCancelButton: true,
+          confirmButtonText: 'Logout',
+          cancelButtonText: 'Cancel',
+          background: '#fff',
+          buttonsStyling: false,
+          customClass: {
+            popup: 'rounded-3',
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
+          }
+        });
+      }
+
+      const topBtn = document.getElementById('logoutTriggerTop');
+      if (topBtn) {
+        topBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          showLogoutConfirm().then(res => {
+            if (res.isConfirmed) document.getElementById('logoutForm').submit();
+          });
+        });
+      }
+
+      const sideBtn = document.getElementById('logoutBtn');
+      if (sideBtn) {
+        sideBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          showLogoutConfirm().then(res => {
+            if (res.isConfirmed) document.getElementById('logoutForm').submit();
+          });
+        });
+      }
+    })();
+  </script>
