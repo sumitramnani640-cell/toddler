@@ -26,9 +26,9 @@ const UserModel = require('./User');
 const OrderModel = require('./Order');
 const NewsletterModel = require('./Newsletter');
 const CmsPageModel = require('./CmsPage');
+const CartModel = require('./cart');       // filename must be cart.js
+const WishlistModel = require('./Wishlist'); 
 
-// ⭐ ADD THIS — CART MODEL ⭐
-const CartModel = require('./cart');   // filename must be cart.js
 
 // initialize models
 const Admin = AdminModel(sequelize, DataTypes);
@@ -39,9 +39,10 @@ const User = UserModel(sequelize, DataTypes);
 const Order = OrderModel(sequelize, DataTypes);
 const Newsletter = NewsletterModel(sequelize, DataTypes);
 const CmsPage = CmsPageModel(sequelize, DataTypes);
-
-// ⭐ INITIALIZE CART MODEL ⭐
 const Cart = CartModel(sequelize, DataTypes);
+const Wishlist = WishlistModel(sequelize, DataTypes);
+
+
 
 // Gather models
 const models = {
@@ -53,7 +54,8 @@ const models = {
   Order,
   Newsletter,
   CmsPage,
-  Cart  // ⭐ ADD HERE
+  Cart,
+  Wishlist
 };
 
 // Debug log

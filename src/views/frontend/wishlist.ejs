@@ -1,159 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title><%= title %></title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "My Wishlist" %></title>
 
-  <!-- Bootstrap -->
+  <!-- Bootstrap + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
   <style>
-    body { background:#fafafa; }
-
-    .sidebar-card { border:1px solid #eee; border-radius:8px; padding:15px; background:#fff; }
-
-    .wishlist-img {
-      width:70px; height:70px; object-fit:cover; border-radius:6px;
-      border:1px solid #ddd;
-    }
-
-    .wishlist-card {
-      background:#fff;
-      border:1px solid #eee;
-      border-radius:8px;
-      padding:18px;
-      margin-bottom:12px;
-      box-shadow:0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .wishlist-card:hover { background:#f9f9f9; }
-
-    .remove-btn i { font-size:16px; }
+    /* concise wishlist styles */
+    .wishlist-table th, .wishlist-table td { vertical-align: middle; }
+    .product-thumb { width:72px; height:72px; object-fit:cover; border-radius:6px; }
+    .action-btns .btn { margin-left:6px; }
+    .account-panel { border:1px solid #eee; border-radius:8px; padding:16px; background:#fff; }
+    .account-panel a { display:block; padding:8px 0; color:#234d2f; text-decoration:none; }
+    .account-panel a.active { font-weight:600; }
+    @media (max-width: 768px){ .product-thumb{ width:56px; height:56px } }
   </style>
 </head>
-
 <body>
 
-  <!-- HEADER -->
+  <!-- header -->
   <%- include("layouts/header") %>
 
-  <div class="container my-5">
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="/" style="color:#000;text-decoration:none">
-            <i class="fa fa-home"></i> Home
-          </a>
-        </li>
-        <li class="breadcrumb-item active">Wishlist</li>
-      </ol>
-    </nav>
-
+  <div class="container py-4">
     <div class="row">
+      <!-- breadcrumb -->
+      <div class="col-12 mb-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb bg-transparent p-0 mb-0">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/account">Account</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Wishlist</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
 
-      <!-- Wishlist Items -->
-      <div class="col-md-9">
-
+    <div class="row g-4">
+      <!-- LEFT: wishlist content -->
+      <div class="col-lg-8">
         <h5 class="fw-bold mb-3">MY WISHLIST</h5>
 
-        <% if (products.length === 0) { %>
-
-          <div class="wishlist-card text-center py-5">
-            <i class="fa fa-heart-circle-xmark text-danger" style="font-size:45px;"></i>
-            <h5 class="mt-3">Your wishlist is empty</h5>
-            <a href="/" class="btn btn-success mt-3">Continue Shopping</a>
-          </div>
-
+        <% if (!wishlist || !Array.isArray(wishlist.items) || wishlist.items.length === 0) { %>
+          <div class="alert alert-info">You don't have any items in your wishlist.</div>
+          <a href="/" class="btn btn-success">Continue shopping</a>
         <% } else { %>
 
-          <% products.forEach(p => { %>
+          <div class="table-responsive">
+            <table class="table wishlist-table align-middle">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Model</th>
+                  <th>Stock</th>
+                  <th>Unit Price</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% wishlist.items.forEach(function(item){ %>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center gap-3">
+                        <img src="<%= item.imageUrl || '/images/no-image.png' %>" alt="<%= item.name %>" class="product-thumb">
+                        <div>
+                          <a href="/product/<%= item.slug || item.productId %>" class="fw-semibold"><%= item.name %></a>
+                          <% if (item.sku) { %><div class="small text-muted">SKU: <%= item.sku %></div><% } %>
+                        </div>
+                      </div>
+                    </td>
 
-            <div class="wishlist-card d-flex align-items-center justify-content-between">
+                    <td><%= item.model || item.model_no || '-' %></td>
 
-              <!-- Left: Image + Name -->
-              <div class="d-flex align-items-center">
+                    <td>
+                      <% if (typeof item.stock === 'number') { %>
+                        <%= item.stock > 0 ? item.stock : 'Out of stock' %>
+                      <% } else { %>
+                        -
+                      <% } %>
+                    </td>
 
-                <img src="<%= p.imageUrl %>" class="wishlist-img me-3">
+                    <td>AED <%= (Number(item.price) || 0).toFixed(2) %></td>
 
-                <div>
-                  <h6 class="fw-bold mb-1"><%= p.name %></h6>
-                  <p class="text-muted mb-1">Price: AED <%= p.price %></p>
-                  <a href="/product/<%= p.slug || p.id %>" class="btn btn-success btn-sm">
-                    <i class="fa fa-eye me-1"></i> View Product
-                  </a>
-                </div>
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center action-btns">
+                        <!-- Add to cart form -->
+                        <form action="/wishlist/add-to-cart" method="POST" style="display:inline-block;">
+                          <input type="hidden" name="productId" value="<%= item.productId %>">
+                          <input type="hidden" name="qty" value="1">
+                          <button class="btn btn-success btn-sm" title="Add to cart" <% if (item.stock <= 0) { %> disabled <% } %>>
+                            <i class="fas fa-shopping-cart"></i>
+                          </button>
+                        </form>
 
-              </div>
+                        <!-- Remove from wishlist -->
+                        <form action="/wishlist/remove" method="POST" style="display:inline-block; margin-left:6px;">
+                          <input type="hidden" name="productId" value="<%= item.productId %>">
+                          <button class="btn btn-outline-danger btn-sm" title="Remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
 
-              <!-- Right: Remove -->
-              <button 
-                class="btn btn-danger btn-sm remove-btn"
-                onclick="removeWishlist(<%= p.id %>)">
-                <i class="fa fa-trash"></i>
-              </button>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <a href="/" class="btn btn-secondary">Continue</a>
 
-            </div>
-
-          <% }) %>
-
+            <form action="/wishlist/clear" method="POST" onsubmit="return confirm('Remove all items from wishlist?');">
+              <button class="btn btn-outline-danger">Clear wishlist</button>
+            </form>
+          </div>
         <% } %>
-
       </div>
 
-      <!-- Sidebar -->
-      <div class="col-md-3">
+      <!-- RIGHT: account sidebar -->
+      <div class="col-lg-4">
+        <div class="account-panel">
+          <div class="d-flex align-items-center mb-3">
+            <i class="fas fa-user-circle fa-2x me-2"></i>
+            <div>
+              <div class="small-muted">ACCOUNT</div>
+              <div class="fw-semibold"><%= user && user.name ? user.name : 'My Account' %></div>
+            </div>
+          </div>
 
-        <div class="sidebar-card">
+          <hr>
 
-          <h6 class="fw-bold mb-3">
-            <i class="fa fa-user text-success me-2"></i> ACCOUNT SETTINGS
-          </h6>
+          <nav>
+            <a href="/account" class="<%= (activePage === 'account') ? 'active' : '' %>">Account</a>
+            <a href="/account/edit" class="<%= (activePage === 'edit') ? 'active' : '' %>">Edit Account</a>
+            <a href="/account/password" class="<%= (activePage === 'password') ? 'active' : '' %>">Password</a>
+            <a href="/account/preorder" class="<%= (activePage === 'preorder') ? 'active' : '' %>">Pre-Order</a>
+            <a href="/account/address" class="<%= (activePage === 'address') ? 'active' : '' %>">Address Book</a>
+          </nav>
 
-          <ul class="list-unstyled mb-3">
-            <li><a href="/account" class="d-block py-1">My Account</a></li>
-            <li><a href="/account/edit" class="d-block py-1">Edit Account</a></li>
-            <li><a href="/account/password" class="d-block py-1">Password</a></li>
-            <li><a href="/account/address" class="d-block py-1">Address Book</a></li>
-          </ul>
+          <hr>
 
-          <h6 class="fw-bold mt-4 mb-3">
-            <i class="fa fa-folder text-success me-2"></i> MY STUFF
-          </h6>
+          <div class="small text-muted mb-2">MY ORDERS</div>
+          <nav>
+            <a href="/account/orders">Order History</a>
+            <a href="/account/returns">Returns</a>
+            <a href="/account/transactions">Transactions</a>
+          </nav>
 
-          <ul class="list-unstyled mb-3">
-            <li><a href="/wishlist" class="d-block py-1">Wishlist</a></li>
-            <li><a href="/newsletter" class="d-block py-1">Newsletter</a></li>
-          </ul>
+          <hr>
 
+          <div class="small text-muted mb-2">MY STUFF</div>
+          <nav>
+            <a href="/account/wishlist" class="active">Wishlist</a>
+            <a href="/account/newsletter">Newsletter</a>
+          </nav>
+
+          <hr>
+
+          <a href="/logout" class="text-danger"><i class="fas fa-power-off me-1"></i> Logout</a>
         </div>
-
       </div>
-
     </div>
   </div>
 
+  <!-- footer -->
   <%- include("layouts/footer") %>
 
-  <script>
-    function removeWishlist(id) {
-      fetch('/wishlist/remove', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: id })
-      })
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          location.reload();
-        }
-      });
-    }
-  </script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

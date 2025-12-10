@@ -1,107 +1,74 @@
-// src/controllers/frontend/wishlistController.js
-const path = require('path');
-const fs = require('fs');
-const { Product } = require('../../models');
+const { Wishlist, Product } = require('../../models');
+const { getGuestId, ensureGuestId } = require('../../services/guestCookie');
 
-const webPrefix = '/uploads/products/';
-const publicPath = path.join(__dirname, '..', '..', 'public', 'uploads', 'products');
-const noImage = '/images/no-image.png';
+module.exports = {
+  // Show wishlist page
+  async index(req, res) {
+    const userId = req.user ? req.user.id.toString() : getGuestId(req);
 
-// Build safe image URL
-function makeImageUrl(prod) {
-  const img = prod && prod.image && String(prod.image).trim() ? String(prod.image).trim() : null;
-  const rel = img ? `${webPrefix}${img}` : noImage;
-  const fullFs = img ? path.join(publicPath, img) : null;
+    const items = await Wishlist.findAll({
+      where: { userId },
+      include: [{ model: Product, as: 'product' }]
+    });
 
-  if (fullFs && !fs.existsSync(fullFs)) {
-    console.warn(`Wishlist image missing for product ${prod.id}: ${fullFs}`);
-  }
-
-  return rel;
-}
-
-const wishlistController = {
-  // GET /wishlist
-  index: async (req, res) => {
-    try {
-      const wishlist = req.session.wishlist || [];
-      const ids = wishlist.map(i => Number(i.productId));
-
-      let products = [];
-
-      if (ids.length > 0) {
-        const found = await Product.findAll({ where: { id: ids } });
-        products = found.map(p => {
-          const plain = p.get ? p.get() : p;
-          plain.imageUrl = makeImageUrl(plain);
-          return plain;
-        });
-      }
-
-      return res.render('frontend/wishlist', {
-        layout: false,
-        title: 'My Wishlist - Saver Grocery',
-        products,
-        wishlist,
-        wishlistCount: wishlist.length
-      });
-    } catch (err) {
-      console.error('Wishlist Index Error:', err);
-      req.flash && req.flash('error_msg', 'Could not load wishlist');
-      return res.redirect('/');
-    }
+    res.render("frontend/wishlist", {
+      title: "My Wishlist",
+      wishlist: { items },
+      user: req.user,
+      activePage: "wishlist"
+    });
   },
 
-  // POST /wishlist/add
-  add: (req, res) => {
-    try {
-      const productId = Number(req.body.productId);
+  // Add item to wishlist
+  async add(req, res) {
+    ensureGuestId(req, res);
 
-      if (!productId) {
-        return res.json({ success: false, message: 'Invalid product' });
-      }
+    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+    const { productId } = req.body;
 
-      req.session.wishlist = req.session.wishlist || [];
+    await Wishlist.findOrCreate({
+      where: { userId, productId },
+      defaults: { qty: 1 }
+    });
 
-      const exists = req.session.wishlist.some(
-        (item) => Number(item.productId) === productId
-      );
-
-      if (!exists) {
-        req.session.wishlist.push({ productId });
-      }
-
-      return res.json({
-        success: true,
-        message: 'Added to wishlist',
-        count: req.session.wishlist.length
-      });
-    } catch (err) {
-      console.error('Wishlist Add Error:', err);
-      return res.json({ success: false, message: 'Could not add to wishlist' });
-    }
+    res.redirect("/frontend/wishlist");
   },
 
-  // POST /wishlist/remove
-  remove: (req, res) => {
-    try {
-      const productId = Number(req.body.productId);
-      req.session.wishlist = req.session.wishlist || [];
+  // Remove item
+  async remove(req, res) {
+    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+    const { productId } = req.body;
 
-      req.session.wishlist = req.session.wishlist.filter(
-        (item) => Number(item.productId) !== productId
-      );
+    await Wishlist.destroy({ where: { userId, productId } });
 
-      return res.json({
-        success: true,
-        message: 'Removed from wishlist',
-        count: req.session.wishlist.length
-      });
-    } catch (err) {
-      console.error('Wishlist Remove Error:', err);
-      return res.json({ success: false, message: 'Could not remove from wishlist' });
-    }
+    res.redirect("/frontend/wishlist");
+  },
+
+  // Clear all wishlist items
+  async clear(req, res) {
+    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+
+    await Wishlist.destroy({ where: { userId } });
+
+    res.redirect("/frontend/wishlist");
+  },
+
+  // Add item to cart and remove from wishlist
+  async addToCart(req, res) {
+    const { Cart } = require('../../models');
+
+    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+    const { productId } = req.body;
+
+    // Add item to cart
+    await Cart.findOrCreate({
+      where: { userId, productId },
+      defaults: { qty: 1 }
+    });
+
+    // remove from wishlist
+    await Wishlist.destroy({ where: { userId, productId } });
+
+    res.redirect("/cart");
   }
 };
-
-module.exports = wishlistController;

@@ -17,7 +17,6 @@ function makeImageUrl(prod) {
   if (fullFs && !fs.existsSync(fullFs)) {
     console.warn(`Product image missing on disk for product ${prod.id}: ${fullFs}`);
   }
-
   return rel;
 }
 
