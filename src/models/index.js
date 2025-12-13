@@ -42,8 +42,6 @@ const CmsPage = CmsPageModel(sequelize, DataTypes);
 const Cart = CartModel(sequelize, DataTypes);
 const Wishlist = WishlistModel(sequelize, DataTypes);
 
-
-
 // Gather models
 const models = {
   Admin,
@@ -74,11 +72,12 @@ Object.keys(models).forEach((name) => {
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
+    console.log('\x1b[32m%s\x1b[0m','🚀Database connection has been established successfully🚀.');
 
     // auto-create table if missing
     await sequelize.sync();
-    console.log('Database synchronized successfully.');
+    console.log('\x1b[32m%s\x1b[0m','🚀🚀 Database synchronized successfully 🚀🚀');
+
 
   } catch (error) {
     console.error('Unable to connect to the database:', error);

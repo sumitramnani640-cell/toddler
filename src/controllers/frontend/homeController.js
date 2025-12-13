@@ -18,11 +18,6 @@ const productAttrs = [
 
 const categoryAttrs = ['id', 'name', 'slug', 'image', 'banner_image', 'updatedAt'];
 
-/**
- * Determine cartCount:
- *  - If user logged in and Cart model exists, sum qty from DB rows
- *  - Else fall back to session cart shapes
- */
 async function getCartCount(req) {
   try {
     const userId = req.session?.user?.id ?? req.user?.id ?? null;

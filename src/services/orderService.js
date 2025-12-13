@@ -3,7 +3,6 @@ const { sequelize, Order } = require('../models');
 
 const MIN_ORDER = 150.00;
 const VAT_RATE = 0.05;
-// default screenshot (your uploaded file path)
 const DEFAULT_SCREENSHOT = '/mnt/data/fbe2401d-05a7-4220-a8c8-21fb58f14ed2.png';
 
 async function createOrder({ userId = null, items = [], delivery = 0, screenshotUrl = null }) {
@@ -26,14 +25,12 @@ async function createOrder({ userId = null, items = [], delivery = 0, screenshot
 
   const t = await sequelize.transaction();
   try {
-    // If DB doesn't support JSON, convert to string; model uses JSON if available.
     const itemsToStore = items;
 
     const order = await Order.create({
       userId,
       totalAmount: total,
       status: 'pending',
-      items: itemsToStore, // stored as JSON (or TEXT if model changed)
       screenshotUrl: screenshotUrl || DEFAULT_SCREENSHOT
     }, { transaction: t });
 
