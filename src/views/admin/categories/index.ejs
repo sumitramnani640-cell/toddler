@@ -42,7 +42,7 @@
                                           <td>
                                             <span>
                                                 <% if (category.image) { %>
-                                                    <img src="/uploads/<%= category.image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
+                                                    <img src="<%= category.image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
                                                 <% } else { %>
                                                     <span class="text-muted">No image</span>
                                                 <% } %>
@@ -51,7 +51,7 @@
                                         <td>
                                             <span>
                                                 <% if (category.banner_image) { %>
-                                                    <img src="/uploads/<%= category.banner_image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
+                                                    <img src="<%= category.banner_image %>" alt="<%= category.name %>" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
                                                 <% } else { %>
                                                     <span class="text-muted">No image</span>
                                                 <% } %>

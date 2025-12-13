@@ -1,4 +1,3 @@
-// src/services/emailService.js
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
@@ -6,17 +5,14 @@ const FROM = process.env.FROM_EMAIL || `"Saver Grocery" <${process.env.GMAIL_USE
 const gmailUser = process.env.GMAIL_USER;
 const gmailPass = process.env.GMAIL_APP_PASSWORD && process.env.GMAIL_APP_PASSWORD.replace(/\s/g, '');
 
-// Optional generic SMTP envs (kept for flexibility)
 const smtpHost = process.env.SMTP_HOST;
 const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
 const smtpUser = process.env.SMTP_USER;
 const smtpPass = process.env.SMTP_PASS;
 const smtpSecure = process.env.SMTP_SECURE === 'true';
 
-let transporterPromise = null;
-
+let transporterPromise = null;      
 async function createTransporter() {
-  // 1) Try Gmail App Password first (recommended)
   if (gmailUser && gmailPass) {
     try {
       console.log('[MAIL] Attempting Gmail SMTP using GMAIL_USER + GMAIL_APP_PASSWORD');
@@ -30,13 +26,11 @@ async function createTransporter() {
     } catch (err) {
       console.error('[MAIL] Gmail SMTP verify failed:', err && err.message ? err.message : err);
       console.error('[MAIL] Falling back to other SMTP options.');
-      // continue to try other options
     }
   } else {
     console.log('[MAIL] GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping Gmail config.');
   }
 
-  // 2) Try generic SMTP settings (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS)
   if (smtpHost && smtpPort && smtpUser && smtpPass) {
     try {
       console.log('[MAIL] Attempting generic SMTP using SMTP_* env variables');
@@ -58,7 +52,6 @@ async function createTransporter() {
     console.log('[MAIL] SMTP_* envs not fully set — skipping generic SMTP.');
   }
 
-  // 3) Ethereal fallback (development/testing)
   try {
     console.log('[MAIL] No SMTP configured → using Ethereal test mailbox');
     const testAccount = await nodemailer.createTestAccount();
@@ -73,10 +66,9 @@ async function createTransporter() {
   } catch (err) {
     console.error('[MAIL] Failed to create Ethereal test account:', err);
     throw err;
-  }
+0  }
 }
 
-// single shared promise so we create transporter once
 function getTransporterPromise() {
   if (!transporterPromise) transporterPromise = createTransporter();
   return transporterPromise;
@@ -123,6 +115,5 @@ async function sendOtpEmail({ to, otp, purpose = 'otp' }) {
 
 module.exports = {
   sendOtpEmail,
-  // expose for debugging if you need lower-level access
   sendMail
 };
