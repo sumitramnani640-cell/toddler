@@ -1,4 +1,126 @@
+<style>
 
+/* Table base */
+.table {
+  vertical-align: middle;
+}
+
+.table thead th {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #f4f6f9;
+  color: #333;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f7f7f7;
+}
+
+/* Avatar + name */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #0d6efd;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #222;
+}
+
+/* Email & phone */
+.table td {
+  font-size: 14px;
+}
+
+.table td small,
+.table td .text-muted {
+  font-size: 13px;
+}
+
+/* Status badge */
+.badge-status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.badge-active {
+  background: #28a745;
+  color: #fff;
+}
+
+.badge-inactive {
+  background: #6c757d;
+  color: #fff;
+}
+
+/* Joined date */
+.joined-date {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.action-buttons .btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.btn-view {
+  background: #17a2b8;
+  color: #fff;
+}
+
+.btn-view:hover {
+  background: #138496;
+}
+
+.btn-edit {
+  background: #ffc107;
+  color: #000;
+}
+
+.btn-edit:hover {
+  background: #e0a800;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+</style>
 <div class="row">
     <div class="col-12">
         <div class="card">
