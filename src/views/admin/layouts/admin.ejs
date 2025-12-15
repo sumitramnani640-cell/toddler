@@ -18,48 +18,301 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit@3.24.5/build/jodit.min.css" />
 
     <style>
-        /* your design styles (unchanged) */
-        * { transition: all 0.3s ease; }
-        .content-wrapper {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-        }
-        .main-sidebar {
-            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        .nav-sidebar .nav-link { border-radius: 8px; margin: 5px 10px; }
-        .nav-sidebar .nav-link:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transform: translateX(5px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-        .nav-sidebar .nav-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-        .brand-link {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 15px;
-            border-bottom: 3px solid rgba(255,255,255,0.2);
-        }
-        .brand-text { font-weight: 700; font-size: 1.3rem; color: #fff !important; }
-        .main-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .navbar-nav .nav-link { color: #fff !important; font-weight: 500; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-        }
-        .main-footer {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: #fff;
-            padding: 20px;
-        }
-    </style>
+  /* ================= GLOBAL ================= */
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.content-wrapper {
+  background: #f6f9f7;
+}
+
+/* ================= NAVBAR ================= */
+.main-header {
+  background: linear-gradient(135deg, #0b662e, #087030);
+  border-bottom: none;
+}
+
+.main-header .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.main-header .nav-link:hover {
+  opacity: 0.9;
+}
+
+/* ================= SIDEBAR ================= */
+.main-sidebar {
+  background: #ffffff !important;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link {
+  color: #444;
+  margin: 6px 12px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link:hover {
+  background: #eaf5ee;
+  color: #0b662e;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+  background: linear-gradient(135deg, #0b662e, #087030);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(11,102,46,0.35);
+}
+
+/* ================= DASHBOARD STAT CARDS ================= */
+.small-box {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.small-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+}
+
+/* Number */
+.small-box h3 {
+  font-size: 38px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+/* Label text */
+.small-box p {
+  font-size: 15px;
+  opacity: 0.95;
+}
+
+/* Icon */
+.small-box .icon {
+  font-size: 72px;
+  opacity: 0.2;
+  top: 18px;
+  right: 20px;
+}
+
+/* Footer */
+.small-box-footer {
+  background: rgba(0,0,0,0.08);
+  font-weight: 600;
+  padding: 10px 0;
+  transition: background 0.3s ease;
+}
+
+.small-box-footer:hover {
+  background: rgba(0,0,0,0.15);
+}
+
+/* ================= COLOR THEMES ================= */
+
+/* Products */
+.bg-info {
+  background: linear-gradient(135deg, #f17c7c, #f7a2a2) !important;
+  
+}
+
+/* Categories (Primary Grocery Green) */
+.bg-success {
+  background: linear-gradient(135deg, #95ecb6, #2a6d42) !important;
+}
+
+/* Customers */
+.bg-warning {
+  background: linear-gradient(135deg, #afe0ec, #02566b) !important;
+  color: #000 !important;
+}
+
+/* Banners */
+.bg-danger {
+  background: linear-gradient(135deg, #b897ec, #582c9e) !important;
+}
+
+/* CMS */
+.bg-teal {
+  background: linear-gradient(135deg, #e8f0a3, #adc004) !important;
+}
+
+/* Newsletter */
+.bg-purple {
+  background: linear-gradient(135deg, #e8f0a3, #adc004) !important;
+}
+
+/* Orders */
+.bg-orange {
+  background: linear-gradient(135deg, #b3e0f1, #10a585) !important;
+}
+
+/* ================= ICON COLOR FIX ================= */
+.small-box .icon i {
+  color: rgba(255,255,255,0.9);
+}
+
+
+/* Sidebar Icons */
+.nav-sidebar .nav-icon {
+  color: inherit;
+}
+
+/* ================= BRAND LOGO ================= */
+.brand-link {
+  background: #fff !important;
+  border-bottom: 1px solid #eee;
+}
+
+.brand-logo {
+  background: #fff;
+  border-radius: 8px;
+}
+
+.brand-text {
+  color: #0b662e !important;
+  font-weight: 700;
+}
+
+/* ================= PAGE HEADER ================= */
+.content-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* ================= CARDS ================= */
+.card {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.card-header {
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+}
+
+.card-title {
+  color: #0b662e;
+}
+
+/* ================= BUTTONS ================= */
+.btn-primary {
+  background: linear-gradient(135deg, #0b662e, #087030);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #087030;
+}
+
+.btn-success {
+  background: #0b662e;
+  border: none;
+}
+
+.btn-danger {
+  background: #d63031;
+  border: none;
+}
+
+.btn-sm {
+  border-radius: 6px;
+}
+
+/* ================= TABLE ================= */
+.table {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f0f5f2;
+  font-weight: 600;
+  border: none;
+}
+
+.table td {
+  vertical-align: middle;
+  border-color: #eee;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background: #fafcfa;
+}
+
+/* ================= IMAGES ================= */
+.table img,
+.img-thumbnail {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* ================= FORMS ================= */
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.form-control:focus {
+  border-color: #0b662e;
+  box-shadow: 0 0 0 0.15rem rgba(11,102,46,0.25);
+}
+
+/* ================= BADGES ================= */
+.badge-success {
+  background: #0b662e;
+}
+
+.badge-warning {
+  background: #f1c40f;
+  color: #000;
+}
+
+.badge-danger {
+  background: #e74c3c;
+}
+
+/* ================= FOOTER ================= */
+.main-footer {
+  background: #ffffff;
+  border-top: 1px solid #eee;
+  color: #666;
+  font-size: 14px;
+}
+
+/* ================= DROPDOWN ================= */
+.dropdown-menu {
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* ================= JODIT EDITOR ================= */
+.jodit-container {
+  border-radius: 12px;
+  border-color: #ddd;
+}
+
+/* ================= ALERTS ================= */
+.alert {
+  border-radius: 10px;
+}
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+}
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+</style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -94,11 +347,69 @@
         </nav>
 
         <!-- Sidebar -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="/admin/dashboard" class="brand-link">
-                <img src="/assets/logo.png" alt="Logo" style="opacity:.8;">
-                <span class="brand-text font-weight-light"></span>
-            </a>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <a href="/admin/dashboard" class="brand-link">
+    <img src="/assets/logo.png" alt="Savers Grocery Logo" class="brand-logo">
+    <span class="brand-text">Savers Grocery</span>
+  </a>
+
+<style>
+/* ===== Sidebar Wrapper ===== */
+.main-sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #2f3e4e;
+}
+
+/* ===== Brand Link ===== */
+.main-sidebar .brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  background: linear-gradient(135deg, #6f72d9, #7d4fa1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Logo Image ===== */
+.main-sidebar .brand-logo {
+  width: 44px;
+  max-height: 44px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  padding: 4px;
+}
+
+/* ===== Brand Text ===== */
+.main-sidebar .brand-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+/* ===== Hover Effect ===== */
+.main-sidebar .brand-link:hover {
+  background: linear-gradient(135deg, #7a7df0, #8a5bbf);
+}
+
+/* ===== Collapsed Sidebar Support (Optional) ===== */
+.sidebar-collapse .main-sidebar {
+  width: 80px;
+}
+
+.sidebar-collapse .brand-text {
+  display: none;
+}
+
+.sidebar-collapse .brand-logo {
+  margin: 0 auto;
+}
+</style>
+
 
             <div class="sidebar">
                 <nav class="mt-2">
@@ -109,7 +420,7 @@
                         <li class="nav-item"><a href="/admin/banners" class="nav-link"><i class="nav-icon fas fa-images"></i> <p>Banners</p></a></li>
                         <li class="nav-item"><a href="/admin/customers" class="nav-link"><i class="nav-icon fas fa-users"></i> <p>Customers</p></a></li>
                         <li class="nav-item"><a href="/admin/orders" class="nav-link"><i class="nav-icon fas fa-shopping-cart"></i> <p>Orders</p></a></li>
-                        <li class="nav-item"><a href="/admin/newsletters" class="nav-link"><i class="nav-icon fas fa-envelope"></i> <p>Newsletters</p></a></li>
+                        <li class="nav-item"><a href="/admin/newsletter" class="nav-link"><i class="nav-icon fas fa-envelope"></i> <p>Newsletters</p></a></li>
 
                         <!-- NEW CMS -->
                         <li class="nav-item">
@@ -138,9 +449,221 @@
         </div>
 
         <!-- Footer -->
-        <footer class="main-footer text-center">
-            <strong>© 2024 Savers Grocery</strong> All rights reserved.
-        </footer>
+       <style>
+/* ===== FOOTER MAIN WRAPPER ===== */
+footer {
+  background: #fff;
+  padding: 40px 0 0 0;
+  border-top: 1px solid #e5e5e5;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: #333;
+}
+
+/* ===== TOP BAR ICON STRIP ===== */
+.footer-icons-strip {
+  background: #f8f8f8;
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.footer-icons-strip .icon-box {
+  text-align: center;
+  flex: 1;
+}
+
+.footer-icons-strip i {
+  font-size: 30px;
+  color: #0b662e;
+  margin-bottom: 8px;
+}
+
+.footer-icons-strip p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.footer-icons-strip span {
+  font-size: 13px;
+  color: #777;
+}
+
+/* ===== MAIN FOOTER CONTENT ===== */
+.footer-main {
+  padding: 40px 0;
+}
+
+.footer-logo {
+  width: 180px;
+  margin-bottom: 15px;
+}
+
+.footer-about {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Contact icons */
+.footer-contact i {
+  color: #0b662e;
+  margin-right: 8px;
+}
+
+/* Links */
+.footer-links a {
+  display: block;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: #0b662e;
+  text-decoration: underline;
+}
+
+/* Newsletter */
+.newsletter-box input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.newsletter-box button {
+  background: #0b662e;
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 4px;
+}
+
+.app-btn-img {
+  height: 38px;
+  margin-right: 6px;
+}
+
+/* ===== COPYRIGHT BAR ===== */
+.footer-bottom {
+  background: #087030;
+  color: #fff;
+  text-align: center;
+  padding: 15px 0;
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+.footer-social i {
+  color: #fff;
+  margin: 0 6px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.footer-social i:hover {
+  opacity: .8;
+}
+</style>
+
+<footer>
+
+ 
+  <!-- MAIN FOOTER -->
+  <div class="container footer-main">
+    <div class="row">
+
+     
+
+
+    </div>
+  </div>
+
+  <!-- COPYRIGHT BAR -->
+  <div class="footer-bottom">
+    <div class="footer-social mb-2">
+      <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+    </div>
+
+    Copyright © 2025 SAVER GROCERY FOOD STUFF TRADING L.L.C.
+    All rights reserved.
+  </div>
+
+</footer>
+
+<script>
+  // ===== AJAX NEWSLETTER SUBMIT =====
+  (function () {
+    const form = document.getElementById('newsletterForm');
+    const emailInput = document.getElementById('newsletterEmail');
+    const alertBox = document.getElementById('newsletterAlert');
+
+    if (!form || !emailInput || !alertBox) return;
+
+    function showAlert(message, type) {
+      alertBox.style.display = 'block';
+      alertBox.className = 'alert mb-2 alert-' + (type === 'error' ? 'danger' : 'success');
+      alertBox.textContent = message;
+      setTimeout(() => {
+        alertBox.style.display = 'none';
+      }, 4000);
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const email = emailInput.value.trim();
+      if (!email) {
+        showAlert('Please enter your email address.', 'error');
+        return;
+      }
+
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin'
+      })
+        .then(res => {
+          if (res.ok) {
+            showAlert('Subscribed successfully!', 'success');
+            form.reset();
+          } else {
+            showAlert('Something went wrong. Please try again.', 'error');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showAlert('Unable to subscribe at the moment.', 'error');
+        });
+    });
+  })();
+</script>
+
+<script>
+  // ===== AJAX WISHLIST COUNT =====
+  (function () {
+    const counter = document.getElementById('wishlistCount');
+    if (!counter) return;
+
+    fetch('/api/wishlist/count', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data.count === 'number') {
+          counter.textContent = '(' + data.count + ')';
+        }
+      })
+      .catch(() => {
+        // silently fail, keep default (0)
+      });
+  })();
+</script>
+
 
     </div>
 
