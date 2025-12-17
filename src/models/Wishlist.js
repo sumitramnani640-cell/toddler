@@ -8,8 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     productId: {
       type: DataTypes.INTEGER,
       allowNull: false
-    },
-
+    }
   }, {
     tableName: 'wishlists',
     indexes: [

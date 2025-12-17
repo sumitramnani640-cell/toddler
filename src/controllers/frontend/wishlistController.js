@@ -1,74 +1,110 @@
-const { Wishlist, Product } = require('../../models');
-const { getGuestId, ensureGuestId } = require('../../services/guestCookie');
+const { Wishlist, Product, Cart } = require('../../models');
+
+/**
+ * Require frontend login (session-based)
+ */
+function requireLogin(req) {
+  if (!req.session || !req.session.user || !req.session.user.id) {
+    return null;
+  }
+  return String(req.session.user.id);
+}
 
 module.exports = {
+
+  // =========================
   // Show wishlist page
+  // =========================
   async index(req, res) {
-    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+    const userId = requireLogin(req);
+    if (!userId) return res.redirect('/login');
 
     const items = await Wishlist.findAll({
       where: { userId },
-      include: [{ model: Product, as: 'product' }]
+      include: [{ model: Product, as: 'product' }],
+      order: [['createdAt', 'DESC']]
     });
 
-    res.render("frontend/wishlist", {
-      title: "My Wishlist",
+    return res.render('frontend/wishlist', {
+      title: 'My Wishlist',
       wishlist: { items },
-      user: req.user,
-      activePage: "wishlist"
+      user: req.session.user,
+      activePage: 'wishlist'
     });
   },
 
+  // =========================
   // Add item to wishlist
+  // =========================
   async add(req, res) {
-    ensureGuestId(req, res);
+    const userId = requireLogin(req);
+    if (!userId) return res.redirect('/login');
 
-    const userId = req.user ? req.user.id.toString() : getGuestId(req);
-    const { productId } = req.body;
+    const productId = Number(req.body.productId);
+    if (!productId) return res.redirect('back');
 
-    await Wishlist.findOrCreate({
-      where: { userId, productId },
-      defaults: { qty: 1 }
+    const [row, created] = await Wishlist.findOrCreate({
+      where: { userId, productId }
     });
 
-    res.redirect("/frontend/wishlist");
+    const referer = req.get('referer') || '/';
+
+    // pass flag for SweetAlert popup
+    return res.redirect(
+      `${referer}${referer.includes('?') ? '&' : '?'}wishlist=${created ? 'added' : 'exists'}`
+    );
   },
 
-  // Remove item
+  // =========================
+  // Remove item from wishlist
+  // =========================
   async remove(req, res) {
-    const userId = req.user ? req.user.id.toString() : getGuestId(req);
-    const { productId } = req.body;
+    const userId = requireLogin(req);
+    if (!userId) return res.redirect('/login');
 
-    await Wishlist.destroy({ where: { userId, productId } });
+    const productId = Number(req.body.productId);
+    if (!productId) return res.redirect('/wishlist');
 
-    res.redirect("/frontend/wishlist");
+    await Wishlist.destroy({
+      where: { userId, productId }
+    });
+
+    return res.redirect('/wishlist');
   },
 
-  // Clear all wishlist items
+  // =========================
+  // Clear wishlist
+  // =========================
   async clear(req, res) {
-    const userId = req.user ? req.user.id.toString() : getGuestId(req);
+    const userId = requireLogin(req);
+    if (!userId) return res.redirect('/login');
 
-    await Wishlist.destroy({ where: { userId } });
+    await Wishlist.destroy({
+      where: { userId }
+    });
 
-    res.redirect("/frontend/wishlist");
+    return res.redirect('/wishlist');
   },
 
-  // Add item to cart and remove from wishlist
+  // =========================
+  // Add to cart & remove from wishlist
+  // =========================
   async addToCart(req, res) {
-    const { Cart } = require('../../models');
+    const userId = requireLogin(req);
+    if (!userId) return res.redirect('/login');
 
-    const userId = req.user ? req.user.id.toString() : getGuestId(req);
-    const { productId } = req.body;
+    const productId = Number(req.body.productId);
+    if (!productId) return res.redirect('/wishlist');
 
-    // Add item to cart
     await Cart.findOrCreate({
       where: { userId, productId },
       defaults: { qty: 1 }
     });
 
-    // remove from wishlist
-    await Wishlist.destroy({ where: { userId, productId } });
+    await Wishlist.destroy({
+      where: { userId, productId }
+    });
 
-    res.redirect("/cart");
+    return res.redirect('/cart');
   }
 };

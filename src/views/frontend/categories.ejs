@@ -38,6 +38,45 @@
       background: #fff;
     }
 
+  
+.product-card {
+  position: relative; /* important */
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Cart button bottom-left */
+.cart-btn-left {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+}
+
+.cart-btn-left .btn {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+.wishlist-circle {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wishlist-circle i {
+  font-size: 14px;
+}
+
+/* optional hover effect */
+.wishlist-circle:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+
     /* keep the existing inline tweaks */
     .top-bar, .sub-bar { background-color: #2f8a4a; }
     .main-header .btn-success { background-color: #198754; border-color: #198754; }
@@ -78,7 +117,7 @@
 
             <% if (typeof categories !== 'undefined') { %>
               <% categories.forEach(cat => { %>
-                <a href="/shop/<%= cat.slug %>" class="list-group-item list-group-item-action d-flex align-items-center">
+                <a href="/category/<%= cat.slug %>" class="list-group-item list-group-item-action d-flex align-items-center">
                   <span class="flex-fill"><%= cat.name %></span>
                 </a>
               <% }) %>
@@ -146,25 +185,24 @@
                 ₹<%= Number(product.price || 0).toFixed(2) %>
               </p>
 
-              <!-- 🟢 Add to Cart button (does NOT trigger card link) -->
-               <div class="d-flex align-items-center justify-content-end gap-5 mt-2">
-            <!-- ADD BUTTON -->
-            <form action="/cart/add" method="POST" class="d-inline">
-               <input type="hidden" name="productId" value="<%= product.id %>">
-               <button type="submit" 
-             class="btn btn-success btn-sm px-3 py-2 d-flex align-items-center">
-      <i class="fas fa-cart-plus me-2"></i>
-      Add
+              <div class="d-flex align-items-center justify-content-end gap-5 mt-2">
+  <!-- ADD BUTTON -->
+  <form action="/cart/add" method="POST" class="cart-btn-left">
+    <input type="hidden" name="productId" value="<%= product.id %>">
+    <button type="submit" class="btn btn-success btn-sm">
+   <i class="fa-solid fa-cart-shopping"></i> Cart
     </button>
   </form>
 
   <!-- WISHLIST BUTTON -->
-  <button class="btn btn-outline-dark btn-sm px-3 py-2 d-flex align-items-center">
-    <i class="fas fa-heart me-2" style="font-size:14px;"></i>
-    Wishlist
-  </button>
-</div>
+<form action="/wishlist/add" method="POST" class="d-inline">
+    <input type="hidden" name="productId" value="<%= product.id %>">
 
+     <button class="btn btn-outline-danger btn-sm">
+                      <i class="far fa-heart"></i>
+                    </button>
+  </form>
+</div>
             </div>
           </div>
 
@@ -208,7 +246,7 @@
         <li class="py-2"><strong><i class="fas fa-angle-right me-2"></i><%= category && category.name ? category.name : 'Category' %></strong></li>
         <% if (typeof categories !== 'undefined') { %>
           <% categories.forEach(cat => { %>
-            <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
+            <li><a href="/category/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
           <% }) %>
         <% } %>
       </ul>
@@ -226,7 +264,7 @@
         <li><a href="/" class="d-block py-2 text-dark">Home</a></li>
         <% if (typeof categories !== 'undefined') { %>
           <% categories.forEach(cat => { %>
-            <li><a href="/shop/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
+            <li><a href="/category/<%= cat.slug %>" class="d-block py-2 text-dark"><%= cat.name %></a></li>
           <% }) %>
         <% } %>
       </ul>
@@ -235,31 +273,66 @@
 
 <%- include("layouts/footer") %>
 
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    // Set cart count from server-provided local (if available) or fallback to localStorage
-    (function() {
-      // server can set: res.locals.cartCount = <number>
-      var serverCartCount = <%= typeof cartCount !== 'undefined' ? Number(cartCount) : 'null'%>;
-      var badge = document.getElementById('cart-count');
+<script>
+/* ================= CART COUNT ================= */
+(function () {
+  const badge = document.getElementById('cart-count');
+  if (!badge) return;
 
-      if (serverCartCount !== null) {
-        badge.textContent = serverCartCount;
-      } else {
-        try {
-          var stored = localStorage.getItem('cart');
-          if (stored) {
-            var cart = JSON.parse(stored);
-            var total = Array.isArray(cart) ? cart.reduce(function(s, it){ return s + (Number(it.quantity || 0)); }, 0) : 0;
-            badge.textContent = total;
-          }
-        } catch (e) {
-          // ignore JSON errors
-        }
-      }
-    })();
-  </script>
+  // value from server (preferred)
+  const serverCartCount = <%= typeof cartCount !== 'undefined' ? Number(cartCount) : 'null' %>;
+
+  if (serverCartCount !== null && !isNaN(serverCartCount)) {
+    badge.textContent = serverCartCount;
+    return;
+  }
+
+  // fallback: localStorage cart
+  try {
+    const stored = localStorage.getItem('cart');
+    if (!stored) return;
+
+    const cart = JSON.parse(stored);
+    const total = Array.isArray(cart)
+      ? cart.reduce((sum, it) => sum + Number(it.quantity || 0), 0)
+      : 0;
+
+    badge.textContent = total;
+  } catch (e) {
+    console.warn('Cart count error:', e);
+  }
+})();
+
+/* ================= WISHLIST SWEETALERT ================= */
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get('wishlist');
+
+  if (status !== 'added' && status !== 'exists') return;
+
+  Swal.fire({
+    title: status === 'added' ? 'Added to Wishlist' : 'Already in Wishlist',
+    text: status === 'added'
+      ? 'Your item was added to your wishlist.'
+      : 'This item is already in your wishlist.',
+    icon: status === 'added' ? 'success' : 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Go to Wishlist',
+    cancelButtonText: 'Continue Shopping',
+    reverseButtons: true
+  }).then(result => {
+    if (result.isConfirmed) {
+      window.location.href = '/wishlist';
+    }
+  });
+
+  // ✅ remove ?wishlist=added / exists from URL
+  window.history.replaceState({}, document.title, window.location.pathname);
+})();
+</script>
+
 </body>
 </html>

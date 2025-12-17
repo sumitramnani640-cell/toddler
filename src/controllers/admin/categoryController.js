@@ -5,9 +5,7 @@ const multer = require("multer");
 const { Category, Product } = require("../../models");
 const { Op } = require("sequelize");
 
-/* ---------------------------------------------
-   UPLOAD FOLDERS
---------------------------------------------- */
+/*UPLOAD FOLDERS*/
 const categoryDir = path.join(process.cwd(), "public", "uploads", "categories");
 const bannerDir = path.join(process.cwd(), "public", "uploads", "banner_image");
 
