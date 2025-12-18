@@ -183,7 +183,7 @@
  <form action="/cart/add" method="POST" class="cart-btn-left">
     <input type="hidden" name="productId" value="<%= product.id %>">
     <button type="submit" class="btn btn-success btn-sm">
-     <i class="fa-solid fa-cart-shopping"></i> Cart
+     <i class="fa-solid fa-cart-shopping"></i> Add To Cart 
     </button>
   </form>
 
@@ -196,7 +196,7 @@
   </button>
 </form>
 </div>
- </a>
+              </a>
                 </div>
               <% }) %>
             </div>
@@ -235,7 +235,7 @@
                   <form action="/cart/add" method="POST" class="flex-fill">
                     <input type="hidden" name="productId" value="<%= prod.id %>">
                     <button class="btn btn-success btn-sm w-100" <%= prod.stock <= 0 ? 'disabled' : '' %>>
-                      <i class="fas fa-cart-plus me-1"></i> Cart
+                      <i class="fas fa-cart-plus me-1"></i>Add To Cart
                     </button>
                   </form>
 
