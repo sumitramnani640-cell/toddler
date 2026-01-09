@@ -86,19 +86,7 @@ public/uploads/*
 .DS_Store
 Thumbs.db
 
-.png
-.jpg
-*.jpeg
-.gif    
-*.bmp
-*.tiff
-.ico
-*.svg
-# Archives
-*.zip
-*.tar.gz
-*.rar
-*.7z
+
 
 
 
